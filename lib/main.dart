@@ -10,8 +10,6 @@ import 'screens/splash_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
-  // NotificationService burdan kalktı, Splash'e gitti.
-  // Wakelock burdan kalktı, Splash'e gitti.
 
   runApp(
     EasyLocalization(
