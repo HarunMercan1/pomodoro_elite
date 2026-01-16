@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class TimeOptionButton extends StatelessWidget {
   final String title;
@@ -47,7 +48,8 @@ class TimeOptionButton extends StatelessWidget {
           ? (activeTextColor ?? darkNavy)
           : Colors.white.withOpacity(0.9);
 
-      borderColor = isSelected ? Colors.transparent : Colors.white.withOpacity(0.2);
+      borderColor =
+          isSelected ? Colors.transparent : Colors.white.withOpacity(0.2);
     }
 
     return GestureDetector(
@@ -64,12 +66,12 @@ class TimeOptionButton extends StatelessWidget {
           ),
           boxShadow: isSelected
               ? [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            )
-          ]
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  )
+                ]
               : [],
         ),
         child: FittedBox(
@@ -88,7 +90,7 @@ class TimeOptionButton extends StatelessWidget {
                 ),
               ),
               Text(
-                "$minutes dk",
+                "$minutes ${'minutes_label'.tr().toLowerCase()}",
                 style: TextStyle(
                   fontFamily: 'Poppins',
                   fontSize: 10,

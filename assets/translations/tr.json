@@ -23,7 +23,6 @@
   "enable_music": "Arka Plan Müziği",
   "notification_sound": "BİLDİRİM SESİ",
   "music_lock_msg": "Müzik değiştirmek için sayacı durdurun.",
-
   "stats_title": "İstatistikler",
   "total_focus": "Toplam Odaklanma",
   "total_sessions": "Toplam Oturum",
@@ -36,13 +35,11 @@
   "minutes_label": "Dakika",
   "daily_streak": "Günlük Seri",
   "day_label": "Gün",
-
   "sound_zil1": "Zil 1",
   "sound_zil2": "Zil 2",
   "sound_zil3": "Zil 3",
   "sound_zil4": "Zil 4",
   "sound_zil5": "Zil 5",
-
   "sound_forest": "Orman",
   "sound_ocean": "Okyanus",
   "sound_rain1": "Çiseleyen Yağmur",
@@ -52,7 +49,6 @@
   "sound_wind": "Rüzgar",
   "keep_streak": "Zinciri kırma!",
   "change_lock_msg": "Süreleri değiştirmek için sayacı durdurun.",
-
   "quote_1": "Bin kilometrelik yolculuk tek bir adımla başlar. - Lao Tzu",
   "quote_2": "Mükemmellik bir eylem değil, bir alışkanlıktır. - Aristoteles",
   "quote_3": "Durmadığın sürece ne kadar yavaş gittiğinin önemi yoktur. - Konfüçyüs",
@@ -153,8 +149,6 @@
   "quote_98": "En zor görev, hiçbir şey yapmamaktır. - Martin Luther King Jr.",
   "quote_99": "Başarı, mutluluğun anahtarı değildir. Mutluluk, başarının anahtarıdır. - Albert Schweitzer",
   "quote_100": "Hayat, kendini bulmakla ilgili değil, kendini yaratmakla ilgilidir. - George Bernard Shaw",
-
-
   "on": "Açık",
   "off": "Kapalı",
   "reset_stats": "İstatistikleri Sıfırla",
@@ -168,6 +162,13 @@
   "break_over_msg": "Hadi işin başına dön. Odaklan!",
   "work_completed_title": "Oturum Tamamlandı! ",
   "work_completed_msg": "Harikasın! Kısa bir molayı hak ettin. ",
-
-  "total_focus_label": "Toplam Odaklanma"
+  "total_focus_label": "Toplam Odaklanma",
+  "theme_settings": "Tema",
+  "theme_elite": "Elite",
+  "theme_applied": "uygulandı!",
+  "theme_unlocked": "açıldı!",
+  "unlock_theme_msg": "Bu temayı açmak için kısa bir video izle.",
+  "watch_ad": "Reklam İzle",
+  "recommended_sound": "Önerilen",
+  "ad_loading": "Reklam yükleniyor, tekrar dene..."
 }

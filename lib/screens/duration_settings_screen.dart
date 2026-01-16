@@ -3,8 +3,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../providers/settings_provider.dart';
 import '../providers/timer_provider.dart';
+import '../providers/ad_manager.dart';
 
 class DurationSettingsScreen extends StatefulWidget {
   const DurationSettingsScreen({super.key});
@@ -18,6 +20,34 @@ class _DurationSettingsScreenState extends State<DurationSettingsScreen> {
   double? _tempWorkTime;
   double? _tempShortBreak;
   double? _tempLongBreak;
+
+  late AdManager _adManager;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _adManager = context.read<AdManager>();
+  }
+
+  @override
+  void dispose() {
+    try {
+      _adManager.disposeDurationBanner();
+    } catch (e) {
+      debugPrint("DurationSettingsScreen Dispose Hatası: $e");
+    }
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // 🔥 Duration ekranı için adaptive banner reklamı yükle
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final width = MediaQuery.of(context).size.width;
+      context.read<AdManager>().loadDurationBanner(width);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +67,8 @@ class _DurationSettingsScreenState extends State<DurationSettingsScreen> {
       appBar: AppBar(
         title: Text(
           "duration_settings".tr(),
-          style: const TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600),
+          style: const TextStyle(
+              fontFamily: 'Poppins', fontWeight: FontWeight.w600),
         ),
         centerTitle: true,
         backgroundColor: Colors.transparent,
@@ -100,7 +131,8 @@ class _DurationSettingsScreenState extends State<DurationSettingsScreen> {
                       onChangeEnd: (val) {
                         int newValue = val.toInt();
                         settings.setWorkTime(newValue);
-                        timerProvider.updateDurationFromSettings(newValue, TimerMode.work);
+                        timerProvider.updateDurationFromSettings(
+                            newValue, TimerMode.work);
                         _tempWorkTime = null;
                       },
                     ),
@@ -120,7 +152,8 @@ class _DurationSettingsScreenState extends State<DurationSettingsScreen> {
                       onChangeEnd: (val) {
                         int newValue = val.toInt();
                         settings.setShortBreakTime(newValue);
-                        timerProvider.updateDurationFromSettings(newValue, TimerMode.shortBreak);
+                        timerProvider.updateDurationFromSettings(
+                            newValue, TimerMode.shortBreak);
                         _tempShortBreak = null;
                       },
                     ),
@@ -140,7 +173,8 @@ class _DurationSettingsScreenState extends State<DurationSettingsScreen> {
                       onChangeEnd: (val) {
                         int newValue = val.toInt();
                         settings.setLongBreakTime(newValue);
-                        timerProvider.updateDurationFromSettings(newValue, TimerMode.longBreak);
+                        timerProvider.updateDurationFromSettings(
+                            newValue, TimerMode.longBreak);
                         _tempLongBreak = null;
                       },
                     ),
@@ -149,20 +183,37 @@ class _DurationSettingsScreenState extends State<DurationSettingsScreen> {
               ),
             ),
           ),
+
+          // 🔥 BANNER REKLAM ALANI
+          Consumer<AdManager>(
+            builder: (context, adManager, child) {
+              if (adManager.isDurationBannerLoaded &&
+                  adManager.durationBannerAd != null) {
+                return Container(
+                  width: adManager.durationBannerAd!.size.width.toDouble(),
+                  height: adManager.durationBannerAd!.size.height.toDouble(),
+                  margin: const EdgeInsets.only(bottom: 10),
+                  child: AdWidget(ad: adManager.durationBannerAd!),
+                );
+              }
+              // Reklam yüklenmediyse boş alan
+              return const SizedBox(height: 50);
+            },
+          ),
         ],
       ),
     );
   }
 
   Widget _buildDurationSlider(
-      BuildContext context, {
-        required String label,
-        required double value,
-        required double min,
-        required double max,
-        required Function(double) onChanged,
-        required Function(double) onChangeEnd,
-      }) {
+    BuildContext context, {
+    required String label,
+    required double value,
+    required double min,
+    required double max,
+    required Function(double) onChanged,
+    required Function(double) onChangeEnd,
+  }) {
     return Card(
       elevation: 0,
       color: Theme.of(context).cardColor.withOpacity(0.5),
@@ -175,27 +226,27 @@ class _DurationSettingsScreenState extends State<DurationSettingsScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                    label,
-                    style: const TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w500, fontSize: 16)
-                ),
-                Text(
-                    "${value.toInt()} dk",
+                Text(label,
+                    style: const TextStyle(
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16)),
+                Text("${value.toInt()} ${'minutes_label'.tr().toLowerCase()}",
                     style: TextStyle(
                         fontFamily: 'Poppins',
                         fontWeight: FontWeight.bold,
                         color: Theme.of(context).primaryColor,
-                        fontSize: 16
-                    )
-                ),
+                        fontSize: 16)),
               ],
             ),
             const SizedBox(height: 10),
             SliderTheme(
               data: SliderTheme.of(context).copyWith(
                 trackHeight: 6.0,
-                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 12.0),
-                overlayShape: const RoundSliderOverlayShape(overlayRadius: 24.0),
+                thumbShape:
+                    const RoundSliderThumbShape(enabledThumbRadius: 12.0),
+                overlayShape:
+                    const RoundSliderOverlayShape(overlayRadius: 24.0),
               ),
               child: Slider(
                 value: value,

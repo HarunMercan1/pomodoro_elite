@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'providers/timer_provider.dart';
 import 'providers/settings_provider.dart';
 import 'providers/stats_provider.dart';
+import 'providers/ad_manager.dart';
+import 'providers/theme_provider.dart';
 import 'screens/splash_screen.dart';
 
 // main artık hafifledi, bekleme yapmıyor
@@ -11,16 +14,49 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
 
+  // 🔥 AdMob SDK'yı başlat
+  await MobileAds.instance.initialize();
+
   runApp(
     EasyLocalization(
-      supportedLocales: const [Locale('tr',), Locale('en',)],
+      supportedLocales: const [
+        Locale('en'), // İngilizce
+        Locale('tr'), // Türkçe
+        Locale('es'), // İspanyolca
+        Locale('pt'), // Portekizce
+        Locale('de'), // Almanca
+        Locale('fr'), // Fransızca
+        Locale('it'), // İtalyanca
+        Locale('ru'), // Rusça
+        Locale('ja'), // Japonca
+        Locale('ko'), // Korece
+        Locale('zh'), // Çince
+        Locale('hi'), // Hintçe
+        Locale('ar'), // Arapça
+        Locale('id'), // Endonezyaca
+        Locale('vi'), // Vietnamca
+        Locale('bn'), // Bengalce
+        Locale('ur'), // Urduca
+        Locale('pl'), // Lehçe
+        Locale('th'), // Tayca
+        Locale('nl'), // Hollandaca
+        Locale('uk'), // Ukraynaca
+        Locale('el'), // Yunanca
+        Locale('sv'), // İsveççe
+      ],
       path: 'assets/translations',
-      fallbackLocale: const Locale('en',),
+      fallbackLocale: const Locale(
+        'en',
+      ),
       child: MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (_) => TimerProvider()),
           ChangeNotifierProvider(create: (_) => SettingsProvider()),
           ChangeNotifierProvider(create: (_) => StatsProvider()),
+          ChangeNotifierProvider(
+              create: (_) => ThemeProvider()), // 🎨 Tema yöneticisi
+          ChangeNotifierProvider(
+              create: (_) => AdManager()), // 🔥 Reklam yöneticisi
         ],
         child: const MyApp(),
       ),

@@ -1,7 +1,7 @@
 name: pomodoro_elite
 description: "Odaklanmayı ve verimliliği artıran profesyonel Pomodoro uygulaması."
 publish_to: 'none'
-version: 1.0.0+1
+version: 1.0.1+2
 
 environment:
   sdk: ^3.0.0
@@ -22,6 +22,7 @@ dependencies:
   hive_flutter: ^1.1.0
   intl: ^0.20.2
   fl_chart: ^0.68.0
+  google_mobile_ads: ^5.3.0
 
 dev_dependencies:
   flutter_test:

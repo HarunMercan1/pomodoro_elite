@@ -9,13 +9,14 @@ import 'stats_provider.dart';
 
 enum TimerMode { work, shortBreak, longBreak }
 
-class TimerProvider with ChangeNotifier {
+class TimerProvider with ChangeNotifier, WidgetsBindingObserver {
   static const int defaultWorkTime = 25;
 
   int _remainingSeconds = defaultWorkTime * 60;
   int _selectedTimeInMinutes = defaultWorkTime;
   TimerMode _currentMode = TimerMode.work;
   String _currentMotivation = "start_message";
+  DateTime? _backgroundExitTime; // Arkaplana giriş zamanı
 
   Timer? _timer;
   bool _isRunning = false;
@@ -24,6 +25,48 @@ class TimerProvider with ChangeNotifier {
 
   final AudioPlayer _alarmPlayer = AudioPlayer();
   final AudioPlayer _musicPlayer = AudioPlayer();
+
+  TimerProvider() {
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _timer?.cancel();
+    _alarmPlayer.dispose();
+    _musicPlayer.dispose();
+    super.dispose();
+  }
+
+  // --- LIFECYCLE (ARKAPLAN) YÖNETİMİ ---
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      if (_isRunning) {
+        _backgroundExitTime = DateTime.now();
+      }
+    } else if (state == AppLifecycleState.resumed) {
+      if (_isRunning && _backgroundExitTime != null) {
+        final timePassed =
+            DateTime.now().difference(_backgroundExitTime!).inSeconds;
+
+        if (timePassed > 0) {
+          _remainingSeconds -= timePassed;
+          debugPrint("⏳ Arkaplanda geçen süre: $timePassed sn");
+
+          if (_remainingSeconds <= 0) {
+            _remainingSeconds = 0;
+            // Timer döngüsü zaten çalışacak ama biz manuel tetikleyelim
+            // Timer.periodic bir sonraki tick'te yakalayacak,
+            // ama hemen UI güncellensin diye:
+            notifyListeners();
+          }
+        }
+        _backgroundExitTime = null;
+      }
+    }
+  }
 
   // Getterlar
   int get remainingSeconds => _remainingSeconds;
@@ -46,7 +89,8 @@ class TimerProvider with ChangeNotifier {
     return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
 
-  final List<String> _quotes = List.generate(100, (index) => "quote_${index + 1}");
+  final List<String> _quotes =
+      List.generate(100, (index) => "quote_${index + 1}");
 
   void _changeQuote() {
     _currentMotivation = _quotes[Random().nextInt(_quotes.length)];
@@ -72,7 +116,8 @@ class TimerProvider with ChangeNotifier {
     // MÜZİK BAŞLAT
     if (settings.isBackgroundMusicEnabled) {
       try {
-        await _musicPlayer.setSource(AssetSource('sounds/music/${settings.backgroundMusic}'));
+        await _musicPlayer
+            .setSource(AssetSource('sounds/music/${settings.backgroundMusic}'));
         await _musicPlayer.setVolume(settings.backgroundVolume);
         await _musicPlayer.setReleaseMode(ReleaseMode.loop);
         await _musicPlayer.resume();
@@ -107,11 +152,11 @@ class TimerProvider with ChangeNotifier {
             stats.addSession(_selectedTimeInMinutes);
           }
           notifTitle = "work_completed_title".tr(); // "Oturum Tamamlandı!"
-          notifBody = "work_completed_msg".tr();    // "Molayı hak ettin"
+          notifBody = "work_completed_msg".tr(); // "Molayı hak ettin"
         } else {
           // MOLA BİTTİ
-          notifTitle = "break_over_title".tr();     // "Mola Bitti!"
-          notifBody = "break_over_msg".tr();        // "İşe dön"
+          notifTitle = "break_over_title".tr(); // "Mola Bitti!"
+          notifBody = "break_over_msg".tr(); // "İşe dön"
         }
 
         // Bildirimi Gönder
@@ -123,7 +168,8 @@ class TimerProvider with ChangeNotifier {
         // Alarmı Çal
         try {
           await _alarmPlayer.stop();
-          await _alarmPlayer.setSource(AssetSource('sounds/bell/${settings.notificationSound}'));
+          await _alarmPlayer.setSource(
+              AssetSource('sounds/bell/${settings.notificationSound}'));
           await _alarmPlayer.setVolume(1.0);
           await _alarmPlayer.setReleaseMode(ReleaseMode.stop);
           await _alarmPlayer.resume();
@@ -135,11 +181,10 @@ class TimerProvider with ChangeNotifier {
     });
   }
 
-  void stopAlarm({
-    required int workTime,
-    required int shortBreakTime,
-    required int longBreakTime
-  }) {
+  void stopAlarm(
+      {required int workTime,
+      required int shortBreakTime,
+      required int longBreakTime}) {
     _alarmPlayer.stop();
     _musicPlayer.stop();
     _isAlarmPlaying = false;

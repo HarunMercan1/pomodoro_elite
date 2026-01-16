@@ -18,7 +18,7 @@ if (keystorePropertiesFile.exists()) {
 android {
     namespace = "com.mercansoftware.pomodoro_elite"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "27.0.12077973"  // google_mobile_ads için gerekli
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8

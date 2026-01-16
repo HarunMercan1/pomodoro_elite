@@ -4,11 +4,13 @@ import 'package:confetti/confetti.dart';
 import 'dart:math';
 import '../providers/timer_provider.dart';
 import '../providers/settings_provider.dart';
-import '../providers/stats_provider.dart'; // <--- EKLENDİ
+import '../providers/stats_provider.dart';
+import '../providers/ad_manager.dart';
+import 'package:pomodoro_elite/utils/app_colors.dart';
+import '../providers/theme_provider.dart';
 import '../screens/settings_screen.dart';
-import '../screens/stats_screen.dart'; // <--- EKLENDİ
+import '../screens/stats_screen.dart';
 import '../widgets/time_option_button.dart';
-import '../utils/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -20,37 +22,60 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late ConfettiController _confettiController;
+  int _lastCompletedRounds = 0;
 
-  @override
   @override
   void initState() {
     super.initState();
-    _confettiController = ConfettiController(duration: const Duration(seconds: 2));
+    _confettiController =
+        ConfettiController(duration: const Duration(seconds: 2));
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // 1. Provider'lara eriş
       final timerProvider = context.read<TimerProvider>();
       final settingsProvider = context.read<SettingsProvider>();
+      final adManager = context.read<AdManager>();
 
-      // --- KRİTİK DÜZELTME: SÜREYİ EŞİTLE ---
-      // Eğer sayaç çalışmıyorsa ve Timer'ın süresi (örn: 25), Ayarlardaki süreden (örn: 40) farklıysa;
-      // Timer'ı ayarlardaki süreye zorla.
+      adManager.loadInterstitialAd();
+
       if (!timerProvider.isRunning &&
           !timerProvider.isAlarmPlaying &&
           timerProvider.currentMode == TimerMode.work) {
-
         if (timerProvider.currentDuration != settingsProvider.workTime) {
           timerProvider.setTime(settingsProvider.workTime, TimerMode.work);
         }
       }
 
-      // 2. Konfeti Dinleyicisi (Eski kodun aynısı)
+      _lastCompletedRounds = timerProvider.completedRounds;
+
       timerProvider.addListener(() {
         if (!mounted) return;
+
+        // 🎨 Timer durumunu tema sistemine bildir (Build dışında)
+        final isTimerRunning = timerProvider.isRunning;
+        final isPaused = (!isTimerRunning &&
+            !timerProvider.isAlarmPlaying &&
+            timerProvider.remainingSeconds > 0 &&
+            timerProvider.remainingSeconds <
+                timerProvider.currentDuration * 60);
+        final isAlarmPlaying = timerProvider.isAlarmPlaying;
+        final modeString = timerProvider.currentMode.toString().split('.').last;
+
+        context.read<ThemeProvider>().updateFromTimer(
+              isRunning: isTimerRunning,
+              isPaused: isPaused,
+              isAlarmPlaying: isAlarmPlaying,
+              mode: modeString,
+            );
+
         if (timerProvider.remainingSeconds == 0 &&
             timerProvider.currentDuration != 0 &&
             _confettiController.state != ConfettiControllerState.playing) {
           _confettiController.play();
+        }
+
+        if (timerProvider.completedRounds > _lastCompletedRounds) {
+          _lastCompletedRounds = timerProvider.completedRounds;
+          adManager.onPomodoroCompleted();
         }
       });
     });
@@ -74,8 +99,10 @@ class _HomeScreenState extends State<HomeScreen> {
     path.moveTo(size.width, halfWidth);
 
     for (double step = 0; step < fullAngle; step += degreesPerStep) {
-      path.lineTo(halfWidth + externalRadius * cos(step), halfWidth + externalRadius * sin(step));
-      path.lineTo(halfWidth + internalRadius * cos(step + halfDegreesPerStep), halfWidth + internalRadius * sin(step + halfDegreesPerStep));
+      path.lineTo(halfWidth + externalRadius * cos(step),
+          halfWidth + externalRadius * sin(step));
+      path.lineTo(halfWidth + internalRadius * cos(step + halfDegreesPerStep),
+          halfWidth + internalRadius * sin(step + halfDegreesPerStep));
     }
     path.close();
     return path;
@@ -84,34 +111,52 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final settingsProvider = context.watch<SettingsProvider>();
+    final themeProvider = context.watch<ThemeProvider>();
+    final currentMode =
+        context.select<TimerProvider, TimerMode>((p) => p.currentMode);
 
-    final bool isTimerRunning = context.select<TimerProvider, bool>((p) => p.isRunning);
-    final bool isAlarmPlaying = context.select<TimerProvider, bool>((p) => p.isAlarmPlaying);
-    final int currentDuration = context.select<TimerProvider, int>((p) => p.currentDuration);
-    final int remainingSeconds = context.select<TimerProvider, int>((p) => p.remainingSeconds);
-    final TimerMode currentMode = context.select<TimerProvider, TimerMode>((p) => p.currentMode);
-    final String currentMotivation = context.select<TimerProvider, String>((p) => p.currentMotivation);
+    final bool isTimerRunning =
+        context.select<TimerProvider, bool>((p) => p.isRunning);
+    final bool isAlarmPlaying =
+        context.select<TimerProvider, bool>((p) => p.isAlarmPlaying);
+    final int currentDuration =
+        context.select<TimerProvider, int>((p) => p.currentDuration);
+    final int remainingSeconds =
+        context.select<TimerProvider, int>((p) => p.remainingSeconds);
+    final String currentMotivation =
+        context.select<TimerProvider, String>((p) => p.currentMotivation);
 
     final bool isPaused = !isTimerRunning &&
         !isAlarmPlaying &&
         remainingSeconds > 0 &&
         remainingSeconds < currentDuration * 60;
 
-    final bool isActiveState = isTimerRunning || isAlarmPlaying || isPaused;
-    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    // 🎨 Timer durumunu tema sistemine bildir
+    String modeString = currentMode == TimerMode.work
+        ? 'work'
+        : currentMode == TimerMode.shortBreak
+            ? 'shortBreak'
+            : 'longBreak';
+    themeProvider.updateFromTimer(
+      isRunning: isTimerRunning,
+      isPaused: isPaused,
+      isAlarmPlaying: isAlarmPlaying,
+      mode: modeString,
+    );
 
-    final Color defaultBg = Theme.of(context).scaffoldBackgroundColor;
-    final Color defaultPrimary = Theme.of(context).primaryColor;
-    final Color defaultText = Theme.of(context).colorScheme.onSurface;
-    final Color defaultDivider = Theme.of(context).dividerColor;
+    // 🎨 Dinamik tema renkleri
+    final stateColors = themeProvider.stateColors;
+    final Color bgColor = stateColors.bgColor;
+    final LinearGradient? bgGradient = stateColors.gradient;
+    final Color textColor = stateColors.textColor;
 
-    final bgGradient = AppColors.getBackgroundGradient(isTimerRunning, isPaused, isAlarmPlaying, defaultBg);
-    final topButtonActiveColor = AppColors.getTopButtonActiveColor(isTimerRunning, isPaused, isAlarmPlaying);
-    final mainButtonBgColor = AppColors.getMainButtonBackgroundColor(isTimerRunning, isPaused, isAlarmPlaying, defaultPrimary);
-    final mainButtonContentColor = AppColors.getMainButtonContentColor(isTimerRunning, isPaused, isAlarmPlaying);
-    final resetTextColor = AppColors.getResetTextColor(isActiveState, isPaused, defaultDivider);
-
-    final bool useLightModeStyles = !isDark && !isActiveState;
+    // Üst buton rengi: Idle durumunda eğer özel bir renk yoksa null (default beyaz),
+    // varsa (örn: Stranger Things) o rengi kullan.
+    final Color? topButtonActiveColor =
+        (themeProvider.timerState == TimerState.idle &&
+                themeProvider.stateColors.menuButtonColor == null)
+            ? null
+            : stateColors.effectiveMenuButtonColor;
 
     final double screenHeight = MediaQuery.of(context).size.height;
     final bool isSmallScreen = screenHeight < 700;
@@ -123,21 +168,18 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       extendBodyBehindAppBar: true,
-
       appBar: AppBar(
         title: Text(
           'title'.tr(),
           style: TextStyle(
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w600,
-            color: useLightModeStyles ? AppColors.darkNavy : Colors.white,
+            color: textColor,
           ),
         ),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
-
-        // --- SOL ÜSTE İSTATİSTİK BUTONU GELDİ ---
         leading: IconButton(
           icon: const Icon(Icons.bar_chart_rounded),
           tooltip: "İstatistikler",
@@ -148,10 +190,7 @@ class _HomeScreenState extends State<HomeScreen> {
             );
           },
         ),
-
-        iconTheme: IconThemeData(
-            color: useLightModeStyles ? AppColors.darkNavy : Colors.white
-        ),
+        iconTheme: IconThemeData(color: textColor),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
@@ -164,16 +203,13 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-
+      // 🎨 AnimatedContainer ile yumuşak 500ms renk/gradient geçişi
       body: AnimatedContainer(
         duration: const Duration(milliseconds: 800),
         curve: Curves.easeInOut,
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: bgGradient,
-          ),
+          color: bgGradient == null ? bgColor : null,
+          gradient: bgGradient,
         ),
         child: Stack(
           alignment: Alignment.topCenter,
@@ -182,24 +218,46 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  // Üst mod butonları
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                     child: IntrinsicHeight(
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Expanded(child: _buildOption(context, "focus".tr(), settingsProvider.workTime, TimerMode.work, currentMode, useLightModeStyles, topButtonActiveColor)),
+                          Expanded(
+                              child: _buildOption(
+                                  context,
+                                  "focus".tr(),
+                                  settingsProvider.workTime,
+                                  TimerMode.work,
+                                  currentMode,
+                                  topButtonActiveColor)),
                           const SizedBox(width: 10),
-                          Expanded(child: _buildOption(context, "short_break".tr(), settingsProvider.shortBreakTime, TimerMode.shortBreak, currentMode, useLightModeStyles, topButtonActiveColor)),
+                          Expanded(
+                              child: _buildOption(
+                                  context,
+                                  "short_break".tr(),
+                                  settingsProvider.shortBreakTime,
+                                  TimerMode.shortBreak,
+                                  currentMode,
+                                  topButtonActiveColor)),
                           const SizedBox(width: 10),
-                          Expanded(child: _buildOption(context, "long_break".tr(), settingsProvider.longBreakTime, TimerMode.longBreak, currentMode, useLightModeStyles, topButtonActiveColor)),
+                          Expanded(
+                              child: _buildOption(
+                                  context,
+                                  "long_break".tr(),
+                                  settingsProvider.longBreakTime,
+                                  TimerMode.longBreak,
+                                  currentMode,
+                                  topButtonActiveColor)),
                         ],
                       ),
                     ),
                   ),
-
                   const Spacer(flex: 2),
-
+                  // Dairesel progress göstergesi
                   Stack(
                     alignment: Alignment.center,
                     children: [
@@ -208,12 +266,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         height: circleSize,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: isActiveState
-                              ? Colors.white.withOpacity(0.15)
-                              : Theme.of(context).cardColor,
+                          color: Colors.white.withAlpha(38),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
+                              color: Colors.black.withAlpha(13),
                               blurRadius: 20,
                               spreadRadius: 10,
                               offset: const Offset(0, 10),
@@ -221,22 +277,35 @@ class _HomeScreenState extends State<HomeScreen> {
                           ],
                         ),
                       ),
-
                       Consumer<TimerProvider>(
                         builder: (context, provider, child) {
-                          final localRingColor = AppColors.getRingColor(
-                              provider.isRunning,
-                              !provider.isRunning && !provider.isAlarmPlaying && provider.remainingSeconds > 0 && provider.remainingSeconds < provider.currentDuration * 60,
-                              provider.isAlarmPlaying,
-                              defaultPrimary
-                          );
+                          // 🔥 Halka Rengi Mantığı
+                          // EĞER Elite teması ise: Orijinal AppColors mantığını kullan.
+                          Color localRingColor;
+                          if (themeProvider.currentThemeId == 'elite' ||
+                              themeProvider.currentThemeId == 'classic_elite') {
+                            localRingColor = AppColors.getRingColor(
+                              isTimerRunning,
+                              isPaused,
+                              isAlarmPlaying,
+                              Theme.of(context).primaryColor,
+                            );
+                          } else {
+                            localRingColor = themeProvider
+                                .stateColors.accentColor; // Tema rengi
+                          }
 
-                          final localTimerTextColor = AppColors.getTimerTextColor(
-                              provider.isRunning,
-                              !provider.isRunning && !provider.isAlarmPlaying && provider.remainingSeconds > 0 && provider.remainingSeconds < provider.currentDuration * 60,
-                              provider.isAlarmPlaying,
-                              defaultText
-                          );
+                          // 🔥 Orijinal Track Rengi Mantığı
+                          final bool isActiveState = provider.isRunning ||
+                              provider.isAlarmPlaying ||
+                              (!provider.isRunning &&
+                                  !provider.isAlarmPlaying &&
+                                  provider.remainingSeconds > 0 &&
+                                  provider.remainingSeconds <
+                                      provider.currentDuration * 60);
+
+                          final bool isDark =
+                              context.read<SettingsProvider>().isDarkMode;
 
                           return Stack(
                             alignment: Alignment.center,
@@ -246,19 +315,21 @@ class _HomeScreenState extends State<HomeScreen> {
                                 height: circleSize - 20,
                                 child: TweenAnimationBuilder<double>(
                                   tween: Tween<double>(
-                                      begin: 0.0,
-                                      end: provider.progress
-                                  ),
+                                      begin: 0.0, end: provider.progress),
                                   duration: const Duration(seconds: 1),
                                   curve: Curves.linear,
                                   builder: (context, value, _) {
                                     return CircularProgressIndicator(
                                       value: value,
                                       strokeWidth: 18,
+                                      // 🔥 Eğer aktif değilse (Idle), Gri Track (Eski usül)
                                       backgroundColor: isActiveState
                                           ? Colors.white.withOpacity(0.2)
-                                          : (isDark ? Colors.grey.shade800 : const Color(0xFFF0F0F0)),
-                                      valueColor: AlwaysStoppedAnimation<Color>(localRingColor),
+                                          : (isDark
+                                              ? Colors.grey.shade800
+                                              : const Color(0xFFF0F0F0)),
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          localRingColor),
                                       strokeCap: StrokeCap.round,
                                     );
                                   },
@@ -275,7 +346,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       style: TextStyle(
                                         fontFamily: 'BebasNeue',
                                         fontSize: timerFontSize,
-                                        color: localTimerTextColor,
+                                        color: textColor,
                                         letterSpacing: 2,
                                         height: 1.0,
                                       ),
@@ -289,9 +360,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 15),
-
+                  // Motivasyon yazısı
                   Container(
                     height: 80,
                     padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -308,17 +378,14 @@ class _HomeScreenState extends State<HomeScreen> {
                           fontFamily: 'Poppins',
                           fontSize: isSmallScreen ? 14 : 16,
                           fontWeight: FontWeight.w500,
-                          color: isActiveState
-                              ? (isPaused ? AppColors.themeBronze : Colors.white.withOpacity(0.9))
-                              : Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+                          color: textColor.withAlpha(229),
                           letterSpacing: 0.5,
                         ),
                       ),
                     ),
                   ),
-
                   const Spacer(flex: 3),
-
+                  // Ana buton ve reset
                   Padding(
                     padding: EdgeInsets.only(bottom: isSmallScreen ? 20 : 40),
                     child: Column(
@@ -326,7 +393,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         GestureDetector(
                           onTap: () {
                             final provider = context.read<TimerProvider>();
-                            final stats = context.read<StatsProvider>(); // <--- STATS EKLENDİ
+                            final stats = context.read<StatsProvider>();
 
                             if (provider.isAlarmPlaying) {
                               provider.stopAlarm(
@@ -337,19 +404,20 @@ class _HomeScreenState extends State<HomeScreen> {
                             } else if (provider.isRunning) {
                               provider.stopTimer(reset: false);
                             } else {
-                              // startTimer'a stats'ı da gönderiyoruz
                               provider.startTimer(settingsProvider, stats);
                             }
                           },
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 300),
-                            padding: EdgeInsets.symmetric(horizontal: btnPadH, vertical: btnPadV),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: btnPadH, vertical: btnPadV),
                             decoration: BoxDecoration(
-                              color: mainButtonBgColor,
+                              color: stateColors
+                                  .effectiveButtonBg, // Buton Arka Planı (Idle: Mor, Active: Beyaz)
                               borderRadius: BorderRadius.circular(50),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
+                                  color: Colors.black.withAlpha(51),
                                   blurRadius: 20,
                                   offset: const Offset(0, 8),
                                 )
@@ -362,9 +430,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                   isAlarmPlaying
                                       ? Icons.check_rounded
                                       : isTimerRunning
-                                      ? Icons.pause_rounded
-                                      : Icons.play_arrow_rounded,
-                                  color: mainButtonContentColor,
+                                          ? Icons.pause_rounded
+                                          : Icons.play_arrow_rounded,
+                                  color: stateColors
+                                      .effectiveButtonTextColor, // Buton İkonu (Idle: Beyaz, Active: Renkli)
                                   size: isSmallScreen ? 28 : 32,
                                 ),
                                 const SizedBox(width: 10),
@@ -372,39 +441,43 @@ class _HomeScreenState extends State<HomeScreen> {
                                   isAlarmPlaying
                                       ? "stop_alarm".tr()
                                       : isTimerRunning
-                                      ? "pause".tr()
-                                      : (isPaused)
-                                      ? "resume".tr()
-                                      : "start".tr(),
+                                          ? "pause".tr()
+                                          : (isPaused)
+                                              ? "resume".tr()
+                                              : "start".tr(),
                                   style: TextStyle(
                                     fontFamily: 'Poppins',
                                     fontSize: isSmallScreen ? 18 : 20,
                                     fontWeight: FontWeight.bold,
-                                    color: mainButtonContentColor,
+                                    color: stateColors
+                                        .effectiveButtonTextColor, // Buton Yazısı (Idle: Beyaz, Active: Renkli)
                                   ),
                                 ),
                               ],
                             ),
                           ),
                         ),
-
                         const SizedBox(height: 15),
-
                         IgnorePointer(
                           ignoring: isAlarmPlaying ||
-                              !isPaused && !isTimerRunning && remainingSeconds == currentDuration * 60,
+                              !isPaused &&
+                                  !isTimerRunning &&
+                                  remainingSeconds == currentDuration * 60,
                           child: Opacity(
                             opacity: (!isAlarmPlaying &&
-                                (isPaused || remainingSeconds != currentDuration * 60))
+                                    (isPaused ||
+                                        remainingSeconds !=
+                                            currentDuration * 60))
                                 ? 1.0
                                 : 0.0,
                             child: GestureDetector(
-                              onTap: () => context.read<TimerProvider>().resetTimer(),
+                              onTap: () =>
+                                  context.read<TimerProvider>().resetTimer(),
                               child: Text(
                                 "reset".tr(),
                                 style: TextStyle(
                                   fontFamily: 'Poppins',
-                                  color: resetTextColor,
+                                  color: textColor.withAlpha(179),
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -417,13 +490,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-
             ConfettiWidget(
               confettiController: _confettiController,
               blastDirectionality: BlastDirectionality.explosive,
               shouldLoop: false,
               colors: const [
-                Colors.green, Colors.blue, Colors.pink, Colors.orange, Colors.purple
+                Colors.green,
+                Colors.blue,
+                Colors.pink,
+                Colors.orange,
+                Colors.purple
               ],
               createParticlePath: drawStar,
             ),
@@ -433,12 +509,14 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildOption(BuildContext context, String title, int time, TimerMode mode, TimerMode currentMode, bool isLightMode, Color? activeColor) {
+  Widget _buildOption(BuildContext context, String title, int time,
+      TimerMode mode, TimerMode currentMode, Color? activeColor) {
+    final isSelected = currentMode == mode;
     return TimeOptionButton(
       title: title,
       minutes: time,
-      isSelected: currentMode == mode,
-      isLightMode: isLightMode,
+      isSelected: isSelected,
+      isLightMode: false,
       activeBackgroundColor: activeColor,
       activeTextColor: activeColor != null ? Colors.white : null,
       onTap: () => context.read<TimerProvider>().setTime(time, mode),

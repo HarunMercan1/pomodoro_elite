@@ -23,7 +23,6 @@
   "enable_music": "Background Music",
   "notification_sound": "NOTIFICATION SOUND",
   "music_lock_msg": "Stop the timer to change music.",
-
   "stats_title": "Statistics",
   "total_focus": "Total Focus",
   "total_sessions": "Total Sessions",
@@ -36,7 +35,6 @@
   "minutes_label": "Minutes",
   "daily_streak": "Daily Streak",
   "day_label": "Day",
-
   "sound_alarm": "Classic Alarm",
   "sound_digital": "Digital",
   "sound_bell3": "Ding Dong",
@@ -46,7 +44,6 @@
   "sound_zil3": "Bell 3",
   "sound_zil4": "Bell 4",
   "sound_zil5": "Bell 5",
-
   "sound_forest": "Forest",
   "sound_ocean": "Ocean",
   "sound_rain1": "Light Rain",
@@ -54,7 +51,6 @@
   "sound_rain3": "Heavy Rain",
   "sound_thunder": "Thunderstorm",
   "sound_wind": "Wind",
-
   "quote_1": "A journey of a thousand miles begins with a single step. - Lao Tzu",
   "quote_2": "Excellence is not an act, but a habit. - Aristotle",
   "quote_3": "It does not matter how slowly you go as long as you do not stop. - Confucius",
@@ -155,7 +151,6 @@
   "quote_98": "The most difficult task is to do nothing. - Martin Luther King Jr.",
   "quote_99": "Success is not the key to happiness. Happiness is the key to success. - Albert Schweitzer",
   "quote_100": "Life isn't about finding yourself. Life is about creating yourself. - George Bernard Shaw",
-
   "on": "On",
   "off": "Off",
   "reset_stats": "Reset Statistics",
@@ -171,5 +166,13 @@
   "work_completed_msg": "Great job! You earned a break.",
   "total_focus_label": "Total Focus",
   "keep_streak": "Don't break the chain!",
-  "change_lock_msg": "Stop the timer to change duration."
+  "change_lock_msg": "Stop the timer to change duration.",
+  "theme_settings": "Theme",
+  "theme_elite": "Elite",
+  "theme_applied": "applied!",
+  "theme_unlocked": "unlocked!",
+  "unlock_theme_msg": "Watch a short video to unlock this theme.",
+  "watch_ad": "Watch Ad",
+  "recommended_sound": "Recommended",
+  "ad_loading": "Ad is loading, please try again..."
 }
