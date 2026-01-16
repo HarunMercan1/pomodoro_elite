@@ -150,116 +150,181 @@ class _SettingsScreenState extends State<SettingsScreen>
             child: ListView(
               padding: const EdgeInsets.all(20),
               children: [
-                // SÜRE AYARLARI
-                Card(
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15)),
-                  child: ListTile(
-                    leading: const Icon(Icons.timer_outlined),
-                    title: Text("duration_settings".tr(),
-                        style: const TextStyle(fontFamily: 'Poppins')),
-                    trailing:
-                        const Icon(Icons.arrow_forward_ios_rounded, size: 18),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                const DurationSettingsScreen()),
-                      );
-                    },
-                  ),
-                ),
+                // 🔥 Dinamik Kart Rengi Hesaplama
+                // Her tema artık kendi settingsCardColor ve settingsBorderColor değerlerini taşıyor.
+                Builder(
+                  builder: (context) {
+                    final theme = themeProvider.currentTheme;
+                    final cardColor =
+                        theme.settingsCardColor ?? const Color(0xFF202020);
+                    final borderColor = theme.settingsBorderColor ??
+                        Colors.white.withOpacity(0.06);
+                    // 🔥 İçerik Rengi: Eğer tema özel renk belirttiyse onu kullan, yoksa genel textColor
+                    final itemColor =
+                        theme.settingsItemColor ?? themeProvider.textColor;
 
-                const SizedBox(height: 20),
-
-                // SES AYARLARI
-                Card(
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15)),
-                  child: ListTile(
-                    leading: const Icon(Icons.music_note_rounded),
-                    title: Text("sound_settings".tr(),
-                        style: const TextStyle(fontFamily: 'Poppins')),
-                    subtitle: Text(
-                      // DÜZELTME 1: "Açık/Kapalı" yerine çeviri anahtarlarını kullandık
-                      settings.isBackgroundMusicEnabled
-                          ? "on".tr()
-                          : "off".tr(),
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                    trailing:
-                        const Icon(Icons.arrow_forward_ios_rounded, size: 18),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const SoundSettingsScreen()),
-                      );
-                    },
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                // DİL AYARI
-                // DİL AYARI
-                Card(
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15)),
-                  child: ListTile(
-                    leading: const Icon(Icons.language),
-                    title: Text('language_label'.tr(),
-                        style: const TextStyle(fontFamily: 'Poppins')),
-                    subtitle: Text(
-                      _getLanguageName(context.locale.languageCode),
-                      style:
-                          const TextStyle(fontFamily: 'Poppins', fontSize: 12),
-                    ),
-                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const LanguageSelectionScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                // 🎨 TEMA AYARI (NEW)
-                Consumer<ThemeProvider>(
-                  builder: (context, themeProvider, child) {
-                    return Card(
-                      elevation: 2,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15)),
-                      child: ListTile(
-                        leading: const Icon(Icons.palette_outlined),
-                        title: Text('theme_settings'.tr(),
-                            style: const TextStyle(fontFamily: 'Poppins')),
-                        subtitle: Text(
-                          themeProvider.currentTheme.name,
-                          style: const TextStyle(
-                              fontFamily: 'Poppins', fontSize: 12),
-                        ),
-                        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const ThemeSelectionScreen(),
+                    return Column(
+                      children: [
+                        // SÜRE AYARLARI
+                        Card(
+                          color: cardColor,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            side: BorderSide(color: borderColor, width: 1),
+                          ),
+                          child: ListTile(
+                            leading:
+                                Icon(Icons.timer_outlined, color: itemColor),
+                            title: Text(
+                              "duration_settings".tr(),
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                color: itemColor,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
-                          );
-                        },
-                      ),
+                            trailing: Icon(Icons.arrow_forward_ios_rounded,
+                                size: 18, color: itemColor),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const DurationSettingsScreen()),
+                              );
+                            },
+                          ),
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        // SES AYARLARI
+                        Card(
+                          color: cardColor,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            side: BorderSide(color: borderColor, width: 1),
+                          ),
+                          child: ListTile(
+                            leading: Icon(Icons.music_note_rounded,
+                                color: itemColor),
+                            title: Text(
+                              "sound_settings".tr(),
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                color: itemColor,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            subtitle: Text(
+                              settings.isBackgroundMusicEnabled
+                                  ? "on".tr()
+                                  : "off".tr(),
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: itemColor.withAlpha(179),
+                              ),
+                            ),
+                            trailing: Icon(Icons.arrow_forward_ios_rounded,
+                                size: 18, color: itemColor),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const SoundSettingsScreen()),
+                              );
+                            },
+                          ),
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        // 🎨 TEMA AYARI
+                        Card(
+                          color: cardColor,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            side: BorderSide(color: borderColor, width: 1),
+                          ),
+                          child: ListTile(
+                            leading:
+                                Icon(Icons.palette_outlined, color: itemColor),
+                            title: Text(
+                              'theme_settings'.tr(),
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                color: itemColor,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            subtitle: Text(
+                              themeProvider.currentTheme.name,
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 12,
+                                color: itemColor.withAlpha(179),
+                              ),
+                            ),
+                            trailing: Icon(Icons.arrow_forward_ios,
+                                size: 16, color: itemColor),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const ThemeSelectionScreen(),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        // DİL AYARI
+                        Card(
+                          color: cardColor,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            side: BorderSide(color: borderColor, width: 1),
+                          ),
+                          child: ListTile(
+                            leading: Icon(Icons.language, color: itemColor),
+                            title: Text(
+                              'language_label'.tr(),
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                color: itemColor,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            subtitle: Text(
+                              _getLanguageName(context.locale.languageCode),
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 12,
+                                color: itemColor.withAlpha(179),
+                              ),
+                            ),
+                            trailing: Icon(Icons.arrow_forward_ios,
+                                size: 16, color: itemColor),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const LanguageSelectionScreen(),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
                     );
                   },
                 ),

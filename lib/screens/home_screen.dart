@@ -150,13 +150,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final LinearGradient? bgGradient = stateColors.gradient;
     final Color textColor = stateColors.textColor;
 
-    // Üst buton rengi: Idle durumunda eğer özel bir renk yoksa null (default beyaz),
-    // varsa (örn: Stranger Things) o rengi kullan.
-    final Color? topButtonActiveColor =
-        (themeProvider.timerState == TimerState.idle &&
-                themeProvider.stateColors.menuButtonColor == null)
-            ? null
-            : stateColors.effectiveMenuButtonColor;
+    // Üst buton rengi: Temadan gelen efektif renkleri kullan
+    final Color topButtonActiveColor = stateColors.effectiveMenuButtonColor;
+    final Color topButtonTextColor = stateColors.effectiveButtonTextColor;
 
     final double screenHeight = MediaQuery.of(context).size.height;
     final bool isSmallScreen = screenHeight < 700;
@@ -233,7 +229,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                   settingsProvider.workTime,
                                   TimerMode.work,
                                   currentMode,
-                                  topButtonActiveColor)),
+                                  topButtonActiveColor,
+                                  topButtonTextColor,
+                                  textColor)), // 🔥 YENİ: Aktif/Pasif renkler
                           const SizedBox(width: 10),
                           Expanded(
                               child: _buildOption(
@@ -242,7 +240,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                   settingsProvider.shortBreakTime,
                                   TimerMode.shortBreak,
                                   currentMode,
-                                  topButtonActiveColor)),
+                                  topButtonActiveColor,
+                                  topButtonTextColor,
+                                  textColor)), // 🔥 YENİ: Aktif/Pasif renkler
                           const SizedBox(width: 10),
                           Expanded(
                               child: _buildOption(
@@ -251,7 +251,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                   settingsProvider.longBreakTime,
                                   TimerMode.longBreak,
                                   currentMode,
-                                  topButtonActiveColor)),
+                                  topButtonActiveColor,
+                                  topButtonTextColor,
+                                  textColor)), // 🔥 YENİ: Aktif/Pasif renkler
                         ],
                       ),
                     ),
@@ -509,8 +511,15 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildOption(BuildContext context, String title, int time,
-      TimerMode mode, TimerMode currentMode, Color? activeColor) {
+  Widget _buildOption(
+      BuildContext context,
+      String title,
+      int time,
+      TimerMode mode,
+      TimerMode currentMode,
+      Color? activeColor,
+      Color? activeTextColor,
+      Color? inactiveTextColor) {
     final isSelected = currentMode == mode;
     return TimeOptionButton(
       title: title,
@@ -518,7 +527,8 @@ class _HomeScreenState extends State<HomeScreen> {
       isSelected: isSelected,
       isLightMode: false,
       activeBackgroundColor: activeColor,
-      activeTextColor: activeColor != null ? Colors.white : null,
+      activeTextColor: activeTextColor, // 🔥 YENİ: Dışarıdan gelen yazı rengi
+      inactiveTextColor: inactiveTextColor,
       onTap: () => context.read<TimerProvider>().setTime(time, mode),
     );
   }

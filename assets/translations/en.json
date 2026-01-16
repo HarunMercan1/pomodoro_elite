@@ -174,5 +174,7 @@
   "unlock_theme_msg": "Watch a short video to unlock this theme.",
   "watch_ad": "Watch Ad",
   "recommended_sound": "Recommended",
-  "ad_loading": "Ad is loading, please try again..."
+  "ad_loading": "Ad is loading, please try again...",
+  "save": "Save",
+  "min_max_warning": "Enter between {} and {}"
 }

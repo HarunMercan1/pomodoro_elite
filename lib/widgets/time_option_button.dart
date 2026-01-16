@@ -11,6 +11,7 @@ class TimeOptionButton extends StatelessWidget {
   // YENİ PARAMETRELER: Rengi dışarıdan alıyoruz
   final Color? activeBackgroundColor;
   final Color? activeTextColor;
+  final Color? inactiveTextColor; // 🔥 YENİ: Seçili olmayan durum rengi
 
   const TimeOptionButton({
     super.key,
@@ -21,6 +22,7 @@ class TimeOptionButton extends StatelessWidget {
     this.isLightMode = false,
     this.activeBackgroundColor,
     this.activeTextColor,
+    this.inactiveTextColor,
   });
 
   @override
@@ -41,15 +43,18 @@ class TimeOptionButton extends StatelessWidget {
       // Seçiliyse dışarıdan gelen rengi kullan (Yoksa beyaz yap)
       backgroundColor = isSelected
           ? (activeBackgroundColor ?? Colors.white)
-          : Colors.white.withOpacity(0.15);
+          : (inactiveTextColor?.withOpacity(0.1) ??
+              Colors.white.withOpacity(0.15));
 
       // Yazı rengi de dışarıdan geliyor
       textColor = isSelected
           ? (activeTextColor ?? darkNavy)
-          : Colors.white.withOpacity(0.9);
+          : (inactiveTextColor ?? Colors.white.withOpacity(0.9));
 
-      borderColor =
-          isSelected ? Colors.transparent : Colors.white.withOpacity(0.2);
+      borderColor = isSelected
+          ? Colors.transparent
+          : (inactiveTextColor?.withOpacity(0.3) ??
+              Colors.white.withOpacity(0.2));
     }
 
     return GestureDetector(

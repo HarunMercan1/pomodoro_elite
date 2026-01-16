@@ -170,5 +170,7 @@
   "unlock_theme_msg": "Bu temayı açmak için kısa bir video izle.",
   "watch_ad": "Reklam İzle",
   "recommended_sound": "Önerilen",
-  "ad_loading": "Reklam yükleniyor, tekrar dene..."
+  "ad_loading": "Reklam yükleniyor, tekrar dene...",
+  "save": "Kaydet",
+  "min_max_warning": "{} ile {} arası giriniz"
 }

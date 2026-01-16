@@ -6,6 +6,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../providers/settings_provider.dart';
 import '../providers/timer_provider.dart';
+import '../providers/theme_provider.dart';
 import '../providers/ad_manager.dart';
 
 class DurationSettingsScreen extends StatefulWidget {
@@ -124,7 +125,7 @@ class _DurationSettingsScreenState extends State<DurationSettingsScreen> {
                       label: "focus".tr(),
                       value: currentWork,
                       min: 10,
-                      max: 90,
+                      max: 180, // 📢 DÜZELTME: Maksimum 180 dk
                       onChanged: (val) {
                         setState(() => _tempWorkTime = val);
                       },
@@ -145,7 +146,7 @@ class _DurationSettingsScreenState extends State<DurationSettingsScreen> {
                       label: "short_break".tr(),
                       value: currentShort,
                       min: 1,
-                      max: 30,
+                      max: 60, // 📢 DÜZELTME: Maksimum 60 dk
                       onChanged: (val) {
                         setState(() => _tempShortBreak = val);
                       },
@@ -166,7 +167,8 @@ class _DurationSettingsScreenState extends State<DurationSettingsScreen> {
                       label: "long_break".tr(),
                       value: currentLong,
                       min: 5,
-                      max: 45,
+                      max:
+                          120, // 📢 DÜZELTME: Maksimum 120 dk (Uzun mola da esnek olsun)
                       onChanged: (val) {
                         setState(() => _tempLongBreak = val);
                       },
@@ -214,10 +216,21 @@ class _DurationSettingsScreenState extends State<DurationSettingsScreen> {
     required Function(double) onChanged,
     required Function(double) onChangeEnd,
   }) {
+    final themeProvider = context.watch<ThemeProvider>();
+    final theme = themeProvider.currentTheme;
+    final cardColor = theme.settingsCardColor ?? const Color(0xFF202020);
+    final borderColor =
+        theme.settingsBorderColor ?? Colors.white.withOpacity(0.06);
+    final itemColor = theme.settingsItemColor ?? themeProvider.textColor;
+    final primaryColor = Theme.of(context).primaryColor;
+
     return Card(
       elevation: 0,
-      color: Theme.of(context).cardColor.withOpacity(0.5),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      color: cardColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+        side: BorderSide(color: borderColor, width: 1),
+      ),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
         child: Column(
@@ -226,17 +239,38 @@ class _DurationSettingsScreenState extends State<DurationSettingsScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(label,
-                    style: const TextStyle(
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w500,
-                        fontSize: 16)),
-                Text("${value.toInt()} ${'minutes_label'.tr().toLowerCase()}",
-                    style: TextStyle(
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w500,
+                    fontSize: 16,
+                    color: itemColor,
+                  ),
+                ),
+                // 🔥 TIKLANABİLİR SÜRE METNİ (Manuel Giriş)
+                GestureDetector(
+                  onTap: () => _showDurationDialog(
+                      context, label, value, min, max, onChangeEnd),
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: primaryColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: primaryColor.withOpacity(0.3)),
+                    ),
+                    child: Text(
+                      "${value.toInt()} ${'minutes_label'.tr().toLowerCase()}",
+                      style: TextStyle(
                         fontFamily: 'Poppins',
                         fontWeight: FontWeight.bold,
-                        color: Theme.of(context).primaryColor,
-                        fontSize: 16)),
+                        color: primaryColor,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 10),
@@ -252,8 +286,8 @@ class _DurationSettingsScreenState extends State<DurationSettingsScreen> {
                 value: value,
                 min: min,
                 max: max,
-                activeColor: Theme.of(context).primaryColor,
-                inactiveColor: Theme.of(context).primaryColor.withOpacity(0.2),
+                activeColor: primaryColor,
+                inactiveColor: primaryColor.withOpacity(0.2),
                 onChanged: onChanged,
                 onChangeEnd: onChangeEnd,
               ),
@@ -261,6 +295,94 @@ class _DurationSettingsScreenState extends State<DurationSettingsScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  // 🔥 Manuel Süre Giriş Dialogu
+  void _showDurationDialog(BuildContext context, String title,
+      double currentVal, double min, double max, Function(double) onConfirm) {
+    final TextEditingController controller =
+        TextEditingController(text: currentVal.toInt().toString());
+    String? errorText; // Hata mesajı için değişken
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              backgroundColor: const Color(0xFF202020),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  side: BorderSide(
+                      color: Colors.white.withOpacity(0.06), width: 1)),
+              title: Text("$title - ${'minutes_label'.tr()}",
+                  style: const TextStyle(
+                      fontFamily: 'Poppins', color: Colors.white)),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: controller,
+                    keyboardType: TextInputType.number,
+                    style: const TextStyle(
+                        color: Colors.white, fontFamily: 'Poppins'),
+                    decoration: InputDecoration(
+                      hintText: "min_max_warning".tr(args: [
+                        min.toInt().toString(),
+                        max.toInt().toString()
+                      ]), // örn: "10 - 180 arası"
+                      hintStyle:
+                          TextStyle(color: Colors.white.withOpacity(0.5)),
+                      errorText: errorText, // 🔥 Hata mesajını göster
+                      errorStyle: const TextStyle(color: Colors.redAccent),
+                      enabledBorder: OutlineInputBorder(
+                          borderSide:
+                              BorderSide(color: Colors.white.withOpacity(0.3))),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              color: Theme.of(context).primaryColor)),
+                      errorBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.redAccent)),
+                      focusedErrorBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.redAccent)),
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text("cancel".tr(),
+                      style: TextStyle(color: Colors.white.withOpacity(0.7))),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).primaryColor),
+                  onPressed: () {
+                    final int? val = int.tryParse(controller.text);
+                    if (val != null && val >= min && val <= max) {
+                      onConfirm(val.toDouble());
+                      Navigator.pop(context);
+                    } else {
+                      // Hata varsa UI'ı güncelle
+                      setState(() {
+                        errorText = "min_max_warning".tr(args: [
+                          min.toInt().toString(),
+                          max.toInt().toString()
+                        ]);
+                      });
+                    }
+                  },
+                  child: Text("save".tr(),
+                      style: const TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold)),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }

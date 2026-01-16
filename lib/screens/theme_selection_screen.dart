@@ -26,20 +26,22 @@ class _ThemeSelectionScreenState extends State<ThemeSelectionScreen> {
     final adManager = context.watch<AdManager>();
 
     return Scaffold(
-      backgroundColor: themeProvider.bgColor,
+      backgroundColor: const Color(0xFF121212), // 🔥 Sabit Siyah Arka Plan
       appBar: AppBar(
         title: Text(
           'theme_settings'.tr(),
           style: TextStyle(
+            // 🔥 Sabit Beyaz Metin
             fontFamily: 'Poppins',
             fontWeight: FontWeight.bold,
-            color: themeProvider.textColor,
+            color: Colors.white,
           ),
         ),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.transparent,
-        iconTheme: IconThemeData(color: themeProvider.textColor),
+        iconTheme:
+            const IconThemeData(color: Colors.white), // 🔥 Sabit Beyaz İkon
       ),
       body: ListView.builder(
         padding: const EdgeInsets.all(16),
@@ -136,15 +138,18 @@ class _ThemeSelectionScreenState extends State<ThemeSelectionScreen> {
               children: [
                 _ColorPreviewCircle(
                   label: 'Focus',
-                  color: theme.focus.accentColor,
+                  color: theme.focus.bgColor,
+                  gradient: theme.focus.gradient,
                 ),
                 _ColorPreviewCircle(
                   label: 'Break',
-                  color: theme.breakState.accentColor,
+                  color: theme.breakState.bgColor,
+                  gradient: theme.breakState.gradient,
                 ),
                 _ColorPreviewCircle(
                   label: 'Finish',
-                  color: theme.finish.accentColor,
+                  color: theme.finish.bgColor,
+                  gradient: theme.finish.gradient,
                 ),
               ],
             ),
@@ -175,20 +180,20 @@ class _ThemeSelectionScreenState extends State<ThemeSelectionScreen> {
               //   onRewardEarned: () async {
               await themeProvider.unlockTheme(theme.id);
 
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Row(
-                      children: [
-                        const Icon(Icons.lock_open, color: Colors.white),
-                        const SizedBox(width: 8),
-                        Text('${theme.name} ${'theme_unlocked'.tr()}'),
-                      ],
-                    ),
-                    backgroundColor: theme.focus.bgColor,
-                  ),
-                );
-              }
+              // if (context.mounted) {
+              //   ScaffoldMessenger.of(context).showSnackBar(
+              //     SnackBar(
+              //       content: Row(
+              //         children: [
+              //           const Icon(Icons.lock_open, color: Colors.white),
+              //           const SizedBox(width: 8),
+              //           Text('${theme.name} ${'theme_unlocked'.tr()}'),
+              //         ],
+              //       ),
+              //       backgroundColor: theme.focus.bgColor,
+              //     ),
+              //   );
+              // }
               //   },
               // );
 
@@ -229,10 +234,12 @@ class _ThemeSelectionScreenState extends State<ThemeSelectionScreen> {
 class _ColorPreviewCircle extends StatelessWidget {
   final String label;
   final Color color;
+  final Gradient? gradient;
 
   const _ColorPreviewCircle({
     required this.label,
     required this.color,
+    this.gradient,
   });
 
   @override
@@ -241,19 +248,29 @@ class _ColorPreviewCircle extends StatelessWidget {
       child: Column(
         children: [
           Container(
-            width: 40,
-            height: 40,
+            width: 50,
+            height: 50,
             decoration: BoxDecoration(
-              color: color,
+              color: gradient == null ? color : null,
+              gradient: gradient,
               shape: BoxShape.circle,
+              border: Border.all(color: Colors.white10, width: 1),
+              boxShadow: [
+                BoxShadow(
+                  color: color.withOpacity(0.4),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 8),
           Text(
             label,
             style: const TextStyle(
-              color: Colors.white60,
-              fontSize: 10,
+              color: Colors.white70,
+              fontSize: 11,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],
@@ -285,8 +302,8 @@ class _ThemeCard extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: theme.idle.hasGradient ? null : theme.idle.bgColor,
-            gradient: theme.idle.gradient,
+            color: theme.focus.hasGradient ? null : theme.focus.bgColor,
+            gradient: theme.focus.gradient,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color:
@@ -342,9 +359,12 @@ class _ThemeCard extends StatelessWidget {
                     color: theme.focus.accentColor,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.check,
-                    color: Colors.white,
+                    // 🔥 Arka plan açiksa siyah, koyuysa beyaz ikon
+                    color: theme.focus.accentColor.computeLuminance() > 0.5
+                        ? Colors.black
+                        : Colors.white,
                     size: 18,
                   ),
                 )

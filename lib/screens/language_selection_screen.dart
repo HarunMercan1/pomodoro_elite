@@ -1,5 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/theme_provider.dart';
 
 class LanguageSelectionScreen extends StatelessWidget {
   const LanguageSelectionScreen({super.key});
@@ -32,6 +34,14 @@ class LanguageSelectionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = context.watch<ThemeProvider>();
+    final theme = themeProvider.currentTheme;
+    final defaultCardColor = theme.settingsCardColor ?? const Color(0xFF202020);
+    final borderColor =
+        theme.settingsBorderColor ?? Colors.white.withOpacity(0.06);
+    final itemColor = theme.settingsItemColor ?? themeProvider.textColor;
+    final primaryColor = Theme.of(context).primaryColor;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -56,17 +66,15 @@ class LanguageSelectionScreen extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),
               side: isSelected
-                  ? BorderSide(color: Theme.of(context).primaryColor, width: 2)
-                  : BorderSide.none,
+                  ? BorderSide(color: primaryColor, width: 2)
+                  : BorderSide(color: borderColor, width: 1),
             ),
             color: isSelected
-                ? Theme.of(context).primaryColor.withOpacity(0.1)
-                : null,
+                ? primaryColor.withOpacity(0.1)
+                : defaultCardColor, // 🔥 Temadan gelen kart rengi
             child: InkWell(
               onTap: () {
                 context.setLocale(Locale(lang['code']!));
-                // Opsiyonel: Seçimden sonra geri dönmek isterseniz:
-                // Navigator.pop(context);
               },
               borderRadius: BorderRadius.circular(15),
               child: Padding(
@@ -87,13 +95,14 @@ class LanguageSelectionScreen extends StatelessWidget {
                           fontSize: 18,
                           fontWeight:
                               isSelected ? FontWeight.bold : FontWeight.normal,
+                          color: itemColor, // 🔥 Metin rengi
                         ),
                       ),
                     ),
                     if (isSelected)
                       Icon(
                         Icons.check_circle,
-                        color: Theme.of(context).primaryColor,
+                        color: primaryColor,
                       ),
                   ],
                 ),
