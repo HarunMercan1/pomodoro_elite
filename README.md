@@ -135,7 +135,7 @@ Sıradan bir sayaç uygulamasının ötesine geçen Pomodoro Elite, **Flutter** 
 
 **Harun Reşit Mercan**
 
-- LinkedIn: [Harun Reşit Mercan](https://www.linkedin.com/in/harun-resit-mercan/)
+- LinkedIn: [Harun Reşit Mercan](https://www.linkedin.com/in/harunresitmercan/)
 - GitHub: [@HarunMercan1](https://github.com/HarunMercan1)
 
 ---
