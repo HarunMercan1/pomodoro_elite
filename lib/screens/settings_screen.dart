@@ -124,21 +124,21 @@ class _SettingsScreenState extends State<SettingsScreen>
     final themeProvider = context.watch<ThemeProvider>();
 
     return Scaffold(
-      backgroundColor: themeProvider.bgColor,
+      backgroundColor: themeProvider.idleBgColor,
       appBar: AppBar(
         title: Text(
           'settings_title'.tr(),
           style: TextStyle(
               fontFamily: 'Poppins',
               fontWeight: FontWeight.w600,
-              color: themeProvider.textColor),
+              color: themeProvider.idleTextColor),
         ),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
-          color: themeProvider.textColor,
+          color: themeProvider.idleTextColor,
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -161,7 +161,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                         Colors.white.withOpacity(0.06);
                     // 🔥 İçerik Rengi: Eğer tema özel renk belirttiyse onu kullan, yoksa genel textColor
                     final itemColor =
-                        theme.settingsItemColor ?? themeProvider.textColor;
+                        theme.settingsItemColor ?? themeProvider.idleTextColor;
 
                     return Column(
                       children: [

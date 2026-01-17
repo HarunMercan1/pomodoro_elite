@@ -39,7 +39,7 @@ class LanguageSelectionScreen extends StatelessWidget {
     final defaultCardColor = theme.settingsCardColor ?? const Color(0xFF202020);
     final borderColor =
         theme.settingsBorderColor ?? Colors.white.withOpacity(0.06);
-    final itemColor = theme.settingsItemColor ?? themeProvider.textColor;
+    final itemColor = theme.settingsItemColor ?? themeProvider.idleTextColor;
     final primaryColor = Theme.of(context).primaryColor;
 
     return Scaffold(

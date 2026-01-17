@@ -622,6 +622,19 @@ class ThemeProvider with ChangeNotifier {
   Color get textColor => stateColors.textColor;
 
   // ============================================================
+  // SETTINGS EKRANI İÇİN SABİT RENKLER (Timer durumundan bağımsız)
+  // ============================================================
+
+  /// Settings için: Her zaman idle arka plan rengi
+  Color get idleBgColor => currentTheme.idle.bgColor;
+
+  /// Settings için: Her zaman idle metin rengi
+  Color get idleTextColor => currentTheme.idle.textColor;
+
+  /// Settings için: Her zaman idle accent rengi
+  Color get idleAccentColor => currentTheme.idle.accentColor;
+
+  // ============================================================
   // DURUM YÖNETİMİ
   // ============================================================
 
