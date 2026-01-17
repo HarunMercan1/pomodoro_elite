@@ -152,7 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     // Üst buton rengi: Temadan gelen efektif renkleri kullan
     final Color topButtonActiveColor = stateColors.effectiveMenuButtonColor;
-    final Color topButtonTextColor = stateColors.effectiveButtonTextColor;
+    final Color topButtonTextColor = stateColors.effectiveMenuButtonTextColor;
 
     final double screenHeight = MediaQuery.of(context).size.height;
     final bool isSmallScreen = screenHeight < 700;

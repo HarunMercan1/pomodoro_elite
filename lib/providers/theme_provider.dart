@@ -20,7 +20,9 @@ class ThemeStateColors {
   final Color? mainButtonColor; // Ana buton arka planı (null ise accentColor)
   final Color?
       mainButtonTextColor; // Ana buton ikon/yazı rengi (null ise beyaz)
-  final Color? menuButtonColor; // Üst menü butonları (null ise accentColor)
+  final Color?
+      menuButtonColor; // Üst menü butonları arka planı (null ise accentColor)
+  final Color? menuButtonTextColor; // 🔥 YENİ: Üst menü buton yazı rengi
 
   const ThemeStateColors({
     required this.bgColor,
@@ -30,6 +32,7 @@ class ThemeStateColors {
     this.mainButtonColor,
     this.mainButtonTextColor,
     this.menuButtonColor,
+    this.menuButtonTextColor,
   });
 
   /// Gradient var mı?
@@ -53,8 +56,11 @@ class ThemeStateColors {
   /// Efektif Buton Yazı Rengi
   Color get effectiveButtonTextColor => mainButtonTextColor ?? Colors.white;
 
-  /// Efektif Menü Buton Rengi
+  /// Efektif Menü Buton Arka Plan Rengi
   Color get effectiveMenuButtonColor => menuButtonColor ?? accentColor;
+
+  /// 🔥 YENİ: Efektif Menü Buton Yazı Rengi
+  Color get effectiveMenuButtonTextColor => menuButtonTextColor ?? Colors.white;
 }
 
 /// Ana tema modeli
@@ -118,21 +124,27 @@ class AppThemes {
       isLocked: false,
       settingsCardColor: Color(0xFF202020),
       settingsBorderColor: Color(0x0FFFFFFF), // White with 0.06 opacity
+      // 🔥 IDLE: Beyaz buton, lacivert yazı
       idle: ThemeStateColors(
         bgColor: Color(0xFF141414),
         gradientColors: [Color(0xFF141414), Color(0xFF141414)],
         accentColor: Color(0xFF1A2980),
         mainButtonColor: Color(0xFF1A2980),
         mainButtonTextColor: Colors.white,
+        menuButtonColor: Colors.white, // Beyaz buton arka planı
+        menuButtonTextColor: Color(0xFF1A2980), // Lacivert yazı
       ),
+      // 🔥 FOCUS: Lacivert buton, beyaz yazı
       focus: ThemeStateColors(
         bgColor: AppColors.themeBlue,
         gradientColors: AppColors.runningGradient,
         accentColor: AppColors.ringCyan,
         mainButtonColor: Colors.white,
         mainButtonTextColor: AppColors.themeBlue,
-        menuButtonColor: AppColors.themeBlue,
+        menuButtonColor: Color(0xFF1A2980), // Lacivert buton arka planı
+        menuButtonTextColor: Colors.white, // Beyaz yazı
       ),
+      // 🔥 BREAK: Kahverengi buton, beyaz yazı
       breakState: ThemeStateColors(
         bgColor: AppColors.themeBronze,
         gradientColors: AppColors.pausedGradient,
@@ -140,6 +152,19 @@ class AppThemes {
         textColor: AppColors.themeBronze,
         mainButtonColor: Colors.white,
         mainButtonTextColor: AppColors.themeBronze,
+        menuButtonColor: AppColors.themeBronze, // Kahverengi buton arka planı
+        menuButtonTextColor: Colors.white, // Beyaz yazı
+      ),
+      // 🔥 WORK PAUSED: Kahverengi buton, beyaz yazı
+      workPaused: ThemeStateColors(
+        bgColor: AppColors.themeBronze,
+        gradientColors: AppColors.pausedGradient,
+        accentColor: AppColors.themeBronze,
+        textColor: AppColors.themeBronze,
+        mainButtonColor: Colors.white,
+        mainButtonTextColor: AppColors.themeBronze,
+        menuButtonColor: AppColors.themeBronze, // Kahverengi buton arka planı
+        menuButtonTextColor: Colors.white, // Beyaz yazı
       ),
       finish: ThemeStateColors(
         bgColor: AppColors.themeGreen,
