@@ -124,21 +124,21 @@ class _SettingsScreenState extends State<SettingsScreen>
     final themeProvider = context.watch<ThemeProvider>();
 
     return Scaffold(
-      backgroundColor: themeProvider.idleBgColor,
+      backgroundColor: themeProvider.settingsBgColor,
       appBar: AppBar(
         title: Text(
           'settings_title'.tr(),
           style: TextStyle(
               fontFamily: 'Poppins',
               fontWeight: FontWeight.w600,
-              color: themeProvider.idleTextColor),
+              color: themeProvider.settingsTextColor),
         ),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
-          color: themeProvider.idleTextColor,
+          color: themeProvider.settingsTextColor,
           onPressed: () => Navigator.pop(context),
         ),
       ),

@@ -64,18 +64,24 @@ class _DurationSettingsScreenState extends State<DurationSettingsScreen> {
     double currentShort = _tempShortBreak ?? settings.shortBreakTime.toDouble();
     double currentLong = _tempLongBreak ?? settings.longBreakTime.toDouble();
 
+    final themeProvider = context.watch<ThemeProvider>();
+
     return Scaffold(
+      backgroundColor: themeProvider.settingsBgColor,
       appBar: AppBar(
         title: Text(
           "duration_settings".tr(),
-          style: const TextStyle(
-              fontFamily: 'Poppins', fontWeight: FontWeight.w600),
+          style: TextStyle(
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w600,
+              color: themeProvider.settingsTextColor),
         ),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
+          color: themeProvider.settingsTextColor,
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -222,7 +228,8 @@ class _DurationSettingsScreenState extends State<DurationSettingsScreen> {
     final borderColor =
         theme.settingsBorderColor ?? Colors.white.withOpacity(0.06);
     final itemColor = theme.settingsItemColor ?? themeProvider.idleTextColor;
-    final primaryColor = Theme.of(context).primaryColor;
+    final sliderColor =
+        themeProvider.idleAccentColor; // Tema bazlı slider rengi
 
     return Card(
       elevation: 0,
@@ -256,16 +263,16 @@ class _DurationSettingsScreenState extends State<DurationSettingsScreen> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
-                      color: primaryColor.withOpacity(0.1),
+                      color: sliderColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: primaryColor.withOpacity(0.3)),
+                      border: Border.all(color: sliderColor.withOpacity(0.3)),
                     ),
                     child: Text(
                       "${value.toInt()} ${'minutes_label'.tr().toLowerCase()}",
                       style: TextStyle(
                         fontFamily: 'Poppins',
                         fontWeight: FontWeight.bold,
-                        color: primaryColor,
+                        color: sliderColor,
                         fontSize: 16,
                       ),
                     ),
@@ -286,8 +293,8 @@ class _DurationSettingsScreenState extends State<DurationSettingsScreen> {
                 value: value,
                 min: min,
                 max: max,
-                activeColor: primaryColor,
-                inactiveColor: primaryColor.withOpacity(0.2),
+                activeColor: sliderColor,
+                inactiveColor: sliderColor.withOpacity(0.2),
                 onChanged: onChanged,
                 onChangeEnd: onChangeEnd,
               ),

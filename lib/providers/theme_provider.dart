@@ -73,6 +73,7 @@ class AppTheme {
   final ThemeStateColors breakState; // Mola
   final ThemeStateColors finish; // Bitiş
   final bool isLocked;
+  final Color? settingsBgColor; // 🔥 YENİ: Ayarlar ekranı arka plan rengi
   final Color? settingsCardColor; // 🔥 YENİ: Ayarlar kart rengi
   final Color? settingsBorderColor; // 🔥 YENİ: Ayarlar border rengi
   final Color? settingsItemColor; // 🔥 YENİ: Ayarlar item rengi
@@ -88,6 +89,7 @@ class AppTheme {
     required this.breakState,
     required this.finish,
     this.isLocked = true,
+    this.settingsBgColor,
     this.settingsCardColor,
     this.settingsBorderColor,
     this.settingsItemColor,
@@ -182,31 +184,54 @@ class AppThemes {
       id: 'classic_elite',
       name: 'Klasik',
       vibe: 'Güven, Sade',
-      settingsCardColor: Color(0xFF1E1E1E),
-      settingsBorderColor: Color(0x1AFFFFFF), // White with 0.1 opacity
+      // 🔥 Ayarlar ekranı renkleri - Açık mavi tonlarında
+      settingsBgColor: Color(0xFFE3F2FD), // Açık mavi-beyaz arka plan
+      settingsCardColor: Color(0xFFBBDEFB), // Açık mavi kart (beyaz-mavi arası)
+      settingsBorderColor: Color(0x661565C0), // Mavi border
+      settingsItemColor: Color(0xFF0D47A1), // Koyu mavi metin
+      // 🔥 IDLE: Koyu arka plan (sayaç ekranı)
       idle: ThemeStateColors(
-        bgColor: Color(0xFF121212),
+        bgColor: Color(0xFF121212), // Koyu arka plan
         gradientColors: [Color(0xFF121212), Color(0xFF1E1E1E)],
-        accentColor: Color(0xFF64B5F6),
+        accentColor: Color(0xFF1565C0), // Koyu mavi halka
+        textColor: Colors.white,
         mainButtonColor: Color(0xFF1565C0),
         mainButtonTextColor: Colors.white,
+        menuButtonColor: Colors.white, // Beyaz buton
+        menuButtonTextColor: Color(0xFF1565C0), // Koyu mavi yazı
       ),
+      // 🔥 FOCUS: Sayaç akarken - daha koyu mavi buton ve halka
       focus: ThemeStateColors(
-        bgColor: Color(0xFF1565C0),
-        gradientColors: [Color(0xFF1565C0), Color(0xFF42A5F5)],
-        accentColor: Color(
-            0xFF90CAF9), // Changed from White to Light Blue to distinguish from others
+        bgColor: Color(0xFFBBDEFB), // Daha koyu açık mavi
+        gradientColors: [Color(0xFFBBDEFB), Color(0xFF90CAF9)],
+        accentColor: Color(0xFF0D47A1), // Koyu mavi halka (butonla aynı)
+        textColor: Color(0xFF0D47A1),
         mainButtonColor: Colors.white,
         mainButtonTextColor: Color(0xFF1565C0),
-        menuButtonColor: Color(0xFF90CAF9),
+        menuButtonColor: Color(0xFF0D47A1), // Daha koyu mavi buton
+        menuButtonTextColor: Colors.white, // Beyaz yazı
       ),
+      // 🔥 BREAK: Sayaç akarken - focus ile aynı
       breakState: ThemeStateColors(
-        bgColor: Color(0xFFE3F2FD),
-        gradientColors: [Color(0xFFE3F2FD), Color(0xFFBBDEFB)],
-        accentColor: Color(0xFF1565C0),
-        textColor: Color(0xFF1565C0),
+        bgColor: Color(0xFFBBDEFB), // Daha koyu açık mavi
+        gradientColors: [Color(0xFFBBDEFB), Color(0xFF90CAF9)],
+        accentColor: Color(0xFF0D47A1), // Koyu mavi halka (butonla aynı)
+        textColor: Color(0xFF0D47A1),
         mainButtonColor: Colors.white,
         mainButtonTextColor: Color(0xFF1565C0),
+        menuButtonColor: Color(0xFF0D47A1), // Daha koyu mavi buton
+        menuButtonTextColor: Colors.white, // Beyaz yazı
+      ),
+      // 🔥 WORK PAUSED: Gri-mavi arka plan, gri-mavi buton
+      workPaused: ThemeStateColors(
+        bgColor: Color(0xFFECEFF1), // Gri-mavi (çok fark edilir)
+        gradientColors: [Color(0xFFECEFF1), Color(0xFFCFD8DC)],
+        accentColor: Color(0xFF455A64), // Gri-mavi halka
+        textColor: Color(0xFF37474F),
+        mainButtonColor: Colors.white,
+        mainButtonTextColor: Color(0xFF455A64),
+        menuButtonColor: Color(0xFF455A64), // Gri-mavi buton
+        menuButtonTextColor: Colors.white, // Beyaz yazı
       ),
       finish: ThemeStateColors(
         bgColor: Color(0xFF43A047),
@@ -214,6 +239,8 @@ class AppThemes {
         accentColor: Colors.white,
         mainButtonColor: Colors.white,
         mainButtonTextColor: Color(0xFF2E7D32),
+        menuButtonColor: Colors.white, // Beyaz buton
+        menuButtonTextColor: Color(0xFF2E7D32), // Yeşil yazı
       ),
     ),
 
@@ -649,6 +676,14 @@ class ThemeProvider with ChangeNotifier {
   // ============================================================
   // SETTINGS EKRANI İÇİN SABİT RENKLER (Timer durumundan bağımsız)
   // ============================================================
+
+  /// Settings için: Tema bazlı arka plan rengi (yoksa idle bgColor)
+  Color get settingsBgColor =>
+      currentTheme.settingsBgColor ?? currentTheme.idle.bgColor;
+
+  /// Settings için: Tema bazlı metin rengi (yoksa idle textColor)
+  Color get settingsTextColor =>
+      currentTheme.settingsItemColor ?? currentTheme.idle.textColor;
 
   /// Settings için: Her zaman idle arka plan rengi
   Color get idleBgColor => currentTheme.idle.bgColor;

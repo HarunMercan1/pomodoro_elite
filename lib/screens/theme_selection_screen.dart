@@ -26,22 +26,24 @@ class _ThemeSelectionScreenState extends State<ThemeSelectionScreen> {
     final adManager = context.watch<AdManager>();
 
     return Scaffold(
-      backgroundColor: const Color(0xFF121212), // 🔥 Sabit Siyah Arka Plan
+      backgroundColor: themeProvider.settingsBgColor, // 🔥 Tema bazlı arka plan
       appBar: AppBar(
         title: Text(
           'theme_settings'.tr(),
           style: TextStyle(
-            // 🔥 Sabit Beyaz Metin
             fontFamily: 'Poppins',
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: themeProvider.settingsTextColor, // 🔥 Tema bazlı metin
           ),
         ),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.transparent,
-        iconTheme:
-            const IconThemeData(color: Colors.white), // 🔥 Sabit Beyaz İkon
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded),
+          color: themeProvider.settingsTextColor, // 🔥 Tema bazlı ikon
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: ListView.builder(
         padding: const EdgeInsets.all(16),

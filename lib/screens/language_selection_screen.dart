@@ -43,15 +43,23 @@ class LanguageSelectionScreen extends StatelessWidget {
     final primaryColor = Theme.of(context).primaryColor;
 
     return Scaffold(
+      backgroundColor: themeProvider.settingsBgColor,
       appBar: AppBar(
         title: Text(
           'language_label'.tr(),
-          style: const TextStyle(
-              fontFamily: 'Poppins', fontWeight: FontWeight.bold),
+          style: TextStyle(
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.bold,
+              color: themeProvider.settingsTextColor),
         ),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.transparent,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded),
+          color: themeProvider.settingsTextColor,
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: ListView.separated(
         padding: const EdgeInsets.all(16),

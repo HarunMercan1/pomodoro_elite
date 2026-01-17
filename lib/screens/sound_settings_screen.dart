@@ -30,7 +30,8 @@ class _SoundSettingsScreenState extends State<SoundSettingsScreen> {
     final borderColor =
         theme.settingsBorderColor ?? Colors.white.withOpacity(0.06);
     final itemColor = theme.settingsItemColor ?? themeProvider.idleTextColor;
-    final primaryColor = Theme.of(context).primaryColor;
+    final sliderColor =
+        themeProvider.idleAccentColor; // Tema bazlı slider/switch rengi
 
     // Slider değeri: Yerel değer varsa onu, yoksa Provider'dakini al
     double sliderValue = _currentSliderValue ?? settings.backgroundVolume;
@@ -39,17 +40,14 @@ class _SoundSettingsScreenState extends State<SoundSettingsScreen> {
     final bool isLocked = timerProvider.isRunning;
 
     return Scaffold(
+      backgroundColor: themeProvider.settingsBgColor,
       appBar: AppBar(
         title: Text(
           "sound_settings".tr(),
           style: TextStyle(
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w600,
-            color:
-                itemColor, // AppBar başlığı için de item rengini kullanabiliriz veya varsayılan bırakabiliriz.
-            // Ancak, Nordic Snow'da AppBar Scaffold üzerindedir (Dark BG). ItemColor Dark.
-            // Bu yüzden AppBar başlığı temaProvider.textColor (White) olmalı.
-            // Bu yüzden burayı DEĞİŞTİRMİYORUM, varsayılan kalsın.
+            color: themeProvider.settingsTextColor,
           ),
         ),
         centerTitle: true,
@@ -57,6 +55,7 @@ class _SoundSettingsScreenState extends State<SoundSettingsScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
+          color: themeProvider.settingsTextColor,
           onPressed: () {
             settings.stopPreview(); // Çıkarken sesi sustur
             Navigator.pop(context);
@@ -128,7 +127,7 @@ class _SoundSettingsScreenState extends State<SoundSettingsScreen> {
                                 ),
                               ),
                               value: settings.isBackgroundMusicEnabled,
-                              activeColor: primaryColor,
+                              activeColor: sliderColor,
                               onChanged: (val) =>
                                   settings.toggleBackgroundMusic(val),
                             ),
@@ -147,7 +146,7 @@ class _SoundSettingsScreenState extends State<SoundSettingsScreen> {
                                       value: sliderValue,
                                       min: 0.0,
                                       max: 1.0,
-                                      activeColor: primaryColor,
+                                      activeColor: sliderColor,
                                       onChanged: (val) {
                                         setState(
                                             () => _currentSliderValue = val);
@@ -184,7 +183,7 @@ class _SoundSettingsScreenState extends State<SoundSettingsScreen> {
                                         ? Icons.radio_button_checked
                                         : Icons.radio_button_off,
                                     color: isSelected
-                                        ? primaryColor
+                                        ? sliderColor
                                         : itemColor.withOpacity(0.5),
                                   ),
                                   onTap: () =>
@@ -223,7 +222,7 @@ class _SoundSettingsScreenState extends State<SoundSettingsScreen> {
                               ),
                             ),
                             trailing: isSelected
-                                ? Icon(Icons.check_circle, color: primaryColor)
+                                ? Icon(Icons.check_circle, color: sliderColor)
                                 : null,
                             onTap: () =>
                                 settings.setNotificationSound(entry.key),

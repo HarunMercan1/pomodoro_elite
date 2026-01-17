@@ -282,10 +282,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       Consumer<TimerProvider>(
                         builder: (context, provider, child) {
                           // 🔥 Halka Rengi Mantığı
-                          // EĞER Elite teması ise: Orijinal AppColors mantığını kullan.
+                          // Sadece Elite teması için orijinal AppColors mantığını kullan
+                          // Klasik tema kendi accentColor'ını kullanır
                           Color localRingColor;
-                          if (themeProvider.currentThemeId == 'elite' ||
-                              themeProvider.currentThemeId == 'classic_elite') {
+                          if (themeProvider.currentThemeId == 'elite') {
                             localRingColor = AppColors.getRingColor(
                               isTimerRunning,
                               isPaused,
