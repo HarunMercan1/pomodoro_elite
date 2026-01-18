@@ -269,13 +269,24 @@ class AppThemes {
         mainButtonTextColor: Color(0xFFB71C1C),
         menuButtonColor: Color(0xFFD32F2F),
       ),
+      // 🔥 BREAK: Focus ile aynı (sayaç akarken kırmızı)
       breakState: ThemeStateColors(
+        bgColor: Color(0xFFB71C1C),
+        gradientColors: [Color(0xFF000000), Color(0xFFB71C1C)],
+        accentColor: Color(0xFFFF5252),
+        mainButtonColor: Colors.white,
+        mainButtonTextColor: Color(0xFFB71C1C),
+        menuButtonColor: Color(0xFFD32F2F),
+      ),
+      // 🔥 WORK PAUSED: Gri tonları (sayaç durduğunda)
+      workPaused: ThemeStateColors(
         bgColor: Color(0xFF212121),
         gradientColors: [Color(0xFF424242), Color(0xFF212121)],
         accentColor: Colors.grey,
         textColor: Colors.white70,
         mainButtonColor: Colors.white,
         mainButtonTextColor: Colors.black,
+        menuButtonColor: Colors.grey,
       ),
       finish: ThemeStateColors(
         bgColor: Color(0xFF000000),
@@ -720,11 +731,9 @@ class ThemeProvider with ChangeNotifier {
     if (isAlarmPlaying) {
       newState = TimerState.finish;
     } else if (isPaused) {
-      if (mode == 'work' || mode == 'focus') {
-        newState = TimerState.workPaused;
-      } else {
-        newState = TimerState.pause;
-      }
+      // 🔥 TÜM MODLAR İÇİN: Duraklatıldığında temanın "workPaused" rengini kullan
+      // (Her tema kendi workPaused rengini tanımlar: ST -> Gri, Klasik -> Gri-Mavi)
+      newState = TimerState.workPaused;
     } else if (mode == 'shortBreak' || mode == 'longBreak') {
       newState = isRunning ? TimerState.pause : TimerState.idle;
     } else {
