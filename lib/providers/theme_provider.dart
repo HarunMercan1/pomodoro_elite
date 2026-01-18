@@ -147,15 +147,15 @@ class AppThemes {
         menuButtonTextColor: Colors.white, // Beyaz yazı
       ),
       // 🔥 BREAK: Kahverengi buton, beyaz yazı
+      // 🔥 BREAK: Focus ile aynı (Mavi) - Kullanıcı isteği
       breakState: ThemeStateColors(
-        bgColor: AppColors.themeBronze,
-        gradientColors: AppColors.pausedGradient,
-        accentColor: AppColors.themeBronze,
-        textColor: AppColors.themeBronze,
+        bgColor: AppColors.themeBlue,
+        gradientColors: AppColors.runningGradient,
+        accentColor: AppColors.ringCyan,
         mainButtonColor: Colors.white,
-        mainButtonTextColor: AppColors.themeBronze,
-        menuButtonColor: AppColors.themeBronze, // Kahverengi buton arka planı
-        menuButtonTextColor: Colors.white, // Beyaz yazı
+        mainButtonTextColor: AppColors.themeBlue,
+        menuButtonColor: Color(0xFF1A2980),
+        menuButtonTextColor: Colors.white,
       ),
       // 🔥 WORK PAUSED: Kahverengi buton, beyaz yazı
       workPaused: ThemeStateColors(
