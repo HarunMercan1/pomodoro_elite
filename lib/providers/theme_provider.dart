@@ -373,7 +373,17 @@ class AppThemes {
         mainButtonTextColor: Color(0xFF01579B),
         menuButtonColor: Color(0xFFB3E5FC),
       ),
+      // 🔥 BREAK: Focus ile aynı (Mavi)
       breakState: ThemeStateColors(
+        bgColor: Color(0xFF0277BD),
+        gradientColors: [Color(0xFF01579B), Color(0xFF29B6F6)],
+        accentColor: Colors.white,
+        mainButtonColor: Colors.white,
+        mainButtonTextColor: Color(0xFF01579B),
+        menuButtonColor: Color(0xFFB3E5FC),
+      ),
+      // 🔥 WORK PAUSED: Eski Break renkleri (Teal/Yeşil)
+      workPaused: ThemeStateColors(
         bgColor: Color(0xFF00695C),
         gradientColors: [Color(0xFF004D40), Color(0xFF4DB6AC)],
         accentColor: Color(0xFFB2DFDB),
@@ -413,7 +423,17 @@ class AppThemes {
         mainButtonTextColor: Color(0xFF1B5E20),
         menuButtonColor: Color(0xFFC8E6C9),
       ),
+      // 🔥 BREAK: Focus ile aynı (Yeşil)
       breakState: ThemeStateColors(
+        bgColor: Color(0xFF2E7D32),
+        gradientColors: [Color(0xFF1B5E20), Color(0xFF66BB6A)],
+        accentColor: Colors.white,
+        mainButtonColor: Colors.white,
+        mainButtonTextColor: Color(0xFF1B5E20),
+        menuButtonColor: Color(0xFFC8E6C9),
+      ),
+      // 🔥 WORK PAUSED: Eski Break renkleri (Kahverengi)
+      workPaused: ThemeStateColors(
         bgColor: Color(0xFF5D4037),
         gradientColors: [Color(0xFF3E2723), Color(0xFF8D6E63)],
         accentColor: Color(0xFFD7CCC8),
@@ -454,7 +474,17 @@ class AppThemes {
         mainButtonTextColor: Color(0xFFEA005E),
         menuButtonColor: Color(0xFFF8BBD0),
       ),
+      // 🔥 BREAK: Focus ile aynı (Neon Pembe)
       breakState: ThemeStateColors(
+        bgColor: Color(0xFFEA005E),
+        gradientColors: [Color(0xFF31004a), Color(0xFFEA005E)],
+        accentColor: Color(0xFFFFFF00),
+        mainButtonColor: Colors.white,
+        mainButtonTextColor: Color(0xFFEA005E),
+        menuButtonColor: Color(0xFFF8BBD0),
+      ),
+      // 🔥 WORK PAUSED: Eski Break renkleri (Koyu Gri)
+      workPaused: ThemeStateColors(
         bgColor: Color(0xFF212121),
         gradientColors: [Color(0xFF000000), Color(0xFF333333)],
         accentColor: Color(0xFF00E676),
@@ -495,7 +525,17 @@ class AppThemes {
         mainButtonTextColor: Color(0xFFA00000),
         menuButtonColor: Color(0xFFFFECB3),
       ),
+      // 🔥 BREAK: Focus ile aynı (Lüks Altın/Kahve)
       breakState: ThemeStateColors(
+        bgColor: Color(0xFF372C01),
+        gradientColors: [Color(0xFF000000), Color(0xFFFFB300)],
+        accentColor: Colors.white,
+        mainButtonColor: Colors.white,
+        mainButtonTextColor: Color(0xFFA00000),
+        menuButtonColor: Color(0xFFFFECB3),
+      ),
+      // 🔥 WORK PAUSED: Eski Break renkleri (Koyu Gri)
+      workPaused: ThemeStateColors(
         bgColor: Color(0xFF424242),
         gradientColors: [Color(0xFF212121), Color(0xFF757575)],
         accentColor: Color(0xFFE0E0E0),
@@ -536,7 +576,17 @@ class AppThemes {
         mainButtonTextColor: Color(0xFF6A1B9A),
         menuButtonColor: Color(0xFFE1BEE7),
       ),
+      // 🔥 BREAK: Focus ile aynı (Mor)
       breakState: ThemeStateColors(
+        bgColor: Color(0xFF6A1B9A),
+        gradientColors: [Color(0xFF4527A0), Color(0xFFFF6B6B)],
+        accentColor: Colors.white,
+        mainButtonColor: Colors.white,
+        mainButtonTextColor: Color(0xFF6A1B9A),
+        menuButtonColor: Color(0xFFE1BEE7),
+      ),
+      // 🔥 WORK PAUSED: Eski Break renkleri (Kahverengi)
+      workPaused: ThemeStateColors(
         bgColor: Color(0xFF3E2723),
         gradientColors: [Color(0xFF2D1B2E), Color(0xFF5D4037)],
         accentColor: Color(0xFFFFB74D),
@@ -579,7 +629,18 @@ class AppThemes {
         mainButtonTextColor: Color(0xFF0277BD),
         menuButtonColor: Color(0xFF0277BD),
       ),
+      // 🔥 BREAK: Focus ile aynı (Buz Mavisi)
       breakState: ThemeStateColors(
+        bgColor: Color(0xFFE3F2FD),
+        gradientColors: [Color(0xFFE1F5FE), Color(0xFFBBDEFB)],
+        accentColor: Color(0xFF0277BD),
+        textColor: Color(0xFF01579B),
+        mainButtonColor: Colors.white,
+        mainButtonTextColor: Color(0xFF0277BD),
+        menuButtonColor: Color(0xFF0277BD),
+      ),
+      // 🔥 WORK PAUSED: Eski Break renkleri (Gri-Mavi)
+      workPaused: ThemeStateColors(
         bgColor: Color(0xFFECEFF1),
         gradientColors: [Color(0xFFCFD8DC), Color(0xFFECEFF1)],
         accentColor: Color(0xFF607D8B),
@@ -622,7 +683,17 @@ class AppThemes {
         mainButtonTextColor: Color(0xFFBF360C),
         menuButtonColor: Color(0xFFFFCCBC),
       ),
+      // 🔥 BREAK: Focus ile aynı (Kızıl-Turuncu)
       breakState: ThemeStateColors(
+        bgColor: Color(0xFFBF360C),
+        gradientColors: [Color(0xFFB71C1C), Color(0xFFFF5722)],
+        accentColor: Colors.white,
+        mainButtonColor: Colors.white,
+        mainButtonTextColor: Color(0xFFBF360C),
+        menuButtonColor: Color(0xFFFFCCBC),
+      ),
+      // 🔥 WORK PAUSED: Eski Break renkleri (Kahverengi)
+      workPaused: ThemeStateColors(
         bgColor: Color(0xFF3E2723),
         gradientColors: [Color(0xFF212121), Color(0xFF5D4037)],
         accentColor: Color(0xFFBDBDBD),
