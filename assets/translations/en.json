@@ -176,5 +176,9 @@
   "recommended_sound": "Recommended",
   "ad_loading": "Ad is loading, please try again...",
   "save": "Save",
-  "min_max_warning": "Enter between {} and {}"
+  "min_max_warning": "Enter between {} and {}",
+  "daily_avg": "Daily Average",
+  "per_day": "per day",
+  "best_day": "Best Day",
+  "keep_fire_burning": "Keep the fire burning!"
 }

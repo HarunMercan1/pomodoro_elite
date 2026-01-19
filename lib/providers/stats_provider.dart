@@ -66,7 +66,8 @@ class StatsProvider with ChangeNotifier {
     String? sessionCountsString = _prefs.getString('daily_session_counts');
     if (sessionCountsString != null) {
       Map<String, dynamic> decoded = jsonDecode(sessionCountsString);
-      _dailySessionCounts = decoded.map((key, value) => MapEntry(key, value as int));
+      _dailySessionCounts =
+          decoded.map((key, value) => MapEntry(key, value as int));
     }
 
     _totalSessions = _prefs.getInt('total_sessions') ?? 0;
@@ -121,13 +122,30 @@ class StatsProvider with ChangeNotifier {
 
     // Kaydet ve Streak'i tekrar hesapla
     await _prefs.setString('daily_stats', jsonEncode(_dailyStats));
-    await _prefs.setString('daily_session_counts', jsonEncode(_dailySessionCounts));
+    await _prefs.setString(
+        'daily_session_counts', jsonEncode(_dailySessionCounts));
     await _prefs.setInt('total_minutes', _totalMinutes);
     await _prefs.setInt('total_sessions', _totalSessions);
 
     _calculateStreak(); // 🔥 Streak güncelle
 
     notifyListeners();
+  }
+
+  // 🔥 YENİ: Günlük Ortalama (Sadece aktif olunan günler baz alınabilir veya genel)
+  int get dailyAverageMinutes {
+    if (_dailyStats.isEmpty) return 0;
+    // Sadece kayıtlı günlerin ortalaması (aktif günler)
+    return _totalMinutes ~/ _dailyStats.length;
+  }
+
+  // 🔥 YENİ: En İyi Gün (En çok odaklanılan gün)
+  Map<String, dynamic> get bestDay {
+    if (_dailyStats.isEmpty) return {'date': '-', 'minutes': 0};
+
+    var maxEntry =
+        _dailyStats.entries.reduce((a, b) => a.value > b.value ? a : b);
+    return {'date': maxEntry.key, 'minutes': maxEntry.value};
   }
 
   Future<void> clearAllStats() async {

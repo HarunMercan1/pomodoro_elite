@@ -172,5 +172,9 @@
   "recommended_sound": "Önerilen",
   "ad_loading": "Reklam yükleniyor, tekrar dene...",
   "save": "Kaydet",
-  "min_max_warning": "{} ile {} arası giriniz"
+  "min_max_warning": "{} ile {} arası giriniz",
+  "daily_avg": "Günlük Ortalama",
+  "per_day": "günlük",
+  "best_day": "En İyi Gün",
+  "keep_fire_burning": "Ateşi canlı tut!"
 }

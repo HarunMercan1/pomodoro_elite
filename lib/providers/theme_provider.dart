@@ -697,11 +697,17 @@ class AppThemes {
       settingsItemColor:
           Color(0xFF01579B), // Derin Mavi (Yazı - Yüksek Okunabilirlik)
       idle: ThemeStateColors(
-        bgColor: Color(0xFFECEFF1), // Çok Açık Gri-Mavi
-        gradientColors: [Color(0xFFCFD8DC), Color(0xFFECEFF1)],
-        accentColor: Color(0xFF00B0FF), // Parlak Mavi
-        mainButtonColor: Color(0xFF00B0FF),
-        mainButtonTextColor: Colors.white,
+        bgColor: Color(0xFF0277BD), // Doygun Buz Mavisi (Koyu Ton)
+        gradientColors: [
+          Color(0xFF01579B),
+          Color(0xFF0288D1)
+        ], // Derin Mavi Gradient
+        accentColor: Colors.white, // Metinler ve İkonlar Beyaz
+        textColor: Colors.white, // Yazılar Beyaz (Okunabilirlik için)
+        mainButtonColor: Colors.white, // Buton Beyaz (Koyu zeminde patlasın)
+        mainButtonTextColor: Color(0xFF01579B), // Buton Yazısı Koyu Mavi
+        menuButtonColor: Color(0xFF039BE5), // Menü butonları hafif açık mavi
+        menuButtonTextColor: Colors.white,
       ),
       focus: ThemeStateColors(
         bgColor: Color(0xFFE1F5FE), // Çok Açık Mavi (Zemin)
