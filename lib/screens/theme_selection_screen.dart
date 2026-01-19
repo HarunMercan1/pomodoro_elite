@@ -135,25 +135,28 @@ class _ThemeSelectionScreenState extends State<ThemeSelectionScreen> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Tema önizleme - 3 durum rengi
-            Row(
-              children: [
-                _ColorPreviewCircle(
-                  label: 'Focus',
-                  color: theme.focus.bgColor,
-                  gradient: theme.focus.gradient,
+            // Tema önizleme - Gradient bar
+            Container(
+              height: 60,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                gradient: LinearGradient(
+                  colors: [
+                    theme.idle.accentColor,
+                    theme.focus.bgColor,
+                    theme.finish.bgColor,
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-                _ColorPreviewCircle(
-                  label: 'Break',
-                  color: theme.breakState.bgColor,
-                  gradient: theme.breakState.gradient,
-                ),
-                _ColorPreviewCircle(
-                  label: 'Finish',
-                  color: theme.finish.bgColor,
-                  gradient: theme.finish.gradient,
-                ),
-              ],
+                boxShadow: [
+                  BoxShadow(
+                    color: theme.focus.bgColor.withOpacity(0.4),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 16),
             Text(
@@ -178,101 +181,51 @@ class _ThemeSelectionScreenState extends State<ThemeSelectionScreen> {
             onPressed: () async {
               Navigator.pop(ctx);
 
-              // final success = await adManager.showRewardedAd(
-              //   onRewardEarned: () async {
-              await themeProvider.unlockTheme(theme.id);
+              final success = await adManager.showRewardedAd(
+                onRewardEarned: () async {
+                  await themeProvider.unlockTheme(theme.id);
 
-              // if (context.mounted) {
-              //   ScaffoldMessenger.of(context).showSnackBar(
-              //     SnackBar(
-              //       content: Row(
-              //         children: [
-              //           const Icon(Icons.lock_open, color: Colors.white),
-              //           const SizedBox(width: 8),
-              //           Text('${theme.name} ${'theme_unlocked'.tr()}'),
-              //         ],
-              //       ),
-              //       backgroundColor: theme.focus.bgColor,
-              //     ),
-              //   );
-              // }
-              //   },
-              // );
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Row(
+                          children: [
+                            const Icon(Icons.lock_open, color: Colors.white),
+                            const SizedBox(width: 8),
+                            Text('${theme.name} ${"theme_unlocked".tr()}'),
+                          ],
+                        ),
+                        backgroundColor: theme.focus.bgColor,
+                      ),
+                    );
+                  }
+                },
+              );
 
-              // if (!success && context.mounted) {
-              //   ScaffoldMessenger.of(context).showSnackBar(
-              //     SnackBar(
-              //       content: Row(
-              //         children: [
-              //           const Icon(Icons.hourglass_empty, color: Colors.white),
-              //           const SizedBox(width: 8),
-              //           Text('ad_loading'.tr()),
-              //         ],
-              //       ),
-              //       backgroundColor: Colors.orange,
-              //       duration: const Duration(seconds: 2),
-              //     ),
-              //   );
-              // }
+              if (!success && context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Row(
+                      children: [
+                        const Icon(Icons.hourglass_empty, color: Colors.white),
+                        const SizedBox(width: 8),
+                        Text('ad_loading'.tr()),
+                      ],
+                    ),
+                    backgroundColor: Colors.orange,
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              }
             },
             icon: const Icon(Icons.play_circle_outline),
-            // 🔥 TEST MODU: Reklamı atla, direkt aç
-            // label: Text('watch_ad'.tr()),
-            label: const Text('TEST: Hemen Aç'),
+            label: Text('watch_ad'.tr()),
             style: ElevatedButton.styleFrom(
               backgroundColor: theme.focus.effectiveButtonBg,
               foregroundColor: theme.focus.effectiveButtonTextColor,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ColorPreviewCircle extends StatelessWidget {
-  final String label;
-  final Color color;
-  final Gradient? gradient;
-
-  const _ColorPreviewCircle({
-    required this.label,
-    required this.color,
-    this.gradient,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Column(
-        children: [
-          Container(
-            width: 50,
-            height: 50,
-            decoration: BoxDecoration(
-              color: gradient == null ? color : null,
-              gradient: gradient,
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.white10, width: 1),
-              boxShadow: [
-                BoxShadow(
-                  color: color.withOpacity(0.4),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
             ),
           ),
         ],
@@ -304,12 +257,19 @@ class _ThemeCard extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: theme.focus.hasGradient ? null : theme.focus.bgColor,
-            gradient: theme.focus.gradient,
+            gradient: LinearGradient(
+              colors: [
+                Color.lerp(Colors.black, theme.idle.accentColor, 0.3)!,
+                Color.lerp(Colors.black, theme.focus.bgColor, 0.7)!,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color:
-                  isSelected ? theme.focus.accentColor : Colors.grey.shade700,
+              color: isSelected
+                  ? theme.focus.accentColor
+                  : theme.idle.accentColor.withOpacity(0.5),
               width: isSelected ? 2 : 1,
             ),
             boxShadow: isSelected
@@ -335,18 +295,18 @@ class _ThemeCard extends StatelessWidget {
                   children: [
                     Text(
                       theme.name,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontFamily: 'Poppins',
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: theme.focus.textColor,
+                        color: Colors.white,
                       ),
                     ),
                     Text(
                       theme.vibe,
                       style: TextStyle(
                         fontSize: 12,
-                        color: theme.focus.textColor.withAlpha(150),
+                        color: Colors.white.withAlpha(180),
                       ),
                     ),
                   ],
@@ -374,12 +334,12 @@ class _ThemeCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: Colors.amber.withAlpha(51),
+                    color: theme.focus.textColor.withAlpha(40),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.lock,
-                    color: Colors.amber,
+                    color: theme.focus.textColor,
                     size: 18,
                   ),
                 ),

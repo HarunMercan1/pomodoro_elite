@@ -682,62 +682,55 @@ class AppThemes {
     ),
 
     // ============================================================
-    // 10. Nordic Snow (Minimal) - Beyaz/Buz Mavisi
-    // ============================================================
-    // ============================================================
-    // 10. Nordic Snow (Minimal) - Kontrastlı (Kar ve Buz)
+    // 10. Nordic Snow - Koyu Lacivert & Buz Mavisi
     // ============================================================
     AppTheme(
       id: 'nordic_snow',
       name: 'Nordic Snow',
       vibe: 'Buz, Ferahlık',
-      settingsBgColor: Color(0xFFF5FDFF), // Neredeyse Beyaz Buz Mavisi (Zemin)
-      settingsCardColor: Color(0xFFFFFFFF), // Saf Beyaz (Kart)
-      settingsBorderColor: Color(0xFF40C4FF), // Canlı Gök Mavisi (Border)
-      settingsItemColor:
-          Color(0xFF01579B), // Derin Mavi (Yazı - Yüksek Okunabilirlik)
+      settingsBgColor: Color(0xFF0A1929), // Koyu lacivert (zemin)
+      settingsCardColor: Color(0xFF1E3A5F), // Koyu buz mavisi (kart)
+      settingsBorderColor: Color(0xFF4FC3F7), // Parlak buz mavisi (border)
+      settingsItemColor: Color(0xFFE1F5FE), // Açık buz mavisi (yazı)
       idle: ThemeStateColors(
-        bgColor: Color(0xFF0277BD), // Doygun Buz Mavisi (Koyu Ton)
-        gradientColors: [
-          Color(0xFF01579B),
-          Color(0xFF0288D1)
-        ], // Derin Mavi Gradient
-        accentColor: Colors.white, // Metinler ve İkonlar Beyaz
-        textColor: Colors.white, // Yazılar Beyaz (Okunabilirlik için)
-        mainButtonColor: Colors.white, // Buton Beyaz (Koyu zeminde patlasın)
-        mainButtonTextColor: Color(0xFF01579B), // Buton Yazısı Koyu Mavi
-        menuButtonColor: Color(0xFF039BE5), // Menü butonları hafif açık mavi
-        menuButtonTextColor: Colors.white,
+        bgColor: Color(0xFF0D2137), // Derin lacivert
+        gradientColors: [Color(0xFF0A1929), Color(0xFF0D2137)],
+        accentColor: Color(0xFF4FC3F7), // Buz mavisi
+        textColor: Color(0xFFE1F5FE), // Açık buz mavisi yazı
+        mainButtonColor: Color(0xFFE1F5FE), // Açık buz mavisi buton
+        mainButtonTextColor: Color(0xFF0D2137), // Koyu yazı
+        menuButtonColor: Color(0xFF1E3A5F), // Koyu buz mavisi
+        menuButtonTextColor: Color(0xFFE1F5FE),
       ),
       focus: ThemeStateColors(
-        bgColor: Color(0xFFE1F5FE), // Çok Açık Mavi (Zemin)
-        gradientColors: [Color(0xFFB3E5FC), Color(0xFFE1F5FE)],
-        accentColor: Color(0xFF01579B), // Koyu Mavi (Vurgular)
-        textColor: Color(0xFF01579B), // Koyu Mavi Yazı (Kontrast)
-        mainButtonColor: Colors.white,
-        mainButtonTextColor: Color(0xFF0277BD),
+        bgColor: Color(0xFF0277BD), // Canlı buz mavisi
+        gradientColors: [Color(0xFF01579B), Color(0xFF039BE5)],
+        accentColor: Color(0xFFE1F5FE), // Açık buz mavisi vurgu
+        textColor: Color(0xFFFFFFFF), // Beyaz yazı
+        mainButtonColor: Color(0xFFFFFFFF),
+        mainButtonTextColor: Color(0xFF01579B),
         menuButtonColor: Color(0xFF0288D1),
         menuButtonTextColor: Colors.white,
       ),
-      // 🔥 BREAK: Focus ile aynı (Açık tonlar)
+      // ❄️ BREAK: Focus ile aynı
       breakState: ThemeStateColors(
-        bgColor: Color(0xFFE1F5FE),
-        gradientColors: [Color(0xFFB3E5FC), Color(0xFFE1F5FE)],
-        accentColor: Color(0xFF01579B),
-        textColor: Color(0xFF01579B),
-        mainButtonColor: Colors.white,
-        mainButtonTextColor: Color(0xFF0277BD),
+        bgColor: Color(0xFF0277BD),
+        gradientColors: [Color(0xFF01579B), Color(0xFF039BE5)],
+        accentColor: Color(0xFFE1F5FE),
+        textColor: Color(0xFFFFFFFF),
+        mainButtonColor: Color(0xFFFFFFFF),
+        mainButtonTextColor: Color(0xFF01579B),
         menuButtonColor: Color(0xFF0288D1),
         menuButtonTextColor: Colors.white,
       ),
-      // 🔥 WORK PAUSED: Soğuk Gri
+      // ⏸️ WORK PAUSED: Soğuk gri-mavi
       workPaused: ThemeStateColors(
-        bgColor: Color(0xFF90A4AE),
-        gradientColors: [Color(0xFF607D8B), Color(0xFF90A4AE)],
-        accentColor: Color(0xFFCFD8DC),
-        textColor: Colors.white,
-        mainButtonColor: Colors.white,
-        mainButtonTextColor: Color(0xFF455A64),
+        bgColor: Color(0xFF37474F),
+        gradientColors: [Color(0xFF263238), Color(0xFF455A64)],
+        accentColor: Color(0xFF90A4AE),
+        textColor: Color(0xFFECEFF1),
+        mainButtonColor: Color(0xFFECEFF1),
+        mainButtonTextColor: Color(0xFF37474F),
         menuButtonColor: Color(0xFF546E7A),
         menuButtonTextColor: Colors.white,
       ),

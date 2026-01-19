@@ -386,10 +386,10 @@ class StatsScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: accentColor.withOpacity(0.15),
+              color: textColor.withOpacity(0.15),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: accentColor, size: 20),
+            child: Icon(icon, color: textColor.withOpacity(0.8), size: 20),
           ),
           const SizedBox(height: 12),
           Text(
@@ -459,11 +459,11 @@ class StatsScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: textColor.withOpacity(0.2),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(Icons.local_fire_department_rounded,
-                    color: Colors.white, size: 28),
+                    color: textColor, size: 28),
               ),
               const SizedBox(width: 15),
               Column(
@@ -475,7 +475,7 @@ class StatsScreen extends StatelessWidget {
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.w600,
                       fontSize: 16,
-                      color: Colors.white.withOpacity(0.9),
+                      color: textColor.withOpacity(0.9),
                     ),
                   ),
                   Text(
@@ -484,7 +484,7 @@ class StatsScreen extends StatelessWidget {
                     style: TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 12,
-                      color: Colors.white.withOpacity(0.7),
+                      color: textColor.withOpacity(0.7),
                     ),
                   ),
                 ],
@@ -495,10 +495,10 @@ class StatsScreen extends StatelessWidget {
             children: [
               Text(
                 "$streak",
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'BebasNeue',
                   fontSize: 42,
-                  color: Colors.white,
+                  color: textColor,
                   height: 1.0,
                 ),
               ),
@@ -508,7 +508,7 @@ class StatsScreen extends StatelessWidget {
                   fontFamily: 'Poppins',
                   fontWeight: FontWeight.w500,
                   fontSize: 12,
-                  color: Colors.white.withOpacity(0.8),
+                  color: textColor.withOpacity(0.8),
                 ),
               ),
             ],
