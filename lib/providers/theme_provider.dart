@@ -302,55 +302,55 @@ class AppThemes {
     // 4. Heisenberg (Breaking Bad)
     // ============================================================
     // ============================================================
-    // 4. Heisenberg (Breaking Bad) - Doygun & Mat
+    // 4. Heisenberg (Breaking Bad) - Kontrastlı
     // ============================================================
     AppTheme(
       id: 'heisenberg',
       name: 'Heisenberg',
       vibe: 'Kristal Mavi, Sarı Tulum',
-      settingsBgColor: Color(0xFF004D40), // Koyu Teal
-      settingsCardColor: Color(0xFF00695C), // Biraz daha açık Teal
-      settingsBorderColor: Color(0xFF00E676), // Neon Yeşil Aksan
-      settingsItemColor: Color(0xFFFFD600), // Sarı yazı
+      settingsBgColor: Color(0xFF00363A), // Daha Koyu Teal (Zemin)
+      settingsCardColor: Color(0xFF005662), // Ayırt edilebilir Teal (Kart)
+      settingsBorderColor: Color(0xFF00E676), // Neon Yeşil Border (Vurgu)
+      settingsItemColor: Color(0xFFFFD600), // Sarı Yazı (Okunabilir)
       idle: ThemeStateColors(
-        bgColor: Color(0xFF00838F), // Doygun Cyan
-        gradientColors: [Color(0xFF006064), Color(0xFF00838F)],
-        accentColor: Color(0xFF00E5FF), // Parlak Cyan
+        bgColor: Color(0xFF006064), // Koyu Cyan Zemin
+        gradientColors: [Color(0xFF00363A), Color(0xFF006064)],
+        accentColor: Color(0xFF00E5FF), // Parlak Cyan (Buton/Slider)
         mainButtonColor: Color(0xFF00E5FF),
-        mainButtonTextColor: Color(0xFF006064),
-        menuButtonColor: Color(0xFF006064),
+        mainButtonTextColor: Color(0xFF00363A), // Koyu yazı
+        menuButtonColor: Color(0xFF004D40), // Koyu buton
         menuButtonTextColor: Colors.white,
       ),
       focus: ThemeStateColors(
-        bgColor: Color(0xFFFBC02D), // Doygun Sarı
-        gradientColors: [Color(0xFFF57F17), Color(0xFFFBC02D)],
-        accentColor: Color(0xFF3E2723), // Koyu Kahve (Kontrast)
-        textColor: Color(0xFF3E2723),
+        bgColor: Color(0xFFFFD600), // Sarı (Tulum)
+        gradientColors: [Color(0xFFFbc02D), Color(0xFFFFAB00)],
+        accentColor: Color(0xFF263238), // Koyu Gri/Mavi (Kontrast)
+        textColor: Color(0xFF263238),
         mainButtonColor: Colors.white,
-        mainButtonTextColor: Color(0xFFF57F17),
-        menuButtonColor: Color(0xFFFFF176),
-        menuButtonTextColor: Color(0xFF3E2723),
+        mainButtonTextColor: Color(0xFFFFD600),
+        menuButtonColor: Color(0xFFFFF9C4), // Açık Sarı
+        menuButtonTextColor: Color(0xFF263238),
       ),
       // 🔥 BREAK: Focus ile aynı (Sarı)
       breakState: ThemeStateColors(
-        bgColor: Color(0xFFFBC02D),
-        gradientColors: [Color(0xFFF57F17), Color(0xFFFBC02D)],
-        accentColor: Color(0xFF3E2723),
-        textColor: Color(0xFF3E2723),
+        bgColor: Color(0xFFFFD600),
+        gradientColors: [Color(0xFFFbc02D), Color(0xFFFFAB00)],
+        accentColor: Color(0xFF263238),
+        textColor: Color(0xFF263238),
         mainButtonColor: Colors.white,
-        mainButtonTextColor: Color(0xFFF57F17),
-        menuButtonColor: Color(0xFFFFF176),
-        menuButtonTextColor: Color(0xFF3E2723),
+        mainButtonTextColor: Color(0xFFFFD600),
+        menuButtonColor: Color(0xFFFFF9C4),
+        menuButtonTextColor: Color(0xFF263238),
       ),
-      // 🔥 WORK PAUSED: Mat Yeşil (Laboratuvar)
+      // 🔥 WORK PAUSED: Koyu Laboratuvar Yeşili
       workPaused: ThemeStateColors(
-        bgColor: Color(0xFF2E7D32),
-        gradientColors: [Color(0xFF1B5E20), Color(0xFF2E7D32)],
-        accentColor: Color(0xFFA5D6A7),
+        bgColor: Color(0xFF1B5E20),
+        gradientColors: [Color(0xFF003300), Color(0xFF1B5E20)],
+        accentColor: Color(0xFF69F0AE), // Açık Yeşil
         textColor: Colors.white,
         mainButtonColor: Colors.white,
         mainButtonTextColor: Color(0xFF1B5E20),
-        menuButtonColor: Color(0xFF1B5E20),
+        menuButtonColor: Color(0xFF2E7D32),
         menuButtonTextColor: Colors.white,
       ),
       finish: ThemeStateColors(
@@ -367,29 +367,30 @@ class AppThemes {
     // 5. Deep Ocean (Derinlik)
     // ============================================================
     // ============================================================
-    // 5. Deep Ocean (Derinlik) - Doygun & Mat
+    // 5. Deep Ocean (Derinlik) - Kontrastlı
     // ============================================================
     AppTheme(
       id: 'deep_ocean',
       name: 'Deep Ocean',
       vibe: 'Derinlik, Odak',
-      settingsBgColor: Color(0xFF001021), // Çok koyu lacivert
-      settingsCardColor: Color(0xFF012A4A), // Koyu okyanus mavisi
-      settingsBorderColor: Color(0xFF00BFA5), // Turkuaz border
-      settingsItemColor: Color(0xFF80DEEA), // Açık turkuaz yazı
+      settingsBgColor: Color(0xFF000A12), // Neredeyse Siyah Lacivert (Zemin)
+      settingsCardColor: Color(0xFF011E32), // Koyu Lacivert (Kart)
+      settingsBorderColor: Color(0xFF00E5FF), // Neon Turkuaz (Border)
+      settingsItemColor: Color(0xFF80DEEA), // Açık Aqua (Yazı)
       idle: ThemeStateColors(
-        bgColor: Color(0xFF01579B), // Doygun Lacivert
-        gradientColors: [Color(0xFF002F6C), Color(0xFF01579B)],
-        accentColor: Color(0xFF00E5FF), // Parlak Cyan
-        mainButtonColor: Color(0xFF00E5FF),
-        mainButtonTextColor: Color(0xFF002F6C),
-        menuButtonColor: Color(0xFF002F6C),
+        bgColor: Color(0xFF001018), // Derin okyanus dibi
+        gradientColors: [Color(0xFF000000), Color(0xFF001018)],
+        accentColor: Color(0xFF00B8D4), // Canlı Turkuaz
+        mainButtonColor: Color(0xFF00B8D4),
+        mainButtonTextColor: Color(0xFF000A12),
+        menuButtonColor: Color(0xFF002F3A),
         menuButtonTextColor: Colors.white,
       ),
       focus: ThemeStateColors(
-        bgColor: Color(0xFF0277BD), // Okyanus Mavisi
-        gradientColors: [Color(0xFF01579B), Color(0xFF0288D1)],
-        accentColor: Colors.white,
+        bgColor: Color(0xFF01579B), // Orta Mavi
+        gradientColors: [Color(0xFF002F6C), Color(0xFF0277BD)],
+        accentColor: Color(0xFF81D4FA), // Açık Mavi (Kontrast)
+        textColor: Colors.white,
         mainButtonColor: Colors.white,
         mainButtonTextColor: Color(0xFF01579B),
         menuButtonColor: Color(0xFF0288D1),
@@ -397,19 +398,20 @@ class AppThemes {
       ),
       // 🔥 BREAK: Focus ile aynı (Mavi)
       breakState: ThemeStateColors(
-        bgColor: Color(0xFF0277BD),
-        gradientColors: [Color(0xFF01579B), Color(0xFF0288D1)],
-        accentColor: Colors.white,
+        bgColor: Color(0xFF01579B),
+        gradientColors: [Color(0xFF002F6C), Color(0xFF0277BD)],
+        accentColor: Color(0xFF81D4FA),
+        textColor: Colors.white,
         mainButtonColor: Colors.white,
         mainButtonTextColor: Color(0xFF01579B),
         menuButtonColor: Color(0xFF0288D1),
         menuButtonTextColor: Colors.white,
       ),
-      // 🔥 WORK PAUSED: Mat Petrol Yeşili
+      // 🔥 WORK PAUSED: Koyu Yeşilimsi Mavi
       workPaused: ThemeStateColors(
         bgColor: Color(0xFF004D40),
         gradientColors: [Color(0xFF00251A), Color(0xFF004D40)],
-        accentColor: Color(0xFF4DB6AC),
+        accentColor: Color(0xFF1DE9B6), // Neon Teal
         mainButtonColor: Colors.white,
         mainButtonTextColor: Color(0xFF004D40),
         menuButtonColor: Color(0xFF00695C),
@@ -428,52 +430,54 @@ class AppThemes {
     // 6. Mystic Forest (Doğa)
     // ============================================================
     // ============================================================
-    // 6. Mystic Forest (Doğa) - Doygun & Mat
+    // 6. Mystic Forest (Doğa) - Kontrastlı
     // ============================================================
     AppTheme(
       id: 'mystic_forest',
       name: 'Mystic Forest',
       vibe: 'Doğa, Huzur',
-      settingsBgColor: Color(0xFF1B5E20), // Koyu Yeşil
-      settingsCardColor: Color(0xFF2E7D32), // Orman Yeşili
-      settingsBorderColor: Color(0xFFAED581), // Açık Yeşil
-      settingsItemColor: Color(0xFFDCEDC8), // Soluk Yeşil Yazı
+      settingsBgColor: Color(0xFF0D2111), // Çok koyu zemin
+      settingsCardColor: Color(0xFF1B5E20), // Belirgin Orman Yeşili Kart
+      settingsBorderColor: Color(0xFF76FF03), // Canlı Yeşil Border
+      settingsItemColor: Color(0xFFFFFFFF), // Beyaz Yazı (Netlik için)
       idle: ThemeStateColors(
-        bgColor: Color(0xFF2E7D32),
-        gradientColors: [Color(0xFF1B5E20), Color(0xFF388E3C)],
-        accentColor: Color(0xFF76FF03), // Canlı Yeşil
-        mainButtonColor: Color(0xFF76FF03),
-        mainButtonTextColor: Color(0xFF1B5E20),
-        menuButtonColor: Color(0xFF1B5E20),
+        bgColor: Color(0xFF1B5E20), // Koyu Yeşil
+        gradientColors: [Color(0xFF003300), Color(0xFF1B5E20)],
+        accentColor: Color(0xFF69F0AE), // Açık Nane Yeşili
+        mainButtonColor: Color(0xFF69F0AE),
+        mainButtonTextColor: Color(0xFF003300),
+        menuButtonColor: Color(0xFF2E7D32),
         menuButtonTextColor: Colors.white,
       ),
       focus: ThemeStateColors(
-        bgColor: Color(0xFF388E3C), // Doygun Yaprak Yeşili
-        gradientColors: [Color(0xFF1B5E20), Color(0xFF43A047)],
-        accentColor: Colors.white,
+        bgColor: Color(0xFF2E7D32), // Orta Yeşil
+        gradientColors: [Color(0xFF1B5E20), Color(0xFF388E3C)],
+        accentColor: Color(0xFF00E676), // Parlak Yeşil
+        textColor: Colors.white,
         mainButtonColor: Colors.white,
         mainButtonTextColor: Color(0xFF1B5E20),
-        menuButtonColor: Color(0xFF4CAF50),
+        menuButtonColor: Color(0xFF43A047),
         menuButtonTextColor: Colors.white,
       ),
       // 🔥 BREAK: Focus ile aynı (Yeşil)
       breakState: ThemeStateColors(
-        bgColor: Color(0xFF388E3C),
-        gradientColors: [Color(0xFF1B5E20), Color(0xFF43A047)],
-        accentColor: Colors.white,
+        bgColor: Color(0xFF2E7D32),
+        gradientColors: [Color(0xFF1B5E20), Color(0xFF388E3C)],
+        accentColor: Color(0xFF00E676),
+        textColor: Colors.white,
         mainButtonColor: Colors.white,
         mainButtonTextColor: Color(0xFF1B5E20),
-        menuButtonColor: Color(0xFF4CAF50),
+        menuButtonColor: Color(0xFF43A047),
         menuButtonTextColor: Colors.white,
       ),
-      // 🔥 WORK PAUSED: Mat Toprak Kahve
+      // 🔥 WORK PAUSED: Koyu Kahve
       workPaused: ThemeStateColors(
-        bgColor: Color(0xFF4E342E),
-        gradientColors: [Color(0xFF3E2723), Color(0xFF5D4037)],
-        accentColor: Color(0xFFA1887F),
+        bgColor: Color(0xFF3E2723),
+        gradientColors: [Color(0xFF1B0000), Color(0xFF3E2723)],
+        accentColor: Color(0xFFD7CCC8), // Açık Bej
         mainButtonColor: Colors.white,
         mainButtonTextColor: Color(0xFF3E2723),
-        menuButtonColor: Color(0xFF5D4037),
+        menuButtonColor: Color(0xFF4E342E),
         menuButtonTextColor: Colors.white,
       ),
       finish: ThemeStateColors(
@@ -490,19 +494,19 @@ class AppThemes {
     // 7. Cyberpunk 2077 (Neon)
     // ============================================================
     // ============================================================
-    // 7. Cyberpunk 2077 (Neon) - Doygun & Mat
+    // 7. Cyberpunk 2077 (Neon) - Kontrastlı
     // ============================================================
     AppTheme(
       id: 'cyberpunk',
       name: 'Cyberpunk 2077',
       vibe: 'Neon, Gelecek',
-      settingsBgColor: Color(0xFF140018), // Çok koyu morumsu siyah
-      settingsCardColor: Color(0xFF280036), // Koyu Neon Mor
+      settingsBgColor: Color(0xFF000000), // Tam Siyah (Zemin)
+      settingsCardColor: Color(0xFF1A1A1A), // Koyu Gri (Kart)
       settingsBorderColor: Color(0xFFD500F9), // Neon Pembe Border
-      settingsItemColor: Color(0xFFFFFF00), // Neon Sarı Yazı
+      settingsItemColor: Color(0xFF00E5FF), // Neon Cyan Yazı (Ayrım İçin)
       idle: ThemeStateColors(
         bgColor: Color(0xFF0F0F0F), // Mat Siyah
-        gradientColors: [Color(0xFF050505), Color(0xFF141414)],
+        gradientColors: [Color(0xFF000000), Color(0xFF141414)],
         accentColor: Color(0xFFFFEA00), // Neon Sarı
         mainButtonColor: Color(0xFFFFEA00),
         mainButtonTextColor: Colors.black,
@@ -510,29 +514,30 @@ class AppThemes {
         menuButtonTextColor: Colors.white,
       ),
       focus: ThemeStateColors(
-        bgColor: Color(0xFFD500F9), // Neon Pembe
-        gradientColors: [Color(0xFF4A0072), Color(0xFFD500F9)],
-        accentColor: Color(0xFFFFFF00), // Neon Sarı
-        textColor: Colors.white,
+        bgColor: Color(0xFF212121), // Koyu Gri (Arka Plan - Pembe değil)
+        gradientColors: [Color(0xFF000000), Color(0xFF212121)],
+        accentColor: Color(0xFFD500F9), // Neon Pembe (Vurgu)
+        textColor: Color(0xFFD500F9), // Neon Yazı
         mainButtonColor: Colors.white,
         mainButtonTextColor: Color(0xFFD500F9),
-        menuButtonColor: Color(0xFF7B1FA2),
+        menuButtonColor: Color(0xFF4A0072),
         menuButtonTextColor: Colors.white,
       ),
-      // 🔥 BREAK: Focus ile aynı (Neon Pembe)
+      // 🔥 BREAK: Focus ile aynı (Pembe Vurgulu Koyu)
       breakState: ThemeStateColors(
-        bgColor: Color(0xFFD500F9),
-        gradientColors: [Color(0xFF4A0072), Color(0xFFD500F9)],
-        accentColor: Color(0xFFFFFF00),
+        bgColor: Color(0xFF212121),
+        gradientColors: [Color(0xFF000000), Color(0xFF212121)],
+        accentColor: Color(0xFFD500F9),
+        textColor: Color(0xFFD500F9),
         mainButtonColor: Colors.white,
         mainButtonTextColor: Color(0xFFD500F9),
-        menuButtonColor: Color(0xFF7B1FA2),
+        menuButtonColor: Color(0xFF4A0072),
         menuButtonTextColor: Colors.white,
       ),
       // 🔥 WORK PAUSED: Mat Koyu Gri
       workPaused: ThemeStateColors(
-        bgColor: Color(0xFF212121),
-        gradientColors: [Color(0xFF121212), Color(0xFF2C2C2C)],
+        bgColor: Color(0xFF121212),
+        gradientColors: [Color(0xFF000000), Color(0xFF121212)],
         accentColor: Color(0xFF757575),
         mainButtonColor: Colors.white,
         mainButtonTextColor: Color(0xFF212121),
@@ -553,19 +558,19 @@ class AppThemes {
     // 8. Royal Gold (Lüks)
     // ============================================================
     // ============================================================
-    // 8. Royal Gold (Lüks) - Doygun & Mat
+    // 8. Royal Gold (Lüks) - Kontrastlı
     // ============================================================
     AppTheme(
       id: 'royal_gold',
       name: 'Royal Gold',
       vibe: 'Lüks, Başarı',
-      settingsBgColor: Color(0xFF121212), // Mat Siyah
-      settingsCardColor: Color(0xFF262626), // Koyu Gri
+      settingsBgColor: Color(0xFF000000), // Mat Siyah Zemin
+      settingsCardColor: Color(0xFF1C1C1C), // Koyu Gri Kart
       settingsBorderColor: Color(0xFFFFD700), // Altın Border
       settingsItemColor: Color(0xFFFFD700), // Altın Yazı
       idle: ThemeStateColors(
         bgColor: Color(0xFF000000),
-        gradientColors: [Color(0xFF000000), Color(0xFF1C1C1C)],
+        gradientColors: [Color(0xFF000000), Color(0xFF121212)],
         accentColor: Color(0xFFFFD700), // Altın
         mainButtonColor: Color(0xFFFFD700),
         mainButtonTextColor: Colors.black,
@@ -573,32 +578,34 @@ class AppThemes {
         menuButtonTextColor: Colors.white,
       ),
       focus: ThemeStateColors(
-        bgColor: Color(0xFFFF8F00), // Doygun Amber/Altın
-        gradientColors: [Color(0xFFBF360C), Color(0xFFFF8F00)],
-        accentColor: Colors.white,
+        bgColor: Color(0xFF1A1A1A), // Koyu Antrasit (Arka Plan)
+        gradientColors: [Color(0xFF000000), Color(0xFF1A1A1A)],
+        accentColor: Color(0xFFFFAB00), // Amber/Altın (Vurgu)
+        textColor: Color(0xFFFFD700), // Altın Yazı
         mainButtonColor: Colors.white,
-        mainButtonTextColor: Color(0xFFBF360C),
-        menuButtonColor: Color(0xFFD84315),
-        menuButtonTextColor: Colors.white,
-      ),
-      // 🔥 BREAK: Focus ile aynı (Altın)
-      breakState: ThemeStateColors(
-        bgColor: Color(0xFFFF8F00),
-        gradientColors: [Color(0xFFBF360C), Color(0xFFFF8F00)],
-        accentColor: Colors.white,
-        mainButtonColor: Colors.white,
-        mainButtonTextColor: Color(0xFFBF360C),
-        menuButtonColor: Color(0xFFD84315),
-        menuButtonTextColor: Colors.white,
-      ),
-      // 🔥 WORK PAUSED: Mat Antrasit
-      workPaused: ThemeStateColors(
-        bgColor: Color(0xFF212121),
-        gradientColors: [Color(0xFF121212), Color(0xFF2D2D2D)],
-        accentColor: Color(0xFF757575),
-        mainButtonColor: Colors.white,
-        mainButtonTextColor: Color(0xFF212121),
+        mainButtonTextColor: Color(0xFFFF6F00),
         menuButtonColor: Color(0xFF424242),
+        menuButtonTextColor: Colors.white,
+      ),
+      // 🔥 BREAK: Focus ile aynı (Altın Vurgulu Siyah)
+      breakState: ThemeStateColors(
+        bgColor: Color(0xFF1A1A1A),
+        gradientColors: [Color(0xFF000000), Color(0xFF1A1A1A)],
+        accentColor: Color(0xFFFFAB00),
+        textColor: Color(0xFFFFD700),
+        mainButtonColor: Colors.white,
+        mainButtonTextColor: Color(0xFFFF6F00),
+        menuButtonColor: Color(0xFF424242),
+        menuButtonTextColor: Colors.white,
+      ),
+      // 🔥 WORK PAUSED: Mat Gri
+      workPaused: ThemeStateColors(
+        bgColor: Color(0xFF2E2E2E), // Biraz daha açık gri
+        gradientColors: [Color(0xFF1F1F1F), Color(0xFF2E2E2E)],
+        accentColor: Color(0xFFBDBDBD),
+        mainButtonColor: Colors.white,
+        mainButtonTextColor: Color(0xFF424242),
+        menuButtonColor: Color(0xFF616161),
         menuButtonTextColor: Colors.white,
       ),
       finish: ThemeStateColors(
@@ -615,16 +622,16 @@ class AppThemes {
     // 9. Sunset Lofi (Chill)
     // ============================================================
     // ============================================================
-    // 9. Sunset Lofi (Chill) - Doygun & Mat
+    // 9. Sunset Lofi (Chill) - Kontrastlı
     // ============================================================
     AppTheme(
       id: 'sunset_lofi',
       name: 'Sunset Lofi',
       vibe: 'Estetik, Chill',
-      settingsBgColor: Color(0xFF2A0F36), // Çok koyu mürdüm
-      settingsCardColor: Color(0xFF4A148C), // Koyu Mor
-      settingsBorderColor: Color(0xFFFF6D00), // Doygun Turuncu
-      settingsItemColor: Color(0xFFFFD180), // Açık Turuncu Yazı
+      settingsBgColor: Color(0xFF1A0520), // Çok Koyu Mürdüm (Zemin)
+      settingsCardColor: Color(0xFF38006B), // Ayrık Mor Kart
+      settingsBorderColor: Color(0xFFFF6D00), // Turuncu Border
+      settingsItemColor: Color(0xFFFFAB40), // Açık Turuncu Yazı
       idle: ThemeStateColors(
         bgColor: Color(0xFF311B92), // Derin Mor
         gradientColors: [Color(0xFF1A1A2E), Color(0xFF311B92)],
@@ -635,23 +642,24 @@ class AppThemes {
         menuButtonTextColor: Colors.white,
       ),
       focus: ThemeStateColors(
-        bgColor: Color(0xFF6A1B9A), // Canlı Mor
-        gradientColors: [Color(0xFF4A148C), Color(0xFF7B1FA2)],
-        accentColor: Color(0xFFFFAB40), // Açık Turuncu
+        bgColor: Color(0xFF4A148C), // Koyu Mor (Arka Plan)
+        gradientColors: [Color(0xFF311B92), Color(0xFF4A148C)],
+        accentColor: Color(0xFFFF6D00), // Turuncu Vurgu
         textColor: Colors.white,
         mainButtonColor: Colors.white,
         mainButtonTextColor: Color(0xFF6A1B9A),
-        menuButtonColor: Color(0xFF8E24AA),
+        menuButtonColor: Color(0xFF7B1FA2),
         menuButtonTextColor: Colors.white,
       ),
-      // 🔥 BREAK: Focus ile aynı (Mor)
+      // 🔥 BREAK: Focus ile aynı (Mor/Turuncu Vurgulu)
       breakState: ThemeStateColors(
-        bgColor: Color(0xFF6A1B9A),
-        gradientColors: [Color(0xFF4A148C), Color(0xFF7B1FA2)],
-        accentColor: Color(0xFFFFAB40),
+        bgColor: Color(0xFF4A148C),
+        gradientColors: [Color(0xFF311B92), Color(0xFF4A148C)],
+        accentColor: Color(0xFFFF6D00),
+        textColor: Colors.white,
         mainButtonColor: Colors.white,
         mainButtonTextColor: Color(0xFF6A1B9A),
-        menuButtonColor: Color(0xFF8E24AA),
+        menuButtonColor: Color(0xFF7B1FA2),
         menuButtonTextColor: Colors.white,
       ),
       // 🔥 WORK PAUSED: Mat Kahve/Mürdüm
@@ -677,51 +685,55 @@ class AppThemes {
     // 10. Nordic Snow (Minimal) - Beyaz/Buz Mavisi
     // ============================================================
     // ============================================================
-    // 10. Nordic Snow (Minimal) - Doygun & Mat (Buz)
+    // 10. Nordic Snow (Minimal) - Kontrastlı (Kar ve Buz)
     // ============================================================
     AppTheme(
       id: 'nordic_snow',
       name: 'Nordic Snow',
-      vibe: 'Ferah, Minimal',
-      settingsBgColor: Color(0xFFECEFF1), // Çok açık gri-mavi
-      settingsCardColor: Color(0xFFFFFFFF), // Beyaz
-      settingsBorderColor: Color(0xFF0288D1), // Canlı Mavi Border
-      settingsItemColor: Color(0xFF01579B), // Koyu Mavi Yazı
+      vibe: 'Buz, Ferahlık',
+      settingsBgColor: Color(0xFFF5FDFF), // Neredeyse Beyaz Buz Mavisi (Zemin)
+      settingsCardColor: Color(0xFFFFFFFF), // Saf Beyaz (Kart)
+      settingsBorderColor: Color(0xFF40C4FF), // Canlı Gök Mavisi (Border)
+      settingsItemColor:
+          Color(0xFF01579B), // Derin Mavi (Yazı - Yüksek Okunabilirlik)
       idle: ThemeStateColors(
-        bgColor: Color(0xFF455A64), // Mat Koyu Gri-Mavi
-        gradientColors: [Color(0xFF37474F), Color(0xFF546E7A)],
-        accentColor: Color(0xFF29B6F6), // Canlı Açık Mavi
-        mainButtonColor: Color(0xFF29B6F6),
+        bgColor: Color(0xFFECEFF1), // Çok Açık Gri-Mavi
+        gradientColors: [Color(0xFFCFD8DC), Color(0xFFECEFF1)],
+        accentColor: Color(0xFF00B0FF), // Parlak Mavi
+        mainButtonColor: Color(0xFF00B0FF),
         mainButtonTextColor: Colors.white,
       ),
       focus: ThemeStateColors(
-        bgColor: Color(0xFF0277BD), // Doygun Buz Mavisi
-        gradientColors: [Color(0xFF01579B), Color(0xFF039BE5)],
-        accentColor: Colors.white,
-        textColor: Colors.white,
+        bgColor: Color(0xFFE1F5FE), // Çok Açık Mavi (Zemin)
+        gradientColors: [Color(0xFFB3E5FC), Color(0xFFE1F5FE)],
+        accentColor: Color(0xFF01579B), // Koyu Mavi (Vurgular)
+        textColor: Color(0xFF01579B), // Koyu Mavi Yazı (Kontrast)
         mainButtonColor: Colors.white,
         mainButtonTextColor: Color(0xFF0277BD),
-        menuButtonColor: Color(0xFF4FC3F7),
+        menuButtonColor: Color(0xFF0288D1),
+        menuButtonTextColor: Colors.white,
       ),
-      // 🔥 BREAK: Focus ile aynı (Buz Mavisi)
+      // 🔥 BREAK: Focus ile aynı (Açık tonlar)
       breakState: ThemeStateColors(
-        bgColor: Color(0xFF0277BD),
-        gradientColors: [Color(0xFF01579B), Color(0xFF039BE5)],
-        accentColor: Colors.white,
-        textColor: Colors.white,
+        bgColor: Color(0xFFE1F5FE),
+        gradientColors: [Color(0xFFB3E5FC), Color(0xFFE1F5FE)],
+        accentColor: Color(0xFF01579B),
+        textColor: Color(0xFF01579B),
         mainButtonColor: Colors.white,
         mainButtonTextColor: Color(0xFF0277BD),
-        menuButtonColor: Color(0xFF4FC3F7),
+        menuButtonColor: Color(0xFF0288D1),
+        menuButtonTextColor: Colors.white,
       ),
-      // 🔥 WORK PAUSED: Mat Gri
+      // 🔥 WORK PAUSED: Soğuk Gri
       workPaused: ThemeStateColors(
-        bgColor: Color(0xFF546E7A),
-        gradientColors: [Color(0xFF455A64), Color(0xFF607D8B)],
-        accentColor: Color(0xFFB0BEC5),
+        bgColor: Color(0xFF90A4AE),
+        gradientColors: [Color(0xFF607D8B), Color(0xFF90A4AE)],
+        accentColor: Color(0xFFCFD8DC),
         textColor: Colors.white,
         mainButtonColor: Colors.white,
-        mainButtonTextColor: Color(0xFF546E7A),
-        menuButtonColor: Color(0xFF78909C),
+        mainButtonTextColor: Color(0xFF455A64),
+        menuButtonColor: Color(0xFF546E7A),
+        menuButtonTextColor: Colors.white,
       ),
       finish: ThemeStateColors(
         bgColor: Color(0xFF43A047),
@@ -737,47 +749,57 @@ class AppThemes {
     // 11. Volcano (Enerji)
     // ============================================================
     // ============================================================
-    // 11. Volcano (Enerji) - Doygun & Mat
+    // 11. Volcano (Enerji) - Kontrastlı (Magma ve Kül)
     // ============================================================
     AppTheme(
       id: 'volcano',
       name: 'Volcano',
       vibe: 'Yüksek Enerji',
-      settingsBgColor: Color(0xFF1B0000), // Çok koyu kızıl
-      settingsCardColor: Color(0xFF3E2723), // Koyu Kahve/Kızıl
-      settingsBorderColor: Color(0xFFD50000), // Magma Kırmızısı
-      settingsItemColor: Color(0xFFFF3D00), // Lav Turuncusu Yazı
+      settingsBgColor:
+          Color(0xFF1B1B1B), // Koyu Kül Grisi (Zemin - Kırmızı Değil!)
+      settingsCardColor: Color(0xFF2D1E1E), // Hafif Kızıl Kahve Gri (Kart)
+      settingsBorderColor: Color(0xFFD50000), // Magma Kırmızısı (Border)
+      settingsItemColor: Color(0xFFFF6D00), // Parlak Turuncu (Yazı)
       idle: ThemeStateColors(
         bgColor: Color(0xFF212121), // Mat Koyu Gri
-        gradientColors: [Color(0xFF000000), Color(0xFF212121)],
+        gradientColors: [Color(0xFF101010), Color(0xFF212121)],
         accentColor: Color(0xFFFF3D00), // Lav Turuncusu
         mainButtonColor: Color(0xFFFF3D00),
         mainButtonTextColor: Colors.white,
+        menuButtonColor: Color(0xFF424242),
+        menuButtonTextColor: Colors.white,
       ),
       focus: ThemeStateColors(
-        bgColor: Color(0xFFD50000), // Magma Kırmızısı
-        gradientColors: [Color(0xFFB71C1C), Color(0xFFD50000)],
-        accentColor: Color(0xFFFFEA00), // Parlak Sarı
+        bgColor: Color(0xFF1B0000), // Çok Koyu Zemin (Magma Akışı gibi)
+        gradientColors: [Color(0xFF000000), Color(0xFF3E2723)],
+        accentColor: Color(0xFFD50000), // Kırmızı Vurgular
+        textColor: Color(0xFFFFAB91), // Açık Salmon/Turuncu Yazı
         mainButtonColor: Colors.white,
         mainButtonTextColor: Color(0xFFD50000),
-        menuButtonColor: Color(0xFFFF8A65),
+        menuButtonColor: Color(0xFFBF360C),
+        menuButtonTextColor: Colors.white,
       ),
-      // 🔥 BREAK: Focus ile aynı (Manyetik Kırmızı)
+      // 🔥 BREAK: Focus ile aynı (Magma)
       breakState: ThemeStateColors(
-        bgColor: Color(0xFFD50000),
-        gradientColors: [Color(0xFFB71C1C), Color(0xFFD50000)],
-        accentColor: Color(0xFFFFEA00),
+        bgColor: Color(0xFF1B0000),
+        gradientColors: [Color(0xFF000000), Color(0xFF3E2723)],
+        accentColor: Color(0xFFD50000),
+        textColor: Color(0xFFFFAB91),
         mainButtonColor: Colors.white,
         mainButtonTextColor: Color(0xFFD50000),
-        menuButtonColor: Color(0xFFFF8A65),
+        menuButtonColor: Color(0xFFBF360C),
+        menuButtonTextColor: Colors.white,
       ),
-      // 🔥 WORK PAUSED: Mat Kül
+      // 🔥 WORK PAUSED: Donmuş Lav (Mat Gri/Kahve)
       workPaused: ThemeStateColors(
-        bgColor: Color(0xFF37474F),
-        gradientColors: [Color(0xFF263238), Color(0xFF455A64)],
-        accentColor: Color(0xFF90A4AE),
+        bgColor: Color(0xFF4E342E),
+        gradientColors: [Color(0xFF3E2723), Color(0xFF5D4037)],
+        accentColor: Color(0xFFBCAAA4),
+        textColor: Colors.white,
         mainButtonColor: Colors.white,
-        mainButtonTextColor: Color(0xFF37474F),
+        mainButtonTextColor: Color(0xFF3E2723),
+        menuButtonColor: Color(0xFF6D4C41),
+        menuButtonTextColor: Colors.white,
       ),
       finish: ThemeStateColors(
         bgColor: Color(0xFFFFD600),
