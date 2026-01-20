@@ -114,14 +114,14 @@ class _ThemeSelectionScreenState extends State<ThemeSelectionScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    theme.name,
+                    'theme_name_${theme.id}'.tr(),
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
-                    theme.vibe,
+                    'theme_vibe_${theme.id}'.tr(),
                     style: TextStyle(
                       color: Colors.grey.shade400,
                       fontSize: 12,
@@ -192,7 +192,8 @@ class _ThemeSelectionScreenState extends State<ThemeSelectionScreen> {
                           children: [
                             const Icon(Icons.lock_open, color: Colors.white),
                             const SizedBox(width: 8),
-                            Text('${theme.name} ${"theme_unlocked".tr()}'),
+                            Text(
+                                '${'theme_name_${theme.id}'.tr()} ${"theme_unlocked".tr()}'),
                           ],
                         ),
                         backgroundColor: theme.focus.bgColor,
@@ -294,7 +295,7 @@ class _ThemeCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      theme.name,
+                      'theme_name_${theme.id}'.tr(),
                       style: const TextStyle(
                         fontFamily: 'Poppins',
                         fontSize: 16,
@@ -303,7 +304,7 @@ class _ThemeCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      theme.vibe,
+                      'theme_vibe_${theme.id}'.tr(),
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.white.withAlpha(180),

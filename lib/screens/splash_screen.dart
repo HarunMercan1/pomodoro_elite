@@ -12,7 +12,8 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
@@ -30,7 +31,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       CurvedAnimation(parent: _controller, curve: Curves.easeIn),
     );
 
-    _slideAnimation = Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero).animate(
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeOut),
     );
 
@@ -84,7 +86,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = isDark ? const Color(0xFF121212) : const Color(0xFFF5F5F7);
     final primaryColor = Theme.of(context).primaryColor;
-    final textColor = isDark ? Colors.white.withOpacity(0.9) : const Color(0xFF2D3142);
+    final textColor =
+        isDark ? Colors.white.withOpacity(0.9) : const Color(0xFF2D3142);
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -107,7 +110,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
                 // POMODORO YAZISI (İnce ve Geniş)
                 Text(
-                  "POMODORO",
+                  "app_name".tr(),
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 24,
@@ -121,7 +124,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
                 // ELITE YAZISI (Kalın ve ARTIK GENİŞ)
                 Text(
-                  "ELITE",
+                  "app_subtitle".tr(),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontFamily: 'Poppins',
@@ -129,7 +132,6 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                     fontWeight: FontWeight.w900, // Ekstra kalın
                     color: primaryColor,
                     height: 1.1,
-                    // BURASI DEĞİŞTİ: Harf aralığını 8.0 yaptık (Pomodoro ile aynı)
                     letterSpacing: 8.0,
                   ),
                 ),
@@ -138,7 +140,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
                 // --- İMZA ---
                 Text(
-                  "by Harun Reşit Mercan",
+                  "developed_by".tr(),
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 12,

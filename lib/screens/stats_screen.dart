@@ -404,17 +404,55 @@ class StatsScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Text(
-              value,
-              style: TextStyle(
-                fontFamily: 'BebasNeue',
-                fontSize: 28,
-                color: textColor,
-                height: 1.0,
-              ),
-            ),
+          Builder(
+            builder: (context) {
+              // Değeri ve birimi ayır (Örn: "25m" -> "25" ve "m")
+              final RegExp regex = RegExp(r'^([\d\.]+)\s*([a-zA-Z]+)?$');
+              final match = regex.firstMatch(value);
+
+              String numberPart = value;
+              String unitPart = '';
+
+              if (match != null) {
+                numberPart = match.group(1) ?? value;
+                unitPart = match.group(2) ?? '';
+              } else {
+                // Eşleşme yoksa (sadece sayı veya sadece metin), olduğu gibi göster
+                // Ama BebasNeue uppercase yaptığı için, eğer sadece metinse Poppins kullanmak daha güvenli olabilir
+                // Şimdilik varsayılan davranış olarak BebasNeue kalsın
+              }
+
+              return FittedBox(
+                fit: BoxFit.scaleDown,
+                child: RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: numberPart,
+                        style: TextStyle(
+                          fontFamily: 'BebasNeue',
+                          fontSize: 28,
+                          color: textColor,
+                          height: 1.0,
+                        ),
+                      ),
+                      if (unitPart.isNotEmpty)
+                        TextSpan(
+                          text: unitPart, // Boşluksuz yapışık
+                          style: TextStyle(
+                            fontFamily:
+                                'Poppins', // Birimler için Poppins (Küçük harf destekler)
+                            fontSize: 16, // Daha küçük boyut
+                            fontWeight: FontWeight.w500,
+                            color: textColor.withOpacity(0.7),
+                            height: 1.0,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              );
+            },
           ),
           const SizedBox(height: 4),
           Text(

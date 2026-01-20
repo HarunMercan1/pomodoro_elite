@@ -64,7 +64,7 @@ class _SettingsScreenState extends State<SettingsScreen>
       case 'nl':
         return 'Nederlands';
       case 'uk':
-        return 'Українська';
+        return 'Укра\u0457нська';
       case 'el':
         return 'Ελληνικά';
       case 'sv':
@@ -262,7 +262,8 @@ class _SettingsScreenState extends State<SettingsScreen>
                               ),
                             ),
                             subtitle: Text(
-                              themeProvider.currentTheme.name,
+                              'theme_name_${themeProvider.currentTheme.id}'
+                                  .tr(),
                               style: TextStyle(
                                 fontFamily: 'Poppins',
                                 fontSize: 12,

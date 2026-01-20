@@ -166,7 +166,7 @@ class _HomeScreenState extends State<HomeScreen> {
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: Text(
-          'title'.tr(),
+          'app_name'.tr(),
           style: TextStyle(
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w600,
