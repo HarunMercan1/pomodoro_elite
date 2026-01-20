@@ -13,6 +13,9 @@ class TimeOptionButton extends StatelessWidget {
   final Color? activeBackgroundColor;
   final Color? activeTextColor;
   final Color? inactiveTextColor; // 🔥 YENİ: Seçili olmayan durum rengi
+  final double? titleFontSize;
+  final double? subTitleFontSize;
+  final EdgeInsetsGeometry? padding;
 
   const TimeOptionButton({
     super.key,
@@ -24,6 +27,9 @@ class TimeOptionButton extends StatelessWidget {
     this.activeBackgroundColor,
     this.activeTextColor,
     this.inactiveTextColor,
+    this.titleFontSize,
+    this.subTitleFontSize,
+    this.padding,
   });
 
   @override
@@ -62,7 +68,8 @@ class TimeOptionButton extends StatelessWidget {
       onTap: onTap,
       child: Container(
         alignment: Alignment.center,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        padding:
+            padding ?? const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: BorderRadius.circular(30),
@@ -92,14 +99,14 @@ class TimeOptionButton extends StatelessWidget {
                   context: context,
                   color: textColor,
                   fontWeight: FontWeight.w600,
-                  fontSize: 13,
+                  fontSize: titleFontSize ?? 13,
                 ),
               ),
               Text(
                 "$minutes ${'minutes_label'.tr().toLowerCase()}",
                 style: AppFonts.poppins(
                   context: context,
-                  fontSize: 10,
+                  fontSize: subTitleFontSize ?? 10,
                   color: textColor.withOpacity(0.8), // Opacity artırıldı
                 ),
               ),

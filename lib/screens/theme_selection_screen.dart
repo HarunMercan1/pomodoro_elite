@@ -193,8 +193,10 @@ class _ThemeSelectionScreenState extends State<ThemeSelectionScreen> {
                           children: [
                             const Icon(Icons.lock_open, color: Colors.white),
                             const SizedBox(width: 8),
-                            Text(
-                                '${'theme_name_${theme.id}'.tr()} ${"theme_unlocked".tr()}'),
+                            Expanded(
+                              child: Text(
+                                  '${'theme_name_${theme.id}'.tr()} ${"theme_unlocked_72h".tr()}'),
+                            ),
                           ],
                         ),
                         backgroundColor: theme.focus.bgColor,

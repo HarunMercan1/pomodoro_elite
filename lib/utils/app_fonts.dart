@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:easy_localization/easy_localization.dart';
 
 class AppFonts {
   static TextStyle poppins({
@@ -151,52 +149,9 @@ class AppFonts {
     // zorunlu tutarak ilerleyelim. Daha temiz olur.
     // Kullanım: AppFonts.poppins(context: context, ...)
 
-    // 2. Locale kontrolü
-    Locale? currentLocale = locale;
-
-    // Eğer locale parametre olarak gelmediyse context üzerinden almaya çalış
-    if (currentLocale == null && context != null) {
-      currentLocale = context.locale;
-    }
-
-    // Ukraynaca kontrolü
-    bool isUkrainian = currentLocale?.languageCode == 'uk';
-
-    if (isUkrainian) {
-      if (isBebas) {
-        // Bebas Neue (Google Fonts) genelde sadece Latin destekler.
-        // Bu yüzden Ukraynaca için ona en çok benzeyen ve Kiril destekleyen 'Oswald' kullanıyoruz.
-        return GoogleFonts.oswald(
-          textStyle: baseStyle,
-          color: color,
-          fontSize: fontSize,
-          fontWeight: fontWeight,
-          letterSpacing: letterSpacing,
-          height: height,
-        );
-      } else {
-        // Poppins (Google Fonts) genelde sadece Latin/Devanagari destekler.
-        // Ukraynaca için Poppins'e en yakın geometrik sans-serif olan 'Montserrat' kullanıyoruz.
-        return GoogleFonts.montserrat(
-          textStyle: baseStyle,
-          color: color,
-          backgroundColor: backgroundColor,
-          fontSize: fontSize,
-          fontWeight: fontWeight,
-          fontStyle: fontStyle,
-          letterSpacing: letterSpacing,
-          wordSpacing: wordSpacing,
-          decoration: decoration,
-          decorationColor: decorationColor,
-          decorationStyle: decorationStyle,
-          decorationThickness: decorationThickness,
-        );
-      }
-    } else {
-      // Diğer diller için yerel font
-      return baseStyle.copyWith(
-        fontFamily: isBebas ? 'BebasNeue' : 'Poppins',
-      );
-    }
+    // Tüm diller için aynı font kullanılıyor
+    return baseStyle.copyWith(
+      fontFamily: isBebas ? 'BebasNeue' : 'Poppins',
+    );
   }
 }

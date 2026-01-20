@@ -9,7 +9,8 @@ class AdHelper {
   ///
   /// ⚠️ ÖNEMLİ: Production'da bu FALSE olmalı!
   /// Test modunda iken gerçek ID kullanmak hesabının banlanmasına neden olabilir.
-  static const bool isTestMode = true; // 🧪 TEST MODU - Geliştirme için
+  static const bool isTestMode =
+      false; // 🧪 TEST MODU - Production için FALSE yapıldı
 
   // ============================================================
   // 🧪 GOOGLE'IN RESMİ TEST ID'LERİ

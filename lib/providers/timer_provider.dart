@@ -126,7 +126,7 @@ class TimerProvider with ChangeNotifier, WidgetsBindingObserver {
       }
     }
 
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+    _timer = Timer.periodic(const Duration(milliseconds: 1), (timer) async {
       if (_remainingSeconds > 0) {
         _remainingSeconds--;
         notifyListeners();

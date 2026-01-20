@@ -86,131 +86,152 @@ class _DurationSettingsScreenState extends State<DurationSettingsScreen> {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: Column(
-        children: [
-          // --- UYARI MESAJI (Sadece kilitliyse görünür) ---
-          if (isLocked)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(10),
-              margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
-              decoration: BoxDecoration(
-                color: Colors.orangeAccent.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.orangeAccent),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.lock_outline, color: Colors.orange),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      "change_lock_msg".tr(),
-                      style: AppFonts.poppins(
-                        context: context,
-                        fontSize: 12,
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+      body: LayoutBuilder(builder: (context, constraints) {
+        final isTablet = constraints.maxWidth >= 600;
+        final double hPadding = isTablet ? 32 : 20;
+        final double contentPaddingV = isTablet ? 20 : 15;
+        final double titleSize = isTablet ? 20 : 16;
+        final double timeTextSize = isTablet ? 20 : 16;
+        final double sliderHeight = isTablet ? 12.0 : 6.0;
 
-          // --- AYARLAR LİSTESİ (KİLİTLENEBİLİR ALAN) ---
-          Expanded(
-            child: IgnorePointer(
-              ignoring: isLocked, // Kilitliyse dokunmayı engelle
-              child: Opacity(
-                opacity: isLocked ? 0.5 : 1.0, // Kilitliyse soluklaştır
-                child: ListView(
-                  padding: const EdgeInsets.all(20),
+        return Column(
+          children: [
+            // --- UYARI MESAJI (Sadece kilitliyse görünür) ---
+            if (isLocked)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(10),
+                margin: EdgeInsets.fromLTRB(hPadding, 0, hPadding, 10),
+                decoration: BoxDecoration(
+                  color: Colors.orangeAccent.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.orangeAccent),
+                ),
+                child: Row(
                   children: [
-                    // 1. Odaklanma Süresi
-                    _buildDurationSlider(
-                      context,
-                      label: "focus".tr(),
-                      value: currentWork,
-                      min: 10,
-                      max: 180, // 📢 DÜZELTME: Maksimum 180 dk
-                      onChanged: (val) {
-                        setState(() => _tempWorkTime = val);
-                      },
-                      onChangeEnd: (val) {
-                        int newValue = val.toInt();
-                        settings.setWorkTime(newValue);
-                        timerProvider.updateDurationFromSettings(
-                            newValue, TimerMode.work);
-                        _tempWorkTime = null;
-                      },
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // 2. Kısa Mola
-                    _buildDurationSlider(
-                      context,
-                      label: "short_break".tr(),
-                      value: currentShort,
-                      min: 1,
-                      max: 60, // 📢 DÜZELTME: Maksimum 60 dk
-                      onChanged: (val) {
-                        setState(() => _tempShortBreak = val);
-                      },
-                      onChangeEnd: (val) {
-                        int newValue = val.toInt();
-                        settings.setShortBreakTime(newValue);
-                        timerProvider.updateDurationFromSettings(
-                            newValue, TimerMode.shortBreak);
-                        _tempShortBreak = null;
-                      },
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // 3. Uzun Mola
-                    _buildDurationSlider(
-                      context,
-                      label: "long_break".tr(),
-                      value: currentLong,
-                      min: 5,
-                      max:
-                          120, // 📢 DÜZELTME: Maksimum 120 dk (Uzun mola da esnek olsun)
-                      onChanged: (val) {
-                        setState(() => _tempLongBreak = val);
-                      },
-                      onChangeEnd: (val) {
-                        int newValue = val.toInt();
-                        settings.setLongBreakTime(newValue);
-                        timerProvider.updateDurationFromSettings(
-                            newValue, TimerMode.longBreak);
-                        _tempLongBreak = null;
-                      },
+                    const Icon(Icons.lock_outline, color: Colors.orange),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        "change_lock_msg".tr(),
+                        style: AppFonts.poppins(
+                          context: context,
+                          fontSize: 12, // Uyarı mesajı sabit kalabilir
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
                     ),
                   ],
                 ),
               ),
-            ),
-          ),
 
-          // 🔥 BANNER REKLAM ALANI
-          Consumer<AdManager>(
-            builder: (context, adManager, child) {
-              if (adManager.isDurationBannerLoaded &&
-                  adManager.durationBannerAd != null) {
-                return Container(
-                  width: adManager.durationBannerAd!.size.width.toDouble(),
-                  height: adManager.durationBannerAd!.size.height.toDouble(),
-                  margin: const EdgeInsets.only(bottom: 10),
-                  child: AdWidget(ad: adManager.durationBannerAd!),
-                );
-              }
-              // Reklam yüklenmediyse boş alan
-              return const SizedBox(height: 50);
-            },
-          ),
-        ],
-      ),
+            // --- AYARLAR LİSTESİ (KİLİTLENEBİLİR ALAN) ---
+            Expanded(
+              child: IgnorePointer(
+                ignoring: isLocked, // Kilitliyse dokunmayı engelle
+                child: Opacity(
+                  opacity: isLocked ? 0.5 : 1.0, // Kilitliyse soluklaştır
+                  child: ListView(
+                    padding: EdgeInsets.all(hPadding),
+                    children: [
+                      // 1. Odaklanma Süresi
+                      _buildDurationSlider(
+                        context,
+                        label: "focus".tr(),
+                        value: currentWork,
+                        min: 10,
+                        max: 180,
+                        onChanged: (val) {
+                          setState(() => _tempWorkTime = val);
+                        },
+                        onChangeEnd: (val) {
+                          int newValue = val.toInt();
+                          settings.setWorkTime(newValue);
+                          timerProvider.updateDurationFromSettings(
+                              newValue, TimerMode.work);
+                          _tempWorkTime = null;
+                        },
+                        titleSize: titleSize,
+                        timeTextSize: timeTextSize,
+                        sliderHeight: sliderHeight,
+                        contentPaddingV: contentPaddingV,
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // 2. Kısa Mola
+                      _buildDurationSlider(
+                        context,
+                        label: "short_break".tr(),
+                        value: currentShort,
+                        min: 1,
+                        max: 60,
+                        onChanged: (val) {
+                          setState(() => _tempShortBreak = val);
+                        },
+                        onChangeEnd: (val) {
+                          int newValue = val.toInt();
+                          settings.setShortBreakTime(newValue);
+                          timerProvider.updateDurationFromSettings(
+                              newValue, TimerMode.shortBreak);
+                          _tempShortBreak = null;
+                        },
+                        titleSize: titleSize,
+                        timeTextSize: timeTextSize,
+                        sliderHeight: sliderHeight,
+                        contentPaddingV: contentPaddingV,
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // 3. Uzun Mola
+                      _buildDurationSlider(
+                        context,
+                        label: "long_break".tr(),
+                        value: currentLong,
+                        min: 5,
+                        max:
+                            120, // 📢 DÜZELTME: Maksimum 120 dk (Uzun mola da esnek olsun)
+                        onChanged: (val) {
+                          setState(() => _tempLongBreak = val);
+                        },
+                        onChangeEnd: (val) {
+                          int newValue = val.toInt();
+                          settings.setLongBreakTime(newValue);
+                          timerProvider.updateDurationFromSettings(
+                              newValue, TimerMode.longBreak);
+                          _tempLongBreak = null;
+                        },
+                        titleSize: titleSize,
+                        timeTextSize: timeTextSize,
+                        sliderHeight: sliderHeight,
+                        contentPaddingV: contentPaddingV,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // 🔥 BANNER REKLAM ALANI
+            Consumer<AdManager>(
+              builder: (context, adManager, child) {
+                if (adManager.isDurationBannerLoaded &&
+                    adManager.durationBannerAd != null) {
+                  return Container(
+                    width: adManager.durationBannerAd!.size.width.toDouble(),
+                    height: adManager.durationBannerAd!.size.height.toDouble(),
+                    margin: const EdgeInsets.only(bottom: 10),
+                    child: AdWidget(ad: adManager.durationBannerAd!),
+                  );
+                }
+                // Reklam yüklenmediyse boş alan
+                return const SizedBox(height: 50);
+              },
+            ),
+          ],
+        );
+      }),
     );
   }
 
@@ -222,6 +243,10 @@ class _DurationSettingsScreenState extends State<DurationSettingsScreen> {
     required double max,
     required Function(double) onChanged,
     required Function(double) onChangeEnd,
+    double titleSize = 16,
+    double timeTextSize = 16,
+    double sliderHeight = 6.0,
+    double contentPaddingV = 15.0,
   }) {
     final themeProvider = context.watch<ThemeProvider>();
     final theme = themeProvider.currentTheme;
@@ -240,7 +265,8 @@ class _DurationSettingsScreenState extends State<DurationSettingsScreen> {
         side: BorderSide(color: borderColor, width: 1),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+        padding:
+            EdgeInsets.symmetric(vertical: contentPaddingV, horizontal: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -252,7 +278,7 @@ class _DurationSettingsScreenState extends State<DurationSettingsScreen> {
                   style: AppFonts.poppins(
                     context: context,
                     fontWeight: FontWeight.w500,
-                    fontSize: 16,
+                    fontSize: titleSize,
                     color: itemColor,
                   ),
                 ),
@@ -274,7 +300,7 @@ class _DurationSettingsScreenState extends State<DurationSettingsScreen> {
                         context: context,
                         fontWeight: FontWeight.bold,
                         color: sliderColor,
-                        fontSize: 16,
+                        fontSize: timeTextSize,
                       ),
                     ),
                   ),
@@ -284,7 +310,7 @@ class _DurationSettingsScreenState extends State<DurationSettingsScreen> {
             const SizedBox(height: 10),
             SliderTheme(
               data: SliderTheme.of(context).copyWith(
-                trackHeight: 6.0,
+                trackHeight: sliderHeight,
                 thumbShape:
                     const RoundSliderThumbShape(enabledThumbRadius: 12.0),
                 overlayShape:

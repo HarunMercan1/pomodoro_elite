@@ -824,7 +824,15 @@ class ThemeProvider with ChangeNotifier {
   late SharedPreferences _prefs;
 
   String _currentThemeId = 'elite';
-  Set<String> _unlockedThemes = {'elite', 'classic_elite'};
+  // 🔥 Kalıcı ücretsiz temalar
+  static const Set<String> _permanentlyFreeThemes = {'elite', 'classic_elite'};
+
+  // 🔥 Tema kilit açma süresi (72 saat = 3 gün)
+  static const int _unlockDurationHours = 72;
+
+  // 🔥 Her temanın kilit açma bitiş zamanı (tema_id -> bitiş zamanı)
+  Map<String, DateTime> _themeUnlockExpiry = {};
+
   TimerState _timerState = TimerState.idle;
 
   ThemeProvider() {
@@ -837,7 +845,6 @@ class ThemeProvider with ChangeNotifier {
 
   String get currentThemeId => _currentThemeId;
   AppTheme get currentTheme => AppThemes.getById(_currentThemeId);
-  Set<String> get unlockedThemes => _unlockedThemes;
   TimerState get timerState => _timerState;
 
   /// Mevcut durumun renk paleti
@@ -902,13 +909,10 @@ class ThemeProvider with ChangeNotifier {
     if (isAlarmPlaying) {
       newState = TimerState.finish;
     } else if (isPaused) {
-      // 🔥 TÜM MODLAR İÇİN: Duraklatıldığında temanın "workPaused" rengini kullan
-      // (Her tema kendi workPaused rengini tanımlar: ST -> Gri, Klasik -> Gri-Mavi)
       newState = TimerState.workPaused;
     } else if (mode == 'shortBreak' || mode == 'longBreak') {
       newState = isRunning ? TimerState.pause : TimerState.idle;
     } else {
-      // work mode
       newState = isRunning ? TimerState.focus : TimerState.idle;
     }
 
@@ -916,11 +920,44 @@ class ThemeProvider with ChangeNotifier {
   }
 
   // ============================================================
-  // TEMA YÖNETİMİ
+  // TEMA YÖNETİMİ (HER TEMA İÇİN 72 SAATLİK GEÇİCİ KİLİT AÇMA)
   // ============================================================
 
+  /// Tema açık mı kontrol et
   bool isThemeUnlocked(String themeId) {
-    return _unlockedThemes.contains(themeId);
+    // Kalıcı ücretsiz temalar her zaman açık
+    if (_permanentlyFreeThemes.contains(themeId)) {
+      return true;
+    }
+
+    // Bu tema için süre kontrolü
+    final expiry = _themeUnlockExpiry[themeId];
+    if (expiry == null) return false;
+
+    return DateTime.now().isBefore(expiry);
+  }
+
+  /// 🔥 Belirli bir tema için kalan süre
+  Duration getRemainingTimeForTheme(String themeId) {
+    final expiry = _themeUnlockExpiry[themeId];
+    if (expiry == null) return Duration.zero;
+
+    final remaining = expiry.difference(DateTime.now());
+    return remaining.isNegative ? Duration.zero : remaining;
+  }
+
+  /// 🔥 Kalan süreyi okunabilir formatta döndür
+  String getRemainingTimeFormattedForTheme(String themeId) {
+    final remaining = getRemainingTimeForTheme(themeId);
+    if (remaining == Duration.zero) return '';
+
+    final hours = remaining.inHours;
+    final minutes = remaining.inMinutes % 60;
+
+    if (hours > 0) {
+      return '${hours}s ${minutes}dk';
+    }
+    return '${minutes}dk';
   }
 
   Future<void> _loadThemeData() async {
@@ -928,16 +965,30 @@ class ThemeProvider with ChangeNotifier {
 
     _currentThemeId = _prefs.getString('current_theme') ?? 'elite';
 
-    final unlockedList =
-        _prefs.getStringList('unlocked_themes') ?? ['elite', 'classic_elite'];
-    _unlockedThemes = unlockedList.toSet();
-    _unlockedThemes.add('elite'); // Varsayılan her zaman açık
+    // 🔥 Tüm tema kilit açma sürelerini yükle
+    final keys = _prefs.getKeys().where((k) => k.startsWith('theme_unlock_'));
+    for (final key in keys) {
+      final themeId = key.replaceFirst('theme_unlock_', '');
+      final expiryString = _prefs.getString(key);
+      if (expiryString != null) {
+        final expiry = DateTime.tryParse(expiryString);
+        if (expiry != null) {
+          _themeUnlockExpiry[themeId] = expiry;
+        }
+      }
+    }
+
+    // Eğer kullanıcının mevcut teması süresi dolmuşsa, varsayılana dön
+    if (!isThemeUnlocked(_currentThemeId)) {
+      _currentThemeId = 'elite';
+      await _prefs.setString('current_theme', 'elite');
+    }
 
     notifyListeners();
   }
 
   Future<void> selectTheme(String themeId) async {
-    if (!_unlockedThemes.contains(themeId)) {
+    if (!isThemeUnlocked(themeId)) {
       debugPrint('❌ Tema kilidi açık değil: $themeId');
       return;
     }
@@ -949,13 +1000,14 @@ class ThemeProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  /// 🔥 Belirli bir temayı 72 saat boyunca aç
   Future<void> unlockTheme(String themeId) async {
-    if (_unlockedThemes.contains(themeId)) return;
+    final expiry = DateTime.now().add(Duration(hours: _unlockDurationHours));
+    _themeUnlockExpiry[themeId] = expiry;
+    await _prefs.setString('theme_unlock_$themeId', expiry.toIso8601String());
 
-    _unlockedThemes.add(themeId);
-    await _prefs.setStringList('unlocked_themes', _unlockedThemes.toList());
-
-    debugPrint('🔓 Tema açıldı: $themeId');
+    debugPrint(
+        '🔓 $themeId teması $_unlockDurationHours saat açıldı. Bitiş: $expiry');
     notifyListeners();
   }
 }

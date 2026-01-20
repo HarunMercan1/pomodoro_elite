@@ -63,178 +63,215 @@ class _SoundSettingsScreenState extends State<SoundSettingsScreen> {
           },
         ),
       ),
-      body: Column(
-        children: [
-          // --- KİLİT UYARI MESAJI ---
-          if (isLocked)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(10),
-              margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
-              decoration: BoxDecoration(
-                color: Colors.orangeAccent.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.orangeAccent),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.lock_outline, color: Colors.orange),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      "music_lock_msg"
-                          .tr(), // "Müzik değiştirmek için sayacı durdurun."
-                      style: AppFonts.poppins(
-                        context: context,
-                        fontSize: 12,
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+      body: LayoutBuilder(builder: (context, constraints) {
+        final isTablet = constraints.maxWidth >= 600;
+        final double hPadding = isTablet ? 32 : 20;
+        final double sectionTitleSize = isTablet ? 18 : 14;
+        final double titleSize = isTablet ? 18 : 14; // Default -> 18
+        final double switchScale = isTablet ? 1.2 : 1.0;
+        final double contentPaddingV = isTablet ? 12 : 0;
 
-          // --- AYARLAR LİSTESİ (KİLİTLENEBİLİR ALAN) ---
-          Expanded(
-            child: IgnorePointer(
-              ignoring: isLocked, // Kilitliyse tıklanmasın
-              child: Opacity(
-                opacity: isLocked ? 0.5 : 1.0, // Kilitliyse soluk görünsün
-                child: ListView(
-                  padding: const EdgeInsets.all(20),
+        return Column(
+          children: [
+            // --- KİLİT UYARI MESAJI ---
+            if (isLocked)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(10),
+                margin: EdgeInsets.fromLTRB(hPadding, 0, hPadding, 10),
+                decoration: BoxDecoration(
+                  color: Colors.orangeAccent.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.orangeAccent),
+                ),
+                child: Row(
                   children: [
-                    // --- 1. BÖLÜM: MÜZİK ---
-                    _buildSectionHeader(context, "background_music".tr()),
-
-                    Card(
-                      elevation: 0,
-                      color: cardColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                        side: BorderSide(color: borderColor, width: 1),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(15),
-                        child: Column(
-                          children: [
-                            // Aç/Kapa Switch
-                            SwitchListTile(
-                              title: Text(
-                                "enable_music".tr(),
-                                style: AppFonts.poppins(
-                                  context: context,
-                                  color: itemColor,
-                                ),
-                              ),
-                              value: settings.isBackgroundMusicEnabled,
-                              activeColor: sliderColor,
-                              onChanged: (val) =>
-                                  settings.toggleBackgroundMusic(val),
-                            ),
-
-                            // Müzik Açıksa Gösterilecekler
-                            if (settings.isBackgroundMusicEnabled) ...[
-                              Divider(color: itemColor.withOpacity(0.1)),
-
-                              // Ses Seviyesi Slider
-                              Row(
-                                children: [
-                                  Icon(Icons.volume_mute_rounded,
-                                      size: 20, color: itemColor),
-                                  Expanded(
-                                    child: Slider(
-                                      value: sliderValue,
-                                      min: 0.0,
-                                      max: 1.0,
-                                      activeColor: sliderColor,
-                                      onChanged: (val) {
-                                        setState(
-                                            () => _currentSliderValue = val);
-                                        settings.setVolumeLive(val);
-                                        timerProvider.updateMusicVolume(val);
-                                      },
-                                      onChangeEnd: (val) {
-                                        settings.saveVolumeToPrefs();
-                                        _currentSliderValue = null;
-                                      },
-                                    ),
-                                  ),
-                                  Icon(Icons.volume_up_rounded,
-                                      size: 20, color: itemColor),
-                                ],
-                              ),
-
-                              const SizedBox(height: 10),
-
-                              // Müzik Listesi - Custom Widget Kullanımı
-                              ...settings.backgroundMusics.entries.map((entry) {
-                                return _MusicListTile(
-                                  titleKey: entry.value,
-                                  fileName: entry.key,
-                                  settings: settings,
-                                  sliderColor: sliderColor,
-                                  itemColor: itemColor,
-                                );
-                              }).toList(),
-                            ],
-                          ],
+                    const Icon(Icons.lock_outline, color: Colors.orange),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        "music_lock_msg"
+                            .tr(), // "Müzik değiştirmek için sayacı durdurun."
+                        style: AppFonts.poppins(
+                          context: context,
+                          fontSize:
+                              12, // Uyarı yazısı sabit kalsın veya çok az büyüsün
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 30),
-
-                    // --- 2. BÖLÜM: BİLDİRİM SESLERİ ---
-                    _buildSectionHeader(context, "notification_sound".tr()),
-
-                    Card(
-                      elevation: 0,
-                      color: cardColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                        side: BorderSide(color: borderColor, width: 1),
-                      ),
-                      child: Column(
-                        children:
-                            settings.notificationSounds.entries.map((entry) {
-                          final isSelected =
-                              settings.notificationSound == entry.key;
-                          return ListTile(
-                            title: Text(
-                              entry.value.tr(),
-                              style: AppFonts.poppins(
-                                context: context,
-                                color: itemColor,
-                              ),
-                            ),
-                            trailing: isSelected
-                                ? Icon(Icons.check_circle, color: sliderColor)
-                                : null,
-                            onTap: () =>
-                                settings.setNotificationSound(entry.key),
-                          );
-                        }).toList(),
                       ),
                     ),
                   ],
                 ),
               ),
+
+            // --- AYARLAR LİSTESİ (KİLİTLENEBİLİR ALAN) ---
+            Expanded(
+              child: IgnorePointer(
+                ignoring: isLocked, // Kilitliyse tıklanmasın
+                child: Opacity(
+                  opacity: isLocked ? 0.5 : 1.0, // Kilitliyse soluk görünsün
+                  child: ListView(
+                    padding: EdgeInsets.all(hPadding),
+                    children: [
+                      // --- 1. BÖLÜM: MÜZİK ---
+                      _buildSectionHeader(
+                          context, "background_music".tr(), sectionTitleSize),
+
+                      Card(
+                        elevation: 0,
+                        color: cardColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                          side: BorderSide(color: borderColor, width: 1),
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.all(isTablet ? 24 : 15),
+                          child: Column(
+                            children: [
+                              // Aç/Kapa Switch - Row ile düzenlendi (Taşmayı önlemek için)
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      "enable_music".tr(),
+                                      style: AppFonts.poppins(
+                                        context: context,
+                                        color: itemColor,
+                                        fontSize: titleSize,
+                                      ),
+                                    ),
+                                  ),
+                                  Transform.scale(
+                                    scale:
+                                        switchScale, // Sadece switch büyütülüyor
+                                    child: Switch(
+                                      value: settings.isBackgroundMusicEnabled,
+                                      activeColor: sliderColor,
+                                      onChanged: (val) =>
+                                          settings.toggleBackgroundMusic(val),
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              // Müzik Açıksa Gösterilecekler
+                              if (settings.isBackgroundMusicEnabled) ...[
+                                Divider(color: itemColor.withOpacity(0.1)),
+
+                                // Ses Seviyesi Slider
+                                Row(
+                                  children: [
+                                    Icon(Icons.volume_mute_rounded,
+                                        size: isTablet ? 28 : 20,
+                                        color: itemColor),
+                                    Expanded(
+                                      child: Slider(
+                                        value: sliderValue,
+                                        min: 0.0,
+                                        max: 1.0,
+                                        activeColor: sliderColor,
+                                        onChanged: (val) {
+                                          setState(
+                                              () => _currentSliderValue = val);
+                                          settings.setVolumeLive(val);
+                                          timerProvider.updateMusicVolume(val);
+                                        },
+                                        onChangeEnd: (val) {
+                                          settings.saveVolumeToPrefs();
+                                          _currentSliderValue = null;
+                                        },
+                                      ),
+                                    ),
+                                    Icon(Icons.volume_up_rounded,
+                                        size: isTablet ? 28 : 20,
+                                        color: itemColor),
+                                  ],
+                                ),
+
+                                const SizedBox(height: 10),
+
+                                // Müzik Listesi - Custom Widget Kullanımı
+                                ...settings.backgroundMusics.entries
+                                    .map((entry) {
+                                  return _MusicListTile(
+                                    titleKey: entry.value,
+                                    fileName: entry.key,
+                                    settings: settings,
+                                    sliderColor: sliderColor,
+                                    itemColor: itemColor,
+                                    fontSize: titleSize,
+                                    contentPadding: EdgeInsets.symmetric(
+                                        vertical: contentPaddingV),
+                                  );
+                                }).toList(),
+                              ],
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 30),
+
+                      // --- 2. BÖLÜM: BİLDİRİM SESLERİ ---
+                      _buildSectionHeader(
+                          context, "notification_sound".tr(), sectionTitleSize),
+
+                      Card(
+                        elevation: 0,
+                        color: cardColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                          side: BorderSide(color: borderColor, width: 1),
+                        ),
+                        child: Column(
+                          children:
+                              settings.notificationSounds.entries.map((entry) {
+                            final isSelected =
+                                settings.notificationSound == entry.key;
+                            return ListTile(
+                              contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: contentPaddingV),
+                              title: Text(
+                                entry.value.tr(),
+                                style: AppFonts.poppins(
+                                  context: context,
+                                  color: itemColor,
+                                  fontSize: titleSize,
+                                ),
+                              ),
+                              trailing: isSelected
+                                  ? Icon(Icons.check_circle,
+                                      color: sliderColor,
+                                      size: isTablet ? 28 : 24)
+                                  : null,
+                              onTap: () =>
+                                  settings.setNotificationSound(entry.key),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        );
+      }),
     );
   }
 
-  Widget _buildSectionHeader(BuildContext context, String title) {
+  Widget _buildSectionHeader(
+      BuildContext context, String title, double fontSize) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10, left: 5),
       child: Text(
         title,
         style: AppFonts.poppins(
           context: context,
-          fontSize: 14,
+          fontSize: fontSize, // 14 -> isTablet ? 18 : 14
           fontWeight: FontWeight.bold,
           color: Theme.of(context).dividerColor,
           letterSpacing: 1.0,
@@ -251,6 +288,8 @@ class _MusicListTile extends StatefulWidget {
   final SettingsProvider settings;
   final Color sliderColor;
   final Color itemColor;
+  final double fontSize;
+  final EdgeInsetsGeometry contentPadding;
 
   const _MusicListTile({
     required this.titleKey,
@@ -258,6 +297,8 @@ class _MusicListTile extends StatefulWidget {
     required this.settings,
     required this.sliderColor,
     required this.itemColor,
+    required this.fontSize,
+    required this.contentPadding,
   });
 
   @override
@@ -296,11 +337,13 @@ class _MusicListTileState extends State<_MusicListTile> {
     final isDownloading = widget.settings.isDownloading(widget.fileName);
 
     return ListTile(
+      contentPadding: widget.contentPadding,
       title: Text(
         widget.titleKey.tr(),
         style: AppFonts.poppins(
           context: context,
           color: widget.itemColor,
+          fontSize: widget.fontSize,
         ),
       ),
       leading: _buildLeadingIcon(isSelected, isDownloading),

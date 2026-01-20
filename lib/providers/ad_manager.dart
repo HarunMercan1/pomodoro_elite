@@ -228,8 +228,8 @@ class AdManager extends ChangeNotifier {
     _pomodorosSinceLastAd++;
     debugPrint('🍅 Pomodoro sayısı: $_pomodorosSinceLastAd');
 
-    // Her 3 pomodorodan sonra reklam göster
-    if (_pomodorosSinceLastAd >= 3) {
+    // Her 2 pomodorodan sonra reklam göster
+    if (_pomodorosSinceLastAd >= 2) {
       await showInterstitialAd();
       _pomodorosSinceLastAd = 0;
     }

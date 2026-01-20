@@ -156,11 +156,32 @@ class _HomeScreenState extends State<HomeScreen> {
     final Color topButtonTextColor = stateColors.effectiveMenuButtonTextColor;
 
     final double screenHeight = MediaQuery.of(context).size.height;
+    final double screenWidth =
+        MediaQuery.of(context).size.width; // 🔥 YENİ: Ekran genişliği
     final bool isSmallScreen = screenHeight < 700;
-    final double circleSize = isSmallScreen ? 250 : 300;
-    final double timerFontSize = circleSize * 0.28;
-    final double btnPadV = isSmallScreen ? 12 : 16;
-    final double btnPadH = isSmallScreen ? 30 : 40;
+    // Tablet kontrolü: Genişlik 600'den büyükse tablet kabul et
+    final bool isTablet = screenWidth >= 600;
+
+    // 🔥 Tablet için Responsive Boyutlar
+    final double circleSize = isTablet
+        ? screenWidth * 0.45 // Tablette ekranın %45'i kadar
+        : (isSmallScreen ? 250 : 300);
+
+    final double timerFontSize = isTablet
+        ? circleSize * 0.30 // Tablette font biraz daha büyük oranlı
+        : circleSize * 0.28;
+
+    final double btnPadV =
+        isTablet ? 24 : (isSmallScreen ? 12 : 16); // Tablet: 24, Phone: 16
+    final double btnPadH =
+        isTablet ? 60 : (isSmallScreen ? 30 : 40); // Tablet: 60, Phone: 40
+    final double iconSize =
+        isTablet ? 48 : (isSmallScreen ? 28 : 32); // Tablet: 48, Phone: 32
+    final double btnFontSize =
+        isTablet ? 28 : (isSmallScreen ? 18 : 20); // Tablet: 28, Phone: 20
+
+    // Tablette butonlar arası boşluk
+    final double topButtonSpacing = isTablet ? 20 : 10;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -232,8 +253,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                   currentMode,
                                   topButtonActiveColor,
                                   topButtonTextColor,
-                                  textColor)), // 🔥 YENİ: Aktif/Pasif renkler
-                          const SizedBox(width: 10),
+                                  textColor,
+                                  isTablet)), // 🔥 YENİ: isTablet passed
+                          SizedBox(width: topButtonSpacing),
                           Expanded(
                               child: _buildOption(
                                   context,
@@ -243,8 +265,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                   currentMode,
                                   topButtonActiveColor,
                                   topButtonTextColor,
-                                  textColor)), // 🔥 YENİ: Aktif/Pasif renkler
-                          const SizedBox(width: 10),
+                                  textColor,
+                                  isTablet)), // 🔥 YENİ: isTablet passed
+                          SizedBox(width: topButtonSpacing),
                           Expanded(
                               child: _buildOption(
                                   context,
@@ -254,7 +277,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   currentMode,
                                   topButtonActiveColor,
                                   topButtonTextColor,
-                                  textColor)), // 🔥 YENİ: Aktif/Pasif renkler
+                                  textColor,
+                                  isTablet)), // 🔥 YENİ: isTablet passed
                         ],
                       ),
                     ),
@@ -324,7 +348,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                   builder: (context, value, _) {
                                     return CircularProgressIndicator(
                                       value: value,
-                                      strokeWidth: 18,
+                                      strokeWidth: isTablet
+                                          ? 30
+                                          : 18, // Tablette kalın çizgi
                                       // 🔥 Eğer aktif değilse (Idle), Gri Track (Eski usül)
                                       backgroundColor: isActiveState
                                           ? Colors.white.withOpacity(0.2)
@@ -379,7 +405,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         overflow: TextOverflow.ellipsis,
                         style: AppFonts.poppins(
                           context: context,
-                          fontSize: isSmallScreen ? 14 : 16,
+                          fontSize: isTablet
+                              ? 24
+                              : (isSmallScreen
+                                  ? 14
+                                  : 16), // Tablette büyük yazı
                           fontWeight: FontWeight.w500,
                           color: textColor.withAlpha(229),
                           letterSpacing: 0.5,
@@ -437,7 +467,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           : Icons.play_arrow_rounded,
                                   color: stateColors
                                       .effectiveButtonTextColor, // Buton İkonu (Idle: Beyaz, Active: Renkli)
-                                  size: isSmallScreen ? 28 : 32,
+                                  size: iconSize,
                                 ),
                                 const SizedBox(width: 10),
                                 Text(
@@ -450,7 +480,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               : "start".tr(),
                                   style: AppFonts.poppins(
                                     context: context,
-                                    fontSize: isSmallScreen ? 18 : 20,
+                                    fontSize: btnFontSize,
                                     fontWeight: FontWeight.bold,
                                     color: stateColors
                                         .effectiveButtonTextColor, // Buton Yazısı (Idle: Beyaz, Active: Renkli)
@@ -480,6 +510,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                 "reset".tr(),
                                 style: AppFonts.poppins(
                                   context: context,
+                                  fontSize: isTablet
+                                      ? 20
+                                      : 14, // Reset yazısını da büyüt
                                   color: textColor.withAlpha(179),
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -520,8 +553,18 @@ class _HomeScreenState extends State<HomeScreen> {
       TimerMode currentMode,
       Color? activeColor,
       Color? activeTextColor,
-      Color? inactiveTextColor) {
+      Color? inactiveTextColor,
+      bool isTablet) {
+    // 🔥 YENİ: Tablet parametresi
     final isSelected = currentMode == mode;
+
+    // Tablet boyutları
+    final double titleSize = isTablet ? 20 : 13;
+    final double subTitleSize = isTablet ? 14 : 10;
+    final EdgeInsets padding = isTablet
+        ? const EdgeInsets.symmetric(horizontal: 24, vertical: 20)
+        : const EdgeInsets.symmetric(horizontal: 12, vertical: 12);
+
     return TimeOptionButton(
       title: title,
       minutes: time,
@@ -530,6 +573,9 @@ class _HomeScreenState extends State<HomeScreen> {
       activeBackgroundColor: activeColor,
       activeTextColor: activeTextColor, // 🔥 YENİ: Dışarıdan gelen yazı rengi
       inactiveTextColor: inactiveTextColor,
+      titleFontSize: titleSize,
+      subTitleFontSize: subTitleSize,
+      padding: padding,
       onTap: () => context.read<TimerProvider>().setTime(time, mode),
     );
   }

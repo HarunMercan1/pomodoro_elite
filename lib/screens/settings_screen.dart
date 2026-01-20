@@ -144,221 +144,245 @@ class _SettingsScreenState extends State<SettingsScreen>
         ),
       ),
       // 🔥 Body: Column ile wrap edildi - Liste + Banner
-      body: Column(
-        children: [
-          // Ayarlar Listesi (Scrollable)
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.all(20),
-              children: [
-                // 🔥 Dinamik Kart Rengi Hesaplama
-                // Her tema artık kendi settingsCardColor ve settingsBorderColor değerlerini taşıyor.
-                Builder(
-                  builder: (context) {
-                    final theme = themeProvider.currentTheme;
-                    final cardColor =
-                        theme.settingsCardColor ?? const Color(0xFF202020);
-                    final borderColor = theme.settingsBorderColor ??
-                        Colors.white.withOpacity(0.06);
-                    // 🔥 İçerik Rengi: Eğer tema özel renk belirttiyse onu kullan, yoksa genel textColor
-                    final itemColor =
-                        theme.settingsItemColor ?? themeProvider.idleTextColor;
+      body: LayoutBuilder(builder: (context, constraints) {
+        final isTablet = constraints.maxWidth >= 600;
+        final double hPadding = isTablet ? 40 : 20;
+        final double vPadding = isTablet ? 30 : 20;
+        final double titleSize = isTablet ? 20 : 16; // 16 -> 20
+        final double subtitleSize = isTablet ? 14 : 12; // 12 -> 14
+        final double iconSize = isTablet ? 28 : 24; // Default -> 28
+        final double trailingIconSize = isTablet ? 20 : 18; // 18 -> 20
 
-                    return Column(
-                      children: [
-                        // SÜRE AYARLARI
-                        Card(
-                          color: cardColor,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            side: BorderSide(color: borderColor, width: 1),
-                          ),
-                          child: ListTile(
-                            leading:
-                                Icon(Icons.timer_outlined, color: itemColor),
-                            title: Text(
-                              "duration_settings".tr(),
-                              style: AppFonts.poppins(
-                                context: context,
-                                color: itemColor,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            trailing: Icon(Icons.arrow_forward_ios_rounded,
-                                size: 18, color: itemColor),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const DurationSettingsScreen()),
-                              );
-                            },
-                          ),
-                        ),
+        return Column(
+          children: [
+            // Ayarlar Listesi (Scrollable)
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.symmetric(
+                    horizontal: hPadding, vertical: vPadding),
+                children: [
+                  // 🔥 Dinamik Kart Rengi Hesaplama
+                  // Her tema artık kendi settingsCardColor ve settingsBorderColor değerlerini taşıyor.
+                  Builder(
+                    builder: (context) {
+                      final theme = themeProvider.currentTheme;
+                      final cardColor =
+                          theme.settingsCardColor ?? const Color(0xFF202020);
+                      final borderColor = theme.settingsBorderColor ??
+                          Colors.white.withOpacity(0.06);
+                      // 🔥 İçerik Rengi: Eğer tema özel renk belirttiyse onu kullan, yoksa genel textColor
+                      final itemColor = theme.settingsItemColor ??
+                          themeProvider.idleTextColor;
 
-                        const SizedBox(height: 20),
-
-                        // SES AYARLARI
-                        Card(
-                          color: cardColor,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            side: BorderSide(color: borderColor, width: 1),
-                          ),
-                          child: ListTile(
-                            leading: Icon(Icons.music_note_rounded,
-                                color: itemColor),
-                            title: Text(
-                              "sound_settings".tr(),
-                              style: AppFonts.poppins(
-                                context: context,
-                                color: itemColor,
-                                fontWeight: FontWeight.w500,
-                              ),
+                      return Column(
+                        children: [
+                          // SÜRE AYARLARI
+                          Card(
+                            color: cardColor,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              side: BorderSide(color: borderColor, width: 1),
                             ),
-                            subtitle: Text(
-                              settings.isBackgroundMusicEnabled
-                                  ? "on".tr()
-                                  : "off".tr(),
-                              style: AppFonts.poppins(
-                                context: context,
-                                fontSize: 12,
-                                color: itemColor.withAlpha(179),
-                              ),
-                            ),
-                            trailing: Icon(Icons.arrow_forward_ios_rounded,
-                                size: 18, color: itemColor),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const SoundSettingsScreen()),
-                              );
-                            },
-                          ),
-                        ),
-
-                        const SizedBox(height: 20),
-
-                        // 🎨 TEMA AYARI
-                        Card(
-                          color: cardColor,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            side: BorderSide(color: borderColor, width: 1),
-                          ),
-                          child: ListTile(
-                            leading:
-                                Icon(Icons.palette_outlined, color: itemColor),
-                            title: Text(
-                              'theme_settings'.tr(),
-                              style: AppFonts.poppins(
-                                context: context,
-                                color: itemColor,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            subtitle: Text(
-                              'theme_name_${themeProvider.currentTheme.id}'
-                                  .tr(),
-                              style: AppFonts.poppins(
-                                context: context,
-                                fontSize: 12,
-                                color: itemColor.withAlpha(179),
-                              ),
-                            ),
-                            trailing: Icon(Icons.arrow_forward_ios,
-                                size: 16, color: itemColor),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const ThemeSelectionScreen(),
+                            child: ListTile(
+                              contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: isTablet ? 8 : 0),
+                              leading: Icon(Icons.timer_outlined,
+                                  color: itemColor, size: iconSize),
+                              title: Text(
+                                "duration_settings".tr(),
+                                style: AppFonts.poppins(
+                                  context: context,
+                                  color: itemColor,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: titleSize,
                                 ),
-                              );
-                            },
-                          ),
-                        ),
-
-                        const SizedBox(height: 20),
-
-                        // DİL AYARI
-                        Card(
-                          color: cardColor,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            side: BorderSide(color: borderColor, width: 1),
-                          ),
-                          child: ListTile(
-                            leading: Icon(Icons.language, color: itemColor),
-                            title: Text(
-                              'language_label'.tr(),
-                              style: AppFonts.poppins(
-                                context: context,
-                                color: itemColor,
-                                fontWeight: FontWeight.w500,
                               ),
+                              trailing: Icon(Icons.arrow_forward_ios_rounded,
+                                  size: trailingIconSize, color: itemColor),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const DurationSettingsScreen()),
+                                );
+                              },
                             ),
-                            subtitle: Text(
-                              _getLanguageName(context.locale.languageCode),
-                              style: AppFonts.poppins(
-                                context: context,
-                                fontSize: 12,
-                                color: itemColor.withAlpha(179),
-                              ),
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          // SES AYARLARI
+                          Card(
+                            color: cardColor,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              side: BorderSide(color: borderColor, width: 1),
                             ),
-                            trailing: Icon(Icons.arrow_forward_ios,
-                                size: 16, color: itemColor),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const LanguageSelectionScreen(),
+                            child: ListTile(
+                              contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: isTablet ? 8 : 0),
+                              leading: Icon(Icons.music_note_rounded,
+                                  color: itemColor, size: iconSize),
+                              title: Text(
+                                "sound_settings".tr(),
+                                style: AppFonts.poppins(
+                                  context: context,
+                                  color: itemColor,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: titleSize,
                                 ),
-                              );
-                            },
+                              ),
+                              subtitle: Text(
+                                settings.isBackgroundMusicEnabled
+                                    ? "on".tr()
+                                    : "off".tr(),
+                                style: AppFonts.poppins(
+                                  context: context,
+                                  fontSize: subtitleSize,
+                                  color: itemColor.withAlpha(179),
+                                ),
+                              ),
+                              trailing: Icon(Icons.arrow_forward_ios_rounded,
+                                  size: trailingIconSize, color: itemColor),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const SoundSettingsScreen()),
+                                );
+                              },
+                            ),
                           ),
-                        ),
-                      ],
-                    );
-                  },
-                ),
 
-                const SizedBox(height: 20),
+                          const SizedBox(height: 20),
 
-                const SizedBox(height: 30),
+                          // 🎨 TEMA AYARI
+                          Card(
+                            color: cardColor,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              side: BorderSide(color: borderColor, width: 1),
+                            ),
+                            child: ListTile(
+                              contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: isTablet ? 8 : 0),
+                              leading: Icon(Icons.palette_outlined,
+                                  color: itemColor, size: iconSize),
+                              title: Text(
+                                'theme_settings'.tr(),
+                                style: AppFonts.poppins(
+                                  context: context,
+                                  color: itemColor,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: titleSize,
+                                ),
+                              ),
+                              subtitle: Text(
+                                'theme_name_${themeProvider.currentTheme.id}'
+                                    .tr(),
+                                style: AppFonts.poppins(
+                                  context: context,
+                                  fontSize: subtitleSize,
+                                  color: itemColor.withAlpha(179),
+                                ),
+                              ),
+                              trailing: Icon(Icons.arrow_forward_ios,
+                                  size: trailingIconSize, color: itemColor),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const ThemeSelectionScreen(),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
 
-                const SizedBox(height: 30),
-              ],
+                          const SizedBox(height: 20),
+
+                          // DİL AYARI
+                          Card(
+                            color: cardColor,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              side: BorderSide(color: borderColor, width: 1),
+                            ),
+                            child: ListTile(
+                              contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: isTablet ? 8 : 0),
+                              leading: Icon(Icons.language,
+                                  color: itemColor, size: iconSize),
+                              title: Text(
+                                'language_label'.tr(),
+                                style: AppFonts.poppins(
+                                  context: context,
+                                  color: itemColor,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: titleSize,
+                                ),
+                              ),
+                              subtitle: Text(
+                                _getLanguageName(context.locale.languageCode),
+                                style: AppFonts.poppins(
+                                  context: context,
+                                  fontSize: subtitleSize,
+                                  color: itemColor.withAlpha(179),
+                                ),
+                              ),
+                              trailing: Icon(Icons.arrow_forward_ios,
+                                  size: trailingIconSize, color: itemColor),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const LanguageSelectionScreen(),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  const SizedBox(height: 30),
+
+                  const SizedBox(height: 30),
+                ],
+              ),
             ),
-          ),
 
-          // 🔥 BANNER REKLAM ALANI
-          Consumer<AdManager>(
-            builder: (context, adManager, child) {
-              if (adManager.isSettingsBannerLoaded &&
-                  adManager.settingsBannerAd != null) {
-                return Container(
-                  width: adManager.settingsBannerAd!.size.width.toDouble(),
-                  height: adManager.settingsBannerAd!.size.height.toDouble(),
-                  margin: const EdgeInsets.only(bottom: 10),
-                  child: AdWidget(ad: adManager.settingsBannerAd!),
-                );
-              }
-              // Reklam yüklenmediyse boş alan
-              return const SizedBox(height: 50);
-            },
-          ),
-        ],
-      ),
+            // 🔥 BANNER REKLAM ALANI
+            Consumer<AdManager>(
+              builder: (context, adManager, child) {
+                if (adManager.isSettingsBannerLoaded &&
+                    adManager.settingsBannerAd != null) {
+                  return Container(
+                    width: adManager.settingsBannerAd!.size.width.toDouble(),
+                    height: adManager.settingsBannerAd!.size.height.toDouble(),
+                    margin: const EdgeInsets.only(bottom: 10),
+                    child: AdWidget(ad: adManager.settingsBannerAd!),
+                  );
+                }
+                // Reklam yüklenmediyse boş alan
+                return const SizedBox(height: 50);
+              },
+            ),
+          ],
+        );
+      }),
     );
   }
 }

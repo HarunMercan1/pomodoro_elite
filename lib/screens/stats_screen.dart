@@ -41,6 +41,9 @@ class StatsScreen extends StatelessWidget {
         final int avgMinutes = stats.dailyAverageMinutes;
         final bestDayData = stats.bestDay;
 
+        // Tablet Kontrolü
+        final bool isTablet = MediaQuery.of(context).size.width >= 600;
+
         return Scaffold(
           backgroundColor: theme.idle.bgColor, // Temanın ana arka planı
           appBar: AppBar(
@@ -82,6 +85,7 @@ class StatsScreen extends StatelessWidget {
                         end: Alignment.bottomRight,
                       ),
                       textColor: theme.focus.textColor,
+                      isTablet: isTablet,
                     ),
 
                     const SizedBox(height: 25),
@@ -104,6 +108,7 @@ class StatsScreen extends StatelessWidget {
                             accentColor: color1,
                             cardColor: cardBgColor,
                             textColor: textColor,
+                            isTablet: isTablet,
                           ),
                           // Toplam Odak
                           _buildStatItem(
@@ -117,6 +122,7 @@ class StatsScreen extends StatelessWidget {
                             accentColor: color2,
                             cardColor: cardBgColor,
                             textColor: textColor,
+                            isTablet: isTablet,
                           ),
                           // Günlük Ortalama
                           _buildStatItem(
@@ -129,6 +135,7 @@ class StatsScreen extends StatelessWidget {
                             accentColor: color3,
                             cardColor: cardBgColor,
                             textColor: textColor,
+                            isTablet: isTablet,
                           ),
                           // En İyi Gün
                           _buildStatItem(
@@ -141,6 +148,7 @@ class StatsScreen extends StatelessWidget {
                             accentColor: theme.finish.bgColor,
                             cardColor: cardBgColor,
                             textColor: textColor,
+                            isTablet: isTablet,
                           ),
                         ],
                       );
@@ -362,10 +370,11 @@ class StatsScreen extends StatelessWidget {
     required Color accentColor,
     required Color cardColor,
     required Color textColor,
+    bool isTablet = false,
   }) {
     return Container(
       width: width,
-      padding: const EdgeInsets.all(15),
+      padding: EdgeInsets.all(isTablet ? 24 : 15),
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(20),
@@ -382,24 +391,27 @@ class StatsScreen extends StatelessWidget {
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: EdgeInsets.all(isTablet ? 12 : 8),
             decoration: BoxDecoration(
               color: textColor.withOpacity(0.15),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: textColor.withOpacity(0.8), size: 20),
+            child: Icon(icon,
+                color: textColor.withOpacity(0.8), size: isTablet ? 32 : 20),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: isTablet ? 16 : 12),
           Text(
             title,
             maxLines: 1,
+            textAlign: TextAlign.center,
             overflow: TextOverflow.ellipsis,
             style: AppFonts.poppins(
               context: context,
-              fontSize: 12,
+              fontSize: isTablet ? 16 : 12,
               fontWeight: FontWeight.w500,
               color: textColor.withOpacity(0.6),
             ),
@@ -417,22 +429,19 @@ class StatsScreen extends StatelessWidget {
               if (match != null) {
                 numberPart = match.group(1) ?? value;
                 unitPart = match.group(2) ?? '';
-              } else {
-                // Eşleşme yoksa (sadece sayı veya sadece metin), olduğu gibi göster
-                // Ama BebasNeue uppercase yaptığı için, eğer sadece metinse Poppins kullanmak daha güvenli olabilir
-                // Şimdilik varsayılan davranış olarak BebasNeue kalsın
               }
 
               return FittedBox(
                 fit: BoxFit.scaleDown,
                 child: RichText(
+                  textAlign: TextAlign.center,
                   text: TextSpan(
                     children: [
                       TextSpan(
                         text: numberPart,
                         style: AppFonts.bebasNeue(
                           context: context,
-                          fontSize: 28,
+                          fontSize: isTablet ? 48 : 28,
                           color: textColor,
                           height: 1.0,
                         ),
@@ -442,7 +451,7 @@ class StatsScreen extends StatelessWidget {
                           text: unitPart, // Boşluksuz yapışık
                           style: AppFonts.poppins(
                             context: context,
-                            fontSize: 16, // Daha küçük boyut
+                            fontSize: isTablet ? 24 : 16, // Daha küçük boyut
                             fontWeight: FontWeight.w500,
                             color: textColor.withOpacity(0.7),
                             height: 1.0,
@@ -458,10 +467,11 @@ class StatsScreen extends StatelessWidget {
           Text(
             subValue,
             maxLines: 1,
+            textAlign: TextAlign.center,
             overflow: TextOverflow.ellipsis,
             style: AppFonts.poppins(
               context: context,
-              fontSize: 10,
+              fontSize: isTablet ? 14 : 10,
               color: textColor.withOpacity(0.4),
             ),
           ),
@@ -475,9 +485,11 @@ class StatsScreen extends StatelessWidget {
     required int streak,
     required Gradient gradient,
     required Color textColor,
+    bool isTablet = false,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      padding:
+          EdgeInsets.symmetric(horizontal: 20, vertical: isTablet ? 30 : 20),
       decoration: BoxDecoration(
         gradient: gradient,
         borderRadius: BorderRadius.circular(25),
@@ -495,13 +507,13 @@ class StatsScreen extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: EdgeInsets.all(isTablet ? 16 : 10),
                 decoration: BoxDecoration(
                   color: textColor.withOpacity(0.2),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(Icons.local_fire_department_rounded,
-                    color: textColor, size: 28),
+                    color: textColor, size: isTablet ? 40 : 28),
               ),
               const SizedBox(width: 15),
               Column(
@@ -512,7 +524,7 @@ class StatsScreen extends StatelessWidget {
                     style: AppFonts.poppins(
                       context: context,
                       fontWeight: FontWeight.w600,
-                      fontSize: 16,
+                      fontSize: isTablet ? 24 : 16,
                       color: textColor.withOpacity(0.9),
                     ),
                   ),
@@ -521,7 +533,7 @@ class StatsScreen extends StatelessWidget {
                         .tr(), // Localize key: keep_streak alternatifi
                     style: AppFonts.poppins(
                       context: context,
-                      fontSize: 12,
+                      fontSize: isTablet ? 16 : 12,
                       color: textColor.withOpacity(0.7),
                     ),
                   ),
@@ -535,7 +547,7 @@ class StatsScreen extends StatelessWidget {
                 "$streak",
                 style: AppFonts.bebasNeue(
                   context: context,
-                  fontSize: 42,
+                  fontSize: isTablet ? 70 : 42,
                   color: textColor,
                   height: 1.0,
                 ),
@@ -545,7 +557,7 @@ class StatsScreen extends StatelessWidget {
                 style: AppFonts.poppins(
                   context: context,
                   fontWeight: FontWeight.w500,
-                  fontSize: 12,
+                  fontSize: isTablet ? 16 : 12,
                   color: textColor.withOpacity(0.8),
                 ),
               ),
