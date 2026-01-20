@@ -1,10 +1,17 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 
 class SettingsProvider with ChangeNotifier {
   late SharedPreferences _prefs;
   final AudioPlayer _previewPlayer = AudioPlayer();
+
+  // Supabase Storage Base URL
+  static const String _storageBaseUrl =
+      'https://dqhbvcceaftatuvyokxq.supabase.co/storage/v1/object/public/sounds';
 
   // --- AYARLAR ---
   bool _isDarkMode = true;
@@ -19,6 +26,10 @@ class SettingsProvider with ChangeNotifier {
   int _workTime = 25;
   int _shortBreakTime = 5;
   int _longBreakTime = 15;
+
+  // İndirme Durumları
+  final Map<String, bool> _downloadingMusic = {};
+  bool isDownloading(String key) => _downloadingMusic[key] ?? false;
 
   // Getterlar
   bool get isDarkMode => _isDarkMode;
@@ -60,14 +71,16 @@ class SettingsProvider with ChangeNotifier {
     _prefs = await SharedPreferences.getInstance();
     _isDarkMode = _prefs.getBool('isDarkMode') ?? true;
 
-    // Eğer hafızada kalan eski bir dosya varsa (örn: digital.mp3), varsayılan 'zil1.mp3'e dön
     String loadedNotif = _prefs.getString('notificationSound') ?? 'zil1.mp3';
-    _notificationSound = notificationSounds.containsKey(loadedNotif) ? loadedNotif : 'zil1.mp3';
+    _notificationSound =
+        notificationSounds.containsKey(loadedNotif) ? loadedNotif : 'zil1.mp3';
 
-    _isBackgroundMusicEnabled = _prefs.getBool('isBackgroundMusicEnabled') ?? false;
+    _isBackgroundMusicEnabled =
+        _prefs.getBool('isBackgroundMusicEnabled') ?? false;
 
     String loadedMusic = _prefs.getString('backgroundMusic') ?? 'rain1.mp3';
-    _backgroundMusic = backgroundMusics.containsKey(loadedMusic) ? loadedMusic : 'rain1.mp3';
+    _backgroundMusic =
+        backgroundMusics.containsKey(loadedMusic) ? loadedMusic : 'rain1.mp3';
 
     _backgroundVolume = _prefs.getDouble('backgroundVolume') ?? 0.5;
     _workTime = _prefs.getInt('workTime') ?? 25;
@@ -102,6 +115,50 @@ class SettingsProvider with ChangeNotifier {
     }
   }
 
+  // --- MÜZİK İNDİRME VE KONTROL ---
+  Future<String> _getLocalPath() async {
+    final directory = await getApplicationDocumentsDirectory();
+    final musicDir = Directory('${directory.path}/sounds/music');
+    if (!await musicDir.exists()) {
+      await musicDir.create(recursive: true);
+    }
+    return musicDir.path;
+  }
+
+  Future<bool> isMusicDownloaded(String fileName) async {
+    final path = await _getLocalPath();
+    final file = File('$path/$fileName');
+    return await file.exists();
+  }
+
+  Future<void> downloadMusic(String fileName) async {
+    if (_downloadingMusic[fileName] == true) return; // Zaten iniyor
+
+    _downloadingMusic[fileName] = true;
+    notifyListeners();
+
+    try {
+      final url = '$_storageBaseUrl/$fileName';
+      debugPrint("⬇️ Müzik İndiriliyor: $url");
+
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final path = await _getLocalPath();
+        final file = File('$path/$fileName');
+        await file.writeAsBytes(response.bodyBytes);
+        debugPrint("✅ Müzik İndirildi: ${file.path}");
+      } else {
+        debugPrint("❌ İndirme Başarısız: ${response.statusCode}");
+      }
+    } catch (e) {
+      debugPrint("❌ İndirme Hatası: $e");
+    } finally {
+      _downloadingMusic[fileName] = false;
+      notifyListeners();
+    }
+  }
+
   // --- MÜZİK SEÇME ---
   Future<void> setBackgroundMusic(String soundPath) async {
     _backgroundMusic = soundPath;
@@ -109,15 +166,31 @@ class SettingsProvider with ChangeNotifier {
     notifyListeners();
 
     if (_isBackgroundMusicEnabled) {
-      try {
+      // Önce dosya var mı kontrol et
+      if (await isMusicDownloaded(soundPath)) {
+        await _playLocalMusic(soundPath);
+      } else {
+        // Dosya yoksa indirmeyi başlat (veya kullanıcıya indirmesi gerektiğini UI'da gösteriyoruz)
+        debugPrint("⚠️ Müzik bulunamadı, indirilmesi gerek: $soundPath");
+        // Otomatik indirme başlatabiliriz veya UI'dan beklemesini isteyebiliriz.
+        // Şimdilik ses çalmıyor, UI'da indir butonu çıkacak.
         await _previewPlayer.stop();
-        await _previewPlayer.setSource(AssetSource('sounds/music/$soundPath'));
-        await _previewPlayer.setVolume(_backgroundVolume);
-        await _previewPlayer.setReleaseMode(ReleaseMode.loop);
-        await _previewPlayer.resume();
-      } catch (e) {
-        debugPrint("❌ Müzik Hatası: $e");
       }
+    }
+  }
+
+  Future<void> _playLocalMusic(String fileName) async {
+    try {
+      final path = await _getLocalPath();
+      final filePath = '$path/$fileName';
+
+      await _previewPlayer.stop();
+      await _previewPlayer.setSource(DeviceFileSource(filePath));
+      await _previewPlayer.setVolume(_backgroundVolume);
+      await _previewPlayer.setReleaseMode(ReleaseMode.loop);
+      await _previewPlayer.resume();
+    } catch (e) {
+      debugPrint("❌ Müzik Çalma Hatası: $e");
     }
   }
 
@@ -148,7 +221,21 @@ class SettingsProvider with ChangeNotifier {
     await _previewPlayer.stop();
   }
 
-  void setWorkTime(int minutes) { _workTime = minutes; _prefs.setInt('workTime', minutes); notifyListeners(); }
-  void setShortBreakTime(int minutes) { _shortBreakTime = minutes; _prefs.setInt('shortBreakTime', minutes); notifyListeners(); }
-  void setLongBreakTime(int minutes) { _longBreakTime = minutes; _prefs.setInt('longBreakTime', minutes); notifyListeners(); }
+  void setWorkTime(int minutes) {
+    _workTime = minutes;
+    _prefs.setInt('workTime', minutes);
+    notifyListeners();
+  }
+
+  void setShortBreakTime(int minutes) {
+    _shortBreakTime = minutes;
+    _prefs.setInt('shortBreakTime', minutes);
+    notifyListeners();
+  }
+
+  void setLongBreakTime(int minutes) {
+    _longBreakTime = minutes;
+    _prefs.setInt('longBreakTime', minutes);
+    notifyListeners();
+  }
 }

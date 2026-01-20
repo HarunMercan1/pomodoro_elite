@@ -167,28 +167,14 @@ class _SoundSettingsScreenState extends State<SoundSettingsScreen> {
 
                               const SizedBox(height: 10),
 
-                              // Müzik Listesi
+                              // Müzik Listesi - Custom Widget Kullanımı
                               ...settings.backgroundMusics.entries.map((entry) {
-                                final isSelected =
-                                    settings.backgroundMusic == entry.key;
-                                return ListTile(
-                                  title: Text(
-                                    entry.value.tr(),
-                                    style: AppFonts.poppins(
-                                      context: context,
-                                      color: itemColor,
-                                    ),
-                                  ),
-                                  leading: Icon(
-                                    isSelected
-                                        ? Icons.radio_button_checked
-                                        : Icons.radio_button_off,
-                                    color: isSelected
-                                        ? sliderColor
-                                        : itemColor.withOpacity(0.5),
-                                  ),
-                                  onTap: () =>
-                                      settings.setBackgroundMusic(entry.key),
+                                return _MusicListTile(
+                                  titleKey: entry.value,
+                                  fileName: entry.key,
+                                  settings: settings,
+                                  sliderColor: sliderColor,
+                                  itemColor: itemColor,
                                 );
                               }).toList(),
                             ],
@@ -254,6 +240,114 @@ class _SoundSettingsScreenState extends State<SoundSettingsScreen> {
           letterSpacing: 1.0,
         ),
       ),
+    );
+  }
+}
+
+// --- YARDIMCI WIDGET: MÜZİK LİSTESİ ÖĞESİ ---
+class _MusicListTile extends StatefulWidget {
+  final String titleKey;
+  final String fileName;
+  final SettingsProvider settings;
+  final Color sliderColor;
+  final Color itemColor;
+
+  const _MusicListTile({
+    required this.titleKey,
+    required this.fileName,
+    required this.settings,
+    required this.sliderColor,
+    required this.itemColor,
+  });
+
+  @override
+  State<_MusicListTile> createState() => _MusicListTileState();
+}
+
+class _MusicListTileState extends State<_MusicListTile> {
+  bool? _isDownloaded;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkDownloadStatus();
+  }
+
+  Future<void> _checkDownloadStatus() async {
+    final exists = await widget.settings.isMusicDownloaded(widget.fileName);
+    if (mounted) {
+      setState(() {
+        _isDownloaded = exists;
+      });
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant _MusicListTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Re-check just in case state changed externally or widget rebuilt
+    _checkDownloadStatus();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isSelected = widget.settings.backgroundMusic == widget.fileName;
+    // Provider'dan indirme durumu (Global Map)
+    final isDownloading = widget.settings.isDownloading(widget.fileName);
+
+    return ListTile(
+      title: Text(
+        widget.titleKey.tr(),
+        style: AppFonts.poppins(
+          context: context,
+          color: widget.itemColor,
+        ),
+      ),
+      leading: _buildLeadingIcon(isSelected, isDownloading),
+      onTap: () async {
+        // Eğer zaten seçiliyse ve indirilmişse bir şey yapmaya gerek yok veya durdur
+        if (isSelected) return;
+
+        if (_isDownloaded == true) {
+          // İndirilmişse direkt seç ve çal
+          await widget.settings.setBackgroundMusic(widget.fileName);
+        } else {
+          // İndirilmemişse indir
+          await widget.settings.downloadMusic(widget.fileName);
+          // İndirme bittiğinde tekrar kontrol et
+          await _checkDownloadStatus();
+          // Eğer başarılı indiyse otomatik seçebilirsiniz:
+          if (_isDownloaded == true) {
+            await widget.settings.setBackgroundMusic(widget.fileName);
+          }
+        }
+      },
+    );
+  }
+
+  Widget _buildLeadingIcon(bool isSelected, bool isDownloading) {
+    if (isDownloading) {
+      return SizedBox(
+        width: 24,
+        height: 24,
+        child: CircularProgressIndicator(
+          strokeWidth: 2,
+          color: widget.sliderColor,
+        ),
+      );
+    }
+
+    if (_isDownloaded == false) {
+      return Icon(
+        Icons.cloud_download_rounded,
+        color: widget.itemColor.withOpacity(0.7),
+      );
+    }
+
+    return Icon(
+      isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
+      color:
+          isSelected ? widget.sliderColor : widget.itemColor.withOpacity(0.5),
     );
   }
 }
