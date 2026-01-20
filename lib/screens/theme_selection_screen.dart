@@ -296,6 +296,8 @@ class _ThemeCard extends StatelessWidget {
                   children: [
                     Text(
                       'theme_name_${theme.id}'.tr(),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         fontFamily: 'Poppins',
                         fontSize: 16,
@@ -305,6 +307,8 @@ class _ThemeCard extends StatelessWidget {
                     ),
                     Text(
                       'theme_vibe_${theme.id}'.tr(),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.white.withAlpha(180),
