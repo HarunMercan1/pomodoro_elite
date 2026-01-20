@@ -9,6 +9,7 @@ import 'duration_settings_screen.dart';
 import 'sound_settings_screen.dart';
 import 'theme_selection_screen.dart';
 import '../providers/theme_provider.dart';
+import '../utils/app_fonts.dart';
 
 import 'package:pomodoro_elite/screens/language_selection_screen.dart';
 
@@ -128,8 +129,8 @@ class _SettingsScreenState extends State<SettingsScreen>
       appBar: AppBar(
         title: Text(
           'settings_title'.tr(),
-          style: TextStyle(
-              fontFamily: 'Poppins',
+          style: AppFonts.poppins(
+              context: context,
               fontWeight: FontWeight.w600,
               color: themeProvider.settingsTextColor),
         ),
@@ -178,8 +179,8 @@ class _SettingsScreenState extends State<SettingsScreen>
                                 Icon(Icons.timer_outlined, color: itemColor),
                             title: Text(
                               "duration_settings".tr(),
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
+                              style: AppFonts.poppins(
+                                context: context,
                                 color: itemColor,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -212,8 +213,8 @@ class _SettingsScreenState extends State<SettingsScreen>
                                 color: itemColor),
                             title: Text(
                               "sound_settings".tr(),
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
+                              style: AppFonts.poppins(
+                                context: context,
                                 color: itemColor,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -222,7 +223,8 @@ class _SettingsScreenState extends State<SettingsScreen>
                               settings.isBackgroundMusicEnabled
                                   ? "on".tr()
                                   : "off".tr(),
-                              style: TextStyle(
+                              style: AppFonts.poppins(
+                                context: context,
                                 fontSize: 12,
                                 color: itemColor.withAlpha(179),
                               ),
@@ -255,8 +257,8 @@ class _SettingsScreenState extends State<SettingsScreen>
                                 Icon(Icons.palette_outlined, color: itemColor),
                             title: Text(
                               'theme_settings'.tr(),
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
+                              style: AppFonts.poppins(
+                                context: context,
                                 color: itemColor,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -264,8 +266,8 @@ class _SettingsScreenState extends State<SettingsScreen>
                             subtitle: Text(
                               'theme_name_${themeProvider.currentTheme.id}'
                                   .tr(),
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
+                              style: AppFonts.poppins(
+                                context: context,
                                 fontSize: 12,
                                 color: itemColor.withAlpha(179),
                               ),
@@ -298,16 +300,16 @@ class _SettingsScreenState extends State<SettingsScreen>
                             leading: Icon(Icons.language, color: itemColor),
                             title: Text(
                               'language_label'.tr(),
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
+                              style: AppFonts.poppins(
+                                context: context,
                                 color: itemColor,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
                             subtitle: Text(
                               _getLanguageName(context.locale.languageCode),
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
+                              style: AppFonts.poppins(
+                                context: context,
                                 fontSize: 12,
                                 color: itemColor.withAlpha(179),
                               ),

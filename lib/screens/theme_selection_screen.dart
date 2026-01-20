@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../providers/theme_provider.dart';
 import '../providers/ad_manager.dart';
+import '../utils/app_fonts.dart';
 
 class ThemeSelectionScreen extends StatefulWidget {
   const ThemeSelectionScreen({super.key});
@@ -30,8 +31,8 @@ class _ThemeSelectionScreenState extends State<ThemeSelectionScreen> {
       appBar: AppBar(
         title: Text(
           'theme_settings'.tr(),
-          style: TextStyle(
-            fontFamily: 'Poppins',
+          style: AppFonts.poppins(
+            context: context,
             fontWeight: FontWeight.bold,
             color: themeProvider.settingsTextColor, // 🔥 Tema bazlı metin
           ),
@@ -298,8 +299,8 @@ class _ThemeCard extends StatelessWidget {
                       'theme_name_${theme.id}'.tr(),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontFamily: 'Poppins',
+                      style: AppFonts.poppins(
+                        context: context,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,

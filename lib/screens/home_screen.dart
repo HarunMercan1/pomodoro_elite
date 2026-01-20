@@ -12,6 +12,7 @@ import '../screens/settings_screen.dart';
 import '../screens/stats_screen.dart';
 import '../widgets/time_option_button.dart';
 import 'package:easy_localization/easy_localization.dart';
+import '../utils/app_fonts.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -167,8 +168,8 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: Text(
           'app_name'.tr(),
-          style: TextStyle(
-            fontFamily: 'Poppins',
+          style: AppFonts.poppins(
+            context: context,
             fontWeight: FontWeight.w600,
             color: textColor,
           ),
@@ -345,8 +346,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                     offset: const Offset(0, 5),
                                     child: Text(
                                       provider.timeLeftString,
-                                      style: TextStyle(
-                                        fontFamily: 'BebasNeue',
+                                      style: AppFonts.bebasNeue(
+                                        context: context,
                                         fontSize: timerFontSize,
                                         color: textColor,
                                         letterSpacing: 2,
@@ -376,8 +377,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         textAlign: TextAlign.center,
                         maxLines: 3,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
+                        style: AppFonts.poppins(
+                          context: context,
                           fontSize: isSmallScreen ? 14 : 16,
                           fontWeight: FontWeight.w500,
                           color: textColor.withAlpha(229),
@@ -447,8 +448,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                           : (isPaused)
                                               ? "resume".tr()
                                               : "start".tr(),
-                                  style: TextStyle(
-                                    fontFamily: 'Poppins',
+                                  style: AppFonts.poppins(
+                                    context: context,
                                     fontSize: isSmallScreen ? 18 : 20,
                                     fontWeight: FontWeight.bold,
                                     color: stateColors
@@ -477,8 +478,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   context.read<TimerProvider>().resetTimer(),
                               child: Text(
                                 "reset".tr(),
-                                style: TextStyle(
-                                  fontFamily: 'Poppins',
+                                style: AppFonts.poppins(
+                                  context: context,
                                   color: textColor.withAlpha(179),
                                   fontWeight: FontWeight.w500,
                                 ),

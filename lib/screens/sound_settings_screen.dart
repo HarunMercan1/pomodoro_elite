@@ -6,6 +6,7 @@ import 'package:easy_localization/easy_localization.dart';
 import '../providers/settings_provider.dart';
 import '../providers/timer_provider.dart';
 import '../providers/theme_provider.dart';
+import '../utils/app_fonts.dart';
 
 class SoundSettingsScreen extends StatefulWidget {
   const SoundSettingsScreen({super.key});
@@ -44,8 +45,8 @@ class _SoundSettingsScreenState extends State<SoundSettingsScreen> {
       appBar: AppBar(
         title: Text(
           "sound_settings".tr(),
-          style: TextStyle(
-            fontFamily: 'Poppins',
+          style: AppFonts.poppins(
+            context: context,
             fontWeight: FontWeight.w600,
             color: themeProvider.settingsTextColor,
           ),
@@ -83,8 +84,8 @@ class _SoundSettingsScreenState extends State<SoundSettingsScreen> {
                     child: Text(
                       "music_lock_msg"
                           .tr(), // "Müzik değiştirmek için sayacı durdurun."
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
+                      style: AppFonts.poppins(
+                        context: context,
                         fontSize: 12,
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
@@ -121,8 +122,8 @@ class _SoundSettingsScreenState extends State<SoundSettingsScreen> {
                             SwitchListTile(
                               title: Text(
                                 "enable_music".tr(),
-                                style: TextStyle(
-                                  fontFamily: 'Poppins',
+                                style: AppFonts.poppins(
+                                  context: context,
                                   color: itemColor,
                                 ),
                               ),
@@ -173,8 +174,8 @@ class _SoundSettingsScreenState extends State<SoundSettingsScreen> {
                                 return ListTile(
                                   title: Text(
                                     entry.value.tr(),
-                                    style: TextStyle(
-                                      fontFamily: 'Poppins',
+                                    style: AppFonts.poppins(
+                                      context: context,
                                       color: itemColor,
                                     ),
                                   ),
@@ -216,8 +217,8 @@ class _SoundSettingsScreenState extends State<SoundSettingsScreen> {
                           return ListTile(
                             title: Text(
                               entry.value.tr(),
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
+                              style: AppFonts.poppins(
+                                context: context,
                                 color: itemColor,
                               ),
                             ),
@@ -245,8 +246,8 @@ class _SoundSettingsScreenState extends State<SoundSettingsScreen> {
       padding: const EdgeInsets.only(bottom: 10, left: 5),
       child: Text(
         title,
-        style: TextStyle(
-          fontFamily: 'Poppins',
+        style: AppFonts.poppins(
+          context: context,
           fontSize: 14,
           fontWeight: FontWeight.bold,
           color: Theme.of(context).dividerColor,

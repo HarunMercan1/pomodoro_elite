@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import '../utils/app_fonts.dart';
 
 class TimeOptionButton extends StatelessWidget {
   final String title;
@@ -87,8 +88,8 @@ class TimeOptionButton extends StatelessWidget {
               Text(
                 title,
                 maxLines: 1,
-                style: TextStyle(
-                  fontFamily: 'Poppins',
+                style: AppFonts.poppins(
+                  context: context,
                   color: textColor,
                   fontWeight: FontWeight.w600,
                   fontSize: 13,
@@ -96,8 +97,8 @@ class TimeOptionButton extends StatelessWidget {
               ),
               Text(
                 "$minutes ${'minutes_label'.tr().toLowerCase()}",
-                style: TextStyle(
-                  fontFamily: 'Poppins',
+                style: AppFonts.poppins(
+                  context: context,
                   fontSize: 10,
                   color: textColor.withOpacity(0.8), // Opacity artırıldı
                 ),

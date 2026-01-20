@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
+import '../utils/app_fonts.dart';
 
 class LanguageSelectionScreen extends StatelessWidget {
   const LanguageSelectionScreen({super.key});
@@ -47,8 +48,8 @@ class LanguageSelectionScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           'language_label'.tr(),
-          style: TextStyle(
-              fontFamily: 'Poppins',
+          style: AppFonts.poppins(
+              context: context,
               fontWeight: FontWeight.bold,
               color: themeProvider.settingsTextColor),
         ),
@@ -98,8 +99,8 @@ class LanguageSelectionScreen extends StatelessWidget {
                     Expanded(
                       child: Text(
                         lang['name']!,
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
+                        style: AppFonts.poppins(
+                          context: context,
                           fontSize: 18,
                           fontWeight:
                               isSelected ? FontWeight.bold : FontWeight.normal,

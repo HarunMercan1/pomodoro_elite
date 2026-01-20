@@ -5,6 +5,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../providers/stats_provider.dart';
 import '../providers/theme_provider.dart';
+import '../utils/app_fonts.dart';
 
 class StatsScreen extends StatelessWidget {
   const StatsScreen({super.key});
@@ -45,8 +46,8 @@ class StatsScreen extends StatelessWidget {
           appBar: AppBar(
             title: Text(
               "stats_title".tr(),
-              style: TextStyle(
-                fontFamily: 'Poppins',
+              style: AppFonts.poppins(
+                context: context,
                 fontWeight: FontWeight.w600,
                 color: textColor,
               ),
@@ -176,8 +177,8 @@ class StatsScreen extends StatelessWidget {
                                 children: [
                                   Text(
                                     "this_week".tr(),
-                                    style: TextStyle(
-                                      fontFamily: 'Poppins',
+                                    style: AppFonts.poppins(
+                                      context: context,
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                       color: textColor,
@@ -186,8 +187,8 @@ class StatsScreen extends StatelessWidget {
                                   const SizedBox(height: 5),
                                   Text(
                                     "$totalWeekHours ${"focus_hours".tr()}",
-                                    style: TextStyle(
-                                      fontFamily: 'Poppins',
+                                    style: AppFonts.poppins(
+                                      context: context,
                                       fontSize: 24,
                                       fontWeight: FontWeight.bold,
                                       color: color1, // Odak rengi
@@ -225,10 +226,10 @@ class StatsScreen extends StatelessWidget {
                                         (group, groupIndex, rod, rodIndex) {
                                       return BarTooltipItem(
                                         '${rod.toY.round()} m',
-                                        TextStyle(
+                                        AppFonts.poppins(
+                                          context: context,
                                           color: textColor,
                                           fontWeight: FontWeight.bold,
-                                          fontFamily: 'Poppins',
                                         ),
                                       );
                                     },
@@ -267,12 +268,12 @@ class StatsScreen extends StatelessWidget {
                                                 const EdgeInsets.only(top: 8.0),
                                             child: Text(
                                               dayName,
-                                              style: TextStyle(
+                                              style: AppFonts.poppins(
+                                                context: context,
                                                 color:
                                                     textColor.withOpacity(0.6),
                                                 fontWeight: FontWeight.w600,
                                                 fontSize: 11,
-                                                fontFamily: 'Poppins',
                                               ),
                                             ),
                                           );
@@ -396,8 +397,8 @@ class StatsScreen extends StatelessWidget {
             title,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontFamily: 'Poppins',
+            style: AppFonts.poppins(
+              context: context,
               fontSize: 12,
               fontWeight: FontWeight.w500,
               color: textColor.withOpacity(0.6),
@@ -429,8 +430,8 @@ class StatsScreen extends StatelessWidget {
                     children: [
                       TextSpan(
                         text: numberPart,
-                        style: TextStyle(
-                          fontFamily: 'BebasNeue',
+                        style: AppFonts.bebasNeue(
+                          context: context,
                           fontSize: 28,
                           color: textColor,
                           height: 1.0,
@@ -439,9 +440,8 @@ class StatsScreen extends StatelessWidget {
                       if (unitPart.isNotEmpty)
                         TextSpan(
                           text: unitPart, // Boşluksuz yapışık
-                          style: TextStyle(
-                            fontFamily:
-                                'Poppins', // Birimler için Poppins (Küçük harf destekler)
+                          style: AppFonts.poppins(
+                            context: context,
                             fontSize: 16, // Daha küçük boyut
                             fontWeight: FontWeight.w500,
                             color: textColor.withOpacity(0.7),
@@ -459,8 +459,8 @@ class StatsScreen extends StatelessWidget {
             subValue,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontFamily: 'Poppins',
+            style: AppFonts.poppins(
+              context: context,
               fontSize: 10,
               color: textColor.withOpacity(0.4),
             ),
@@ -509,8 +509,8 @@ class StatsScreen extends StatelessWidget {
                 children: [
                   Text(
                     "daily_streak".tr(),
-                    style: TextStyle(
-                      fontFamily: 'Poppins',
+                    style: AppFonts.poppins(
+                      context: context,
                       fontWeight: FontWeight.w600,
                       fontSize: 16,
                       color: textColor.withOpacity(0.9),
@@ -519,8 +519,8 @@ class StatsScreen extends StatelessWidget {
                   Text(
                     "keep_fire_burning"
                         .tr(), // Localize key: keep_streak alternatifi
-                    style: TextStyle(
-                      fontFamily: 'Poppins',
+                    style: AppFonts.poppins(
+                      context: context,
                       fontSize: 12,
                       color: textColor.withOpacity(0.7),
                     ),
@@ -533,8 +533,8 @@ class StatsScreen extends StatelessWidget {
             children: [
               Text(
                 "$streak",
-                style: TextStyle(
-                  fontFamily: 'BebasNeue',
+                style: AppFonts.bebasNeue(
+                  context: context,
                   fontSize: 42,
                   color: textColor,
                   height: 1.0,
@@ -542,8 +542,8 @@ class StatsScreen extends StatelessWidget {
               ),
               Text(
                 "day_label".tr(),
-                style: TextStyle(
-                  fontFamily: 'Poppins',
+                style: AppFonts.poppins(
+                  context: context,
                   fontWeight: FontWeight.w500,
                   fontSize: 12,
                   color: textColor.withOpacity(0.8),

@@ -8,6 +8,7 @@ import '../providers/settings_provider.dart';
 import '../providers/timer_provider.dart';
 import '../providers/theme_provider.dart';
 import '../providers/ad_manager.dart';
+import '../utils/app_fonts.dart';
 
 class DurationSettingsScreen extends StatefulWidget {
   const DurationSettingsScreen({super.key});
@@ -71,8 +72,8 @@ class _DurationSettingsScreenState extends State<DurationSettingsScreen> {
       appBar: AppBar(
         title: Text(
           "duration_settings".tr(),
-          style: TextStyle(
-              fontFamily: 'Poppins',
+          style: AppFonts.poppins(
+              context: context,
               fontWeight: FontWeight.w600,
               color: themeProvider.settingsTextColor),
         ),
@@ -105,8 +106,8 @@ class _DurationSettingsScreenState extends State<DurationSettingsScreen> {
                   Expanded(
                     child: Text(
                       "change_lock_msg".tr(),
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
+                      style: AppFonts.poppins(
+                        context: context,
                         fontSize: 12,
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
@@ -248,8 +249,8 @@ class _DurationSettingsScreenState extends State<DurationSettingsScreen> {
               children: [
                 Text(
                   label,
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
+                  style: AppFonts.poppins(
+                    context: context,
                     fontWeight: FontWeight.w500,
                     fontSize: 16,
                     color: itemColor,
@@ -269,8 +270,8 @@ class _DurationSettingsScreenState extends State<DurationSettingsScreen> {
                     ),
                     child: Text(
                       "${value.toInt()} ${'minutes_label'.tr().toLowerCase()}",
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
+                      style: AppFonts.poppins(
+                        context: context,
                         fontWeight: FontWeight.bold,
                         color: sliderColor,
                         fontSize: 16,
@@ -324,16 +325,16 @@ class _DurationSettingsScreenState extends State<DurationSettingsScreen> {
                   side: BorderSide(
                       color: Colors.white.withOpacity(0.06), width: 1)),
               title: Text("$title - ${'minutes_label'.tr()}",
-                  style: const TextStyle(
-                      fontFamily: 'Poppins', color: Colors.white)),
+                  style:
+                      AppFonts.poppins(context: context, color: Colors.white)),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   TextField(
                     controller: controller,
                     keyboardType: TextInputType.number,
-                    style: const TextStyle(
-                        color: Colors.white, fontFamily: 'Poppins'),
+                    style:
+                        AppFonts.poppins(context: context, color: Colors.white),
                     decoration: InputDecoration(
                       hintText: "min_max_warning".tr(args: [
                         min.toInt().toString(),

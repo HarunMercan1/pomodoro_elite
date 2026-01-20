@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import '../utils/notification_service.dart';
+import '../utils/app_fonts.dart';
 import 'home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -111,8 +112,8 @@ class _SplashScreenState extends State<SplashScreen>
                 // POMODORO YAZISI (İnce ve Geniş)
                 Text(
                   "app_name".tr(),
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
+                  style: AppFonts.poppins(
+                    context: context,
                     fontSize: 24,
                     fontWeight: FontWeight.w300,
                     color: textColor,
@@ -126,8 +127,8 @@ class _SplashScreenState extends State<SplashScreen>
                 Text(
                   "app_subtitle".tr(),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
+                  style: AppFonts.poppins(
+                    context: context,
                     fontSize: 32,
                     fontWeight: FontWeight.w900, // Ekstra kalın
                     color: primaryColor,
@@ -141,8 +142,8 @@ class _SplashScreenState extends State<SplashScreen>
                 // --- İMZA ---
                 Text(
                   "developed_by".tr(),
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
+                  style: AppFonts.poppins(
+                    context: context,
                     fontSize: 12,
                     fontWeight: FontWeight.w400,
                     color: textColor.withOpacity(0.5),
