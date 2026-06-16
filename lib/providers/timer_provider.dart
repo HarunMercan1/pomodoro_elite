@@ -26,6 +26,10 @@ class TimerProvider with ChangeNotifier, WidgetsBindingObserver {
   final AudioPlayer _alarmPlayer = AudioPlayer();
   final AudioPlayer _musicPlayer = AudioPlayer();
 
+  // Arka plan tamamlanma mantığı için provider referansları
+  SettingsProvider? _lastSettings;
+  StatsProvider? _lastStats;
+
   TimerProvider() {
     WidgetsBinding.instance.addObserver(this);
   }
@@ -43,29 +47,144 @@ class TimerProvider with ChangeNotifier, WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused) {
+      // Uygulama arka plana geçiyor
       if (_isRunning) {
         _backgroundExitTime = DateTime.now();
+        debugPrint("⏸️ Uygulama arka plana geçti, sayaç çalışıyor.");
       }
     } else if (state == AppLifecycleState.resumed) {
+      // Uygulama ön plana döndü
       if (_isRunning && _backgroundExitTime != null) {
         final timePassed =
             DateTime.now().difference(_backgroundExitTime!).inSeconds;
+        _backgroundExitTime = null;
 
         if (timePassed > 0) {
           _remainingSeconds -= timePassed;
-          debugPrint("⏳ Arkaplanda geçen süre: $timePassed sn");
+          debugPrint("⏳ Arkaplanda geçen süre: $timePassed sn, Kalan: $_remainingSeconds sn");
 
           if (_remainingSeconds <= 0) {
             _remainingSeconds = 0;
-            // Timer döngüsü zaten çalışacak ama biz manuel tetikleyelim
-            // Timer.periodic bir sonraki tick'te yakalayacak,
-            // ama hemen UI güncellensin diye:
-            notifyListeners();
+
+            // --- SÜRE ARKAPLANDA BİTTİ: TAM TAMAMLANMA MANTIĞI ---
+            _timer?.cancel();
+            _timer = null;
+
+            // Zamanlanmış bildirimi iptal et (zaten gelmiş olmalı)
+            NotificationService().cancelScheduledNotification();
+
+            _handleTimerCompletion();
+          } else {
+            // Süre hâlâ devam ediyor — Timer.periodic'i yeniden kontrol et
+            _ensureTimerRunning();
+
+            // Zamanlanmış bildirimi güncelle (kalan süreye göre)
+            _scheduleEndNotification();
           }
         }
-        _backgroundExitTime = null;
+      }
+
+      // Uygulama ön plana döndü, zamanlanmış bildirimi iptal et
+      // (artık uygulama açık, anlık bildirim yeterli)
+      if (!_isRunning || _remainingSeconds <= 0) {
+        NotificationService().cancelScheduledNotification();
       }
     }
+  }
+
+  /// Timer.periodic'in çalıştığını doğrular, çalışmıyorsa yeniden başlatır.
+  void _ensureTimerRunning() {
+    if (_timer == null || !_timer!.isActive) {
+      debugPrint("🔄 Timer.periodic yeniden başlatılıyor...");
+      _timer?.cancel();
+      _timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+        if (_remainingSeconds > 0) {
+          _remainingSeconds--;
+          notifyListeners();
+        } else {
+          timer.cancel();
+          _timer = null;
+          NotificationService().cancelScheduledNotification();
+          _handleTimerCompletion();
+        }
+      });
+    }
+  }
+
+  /// Timer tamamlandığında çalışan ortak mantık.
+  /// Hem ön plan (Timer.periodic) hem arka plan (resume) tarafından çağrılır.
+  void _handleTimerCompletion() {
+    _isRunning = false;
+    _isAlarmPlaying = true;
+    _currentMotivation = "congrats";
+
+    _musicPlayer.stop();
+
+    // --- BİLDİRİM METNİNİ AYARLA ---
+    String notifTitle = "";
+    String notifBody = "";
+
+    if (_currentMode == TimerMode.work) {
+      // İŞ BİTTİ
+      _completedRounds++;
+      if (_selectedTimeInMinutes > 0 && _lastStats != null) {
+        _lastStats!.addSession(_selectedTimeInMinutes);
+      }
+      notifTitle = "work_completed_title".tr();
+      notifBody = "work_completed_msg".tr();
+    } else {
+      // MOLA BİTTİ
+      notifTitle = "break_over_title".tr();
+      notifBody = "break_over_msg".tr();
+    }
+
+    // Bildirimi Gönder (Anlık)
+    NotificationService().showNotification(
+      title: notifTitle,
+      body: notifBody,
+    );
+
+    // Alarmı Çal
+    _playAlarm();
+
+    notifyListeners();
+  }
+
+  /// Alarm sesini çalar
+  Future<void> _playAlarm() async {
+    try {
+      final soundFile = _lastSettings?.notificationSound ?? 'zil1.mp3';
+      await _alarmPlayer.stop();
+      await _alarmPlayer.setSource(
+          AssetSource('sounds/bell/$soundFile'));
+      await _alarmPlayer.setVolume(1.0);
+      await _alarmPlayer.setReleaseMode(ReleaseMode.stop);
+      await _alarmPlayer.resume();
+    } catch (e) {
+      debugPrint("❌ Alarm Hatası: $e");
+    }
+  }
+
+  /// Kalan süreye göre bitiş bildirimi planlar
+  void _scheduleEndNotification() {
+    if (_remainingSeconds <= 0) return;
+
+    String title;
+    String body;
+
+    if (_currentMode == TimerMode.work) {
+      title = "work_completed_title".tr();
+      body = "work_completed_msg".tr();
+    } else {
+      title = "break_over_title".tr();
+      body = "break_over_msg".tr();
+    }
+
+    NotificationService().scheduleTimerEndNotification(
+      seconds: _remainingSeconds,
+      title: title,
+      body: body,
+    );
   }
 
   // Getterlar
@@ -109,6 +228,10 @@ class TimerProvider with ChangeNotifier, WidgetsBindingObserver {
       return;
     }
 
+    // Provider referanslarını sakla (arka plan tamamlanma için)
+    _lastSettings = settings;
+    _lastStats = stats;
+
     _isRunning = true;
     _changeQuote();
     notifyListeners();
@@ -116,67 +239,38 @@ class TimerProvider with ChangeNotifier, WidgetsBindingObserver {
     // MÜZİK BAŞLAT
     if (settings.isBackgroundMusicEnabled) {
       try {
-        await _musicPlayer
-            .setSource(AssetSource('sounds/music/${settings.backgroundMusic}'));
-        await _musicPlayer.setVolume(settings.backgroundVolume);
-        await _musicPlayer.setReleaseMode(ReleaseMode.loop);
-        await _musicPlayer.resume();
+        final musicPath =
+            await settings.getMusicFilePath(settings.backgroundMusic);
+        if (musicPath != null) {
+          await _musicPlayer.setSource(DeviceFileSource(musicPath));
+          await _musicPlayer.setVolume(settings.backgroundVolume);
+          await _musicPlayer.setReleaseMode(ReleaseMode.loop);
+          await _musicPlayer.resume();
+        } else {
+          debugPrint(
+              "⚠️ Müzik dosyası bulunamadı: ${settings.backgroundMusic}");
+        }
       } catch (e) {
         debugPrint("❌ Müzik Çalma Hatası: $e");
       }
     }
 
-    _timer = Timer.periodic(const Duration(milliseconds: 1), (timer) async {
+    // 📅 BİTİŞ BİLDİRİMİ PLANLA (arka planda bile çalışır)
+    _scheduleEndNotification();
+
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
       if (_remainingSeconds > 0) {
         _remainingSeconds--;
         notifyListeners();
       } else {
-        // --- SÜRE BİTTİ ---
+        // --- SÜRE BİTTİ (ÖN PLAN) ---
         timer.cancel();
         _timer = null;
 
-        _isRunning = false;
-        _isAlarmPlaying = true;
-        _currentMotivation = "congrats";
+        // Zamanlanmış bildirimi iptal et (ön planda tamamlandı)
+        NotificationService().cancelScheduledNotification();
 
-        await _musicPlayer.stop();
-
-        // --- BİLDİRİM METNİNİ AYARLA ---
-        String notifTitle = "";
-        String notifBody = "";
-
-        if (_currentMode == TimerMode.work) {
-          // İŞ BİTTİ
-          _completedRounds++;
-          if (_selectedTimeInMinutes > 0) {
-            stats.addSession(_selectedTimeInMinutes);
-          }
-          notifTitle = "work_completed_title".tr(); // "Oturum Tamamlandı!"
-          notifBody = "work_completed_msg".tr(); // "Molayı hak ettin"
-        } else {
-          // MOLA BİTTİ
-          notifTitle = "break_over_title".tr(); // "Mola Bitti!"
-          notifBody = "break_over_msg".tr(); // "İşe dön"
-        }
-
-        // Bildirimi Gönder
-        NotificationService().showNotification(
-          title: notifTitle,
-          body: notifBody,
-        );
-
-        // Alarmı Çal
-        try {
-          await _alarmPlayer.stop();
-          await _alarmPlayer.setSource(
-              AssetSource('sounds/bell/${settings.notificationSound}'));
-          await _alarmPlayer.setVolume(1.0);
-          await _alarmPlayer.setReleaseMode(ReleaseMode.stop);
-          await _alarmPlayer.resume();
-        } catch (e) {
-          debugPrint("❌ Alarm Hatası: $e");
-        }
-        notifyListeners();
+        _handleTimerCompletion();
       }
     });
   }
@@ -208,6 +302,10 @@ class TimerProvider with ChangeNotifier, WidgetsBindingObserver {
     _musicPlayer.stop();
     _isRunning = false;
     _isAlarmPlaying = false;
+
+    // 🚫 Zamanlanmış bildirimi iptal et
+    NotificationService().cancelScheduledNotification();
+
     notifyListeners();
   }
 

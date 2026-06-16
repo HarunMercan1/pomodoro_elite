@@ -131,6 +131,17 @@ class SettingsProvider with ChangeNotifier {
     return await file.exists();
   }
 
+  /// Müzik dosyasının lokal yolunu döndürür. Dosya yoksa null döner.
+  /// TimerProvider tarafından müzik çalmak için kullanılır.
+  Future<String?> getMusicFilePath(String fileName) async {
+    final path = await _getLocalPath();
+    final file = File('$path/$fileName');
+    if (await file.exists()) {
+      return file.path;
+    }
+    return null;
+  }
+
   Future<void> downloadMusic(String fileName) async {
     if (_downloadingMusic[fileName] == true) return; // Zaten iniyor
 

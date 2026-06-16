@@ -1,5 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -19,6 +21,10 @@ void main() async {
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
+
+  // 🔥 Timezone başlat (zamanlanmış bildirimler için gerekli)
+  tz.initializeTimeZones();
+  tz.setLocalLocation(tz.getLocation('Europe/Istanbul'));
 
   // 🔥 AdMob SDK'yı başlat
   await MobileAds.instance.initialize();

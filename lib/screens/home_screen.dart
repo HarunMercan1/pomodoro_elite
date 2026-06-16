@@ -132,20 +132,8 @@ class _HomeScreenState extends State<HomeScreen> {
         remainingSeconds > 0 &&
         remainingSeconds < currentDuration * 60;
 
-    // 🎨 Timer durumunu tema sistemine bildir
-    String modeString = currentMode == TimerMode.work
-        ? 'work'
-        : currentMode == TimerMode.shortBreak
-            ? 'shortBreak'
-            : 'longBreak';
-    themeProvider.updateFromTimer(
-      isRunning: isTimerRunning,
-      isPaused: isPaused,
-      isAlarmPlaying: isAlarmPlaying,
-      mode: modeString,
-    );
 
-    // 🎨 Dinamik tema renkleri
+    // 🎨 Dinamik tema renkleri (initState listener'da updateFromTimer zaten çağrılıyor)
     final stateColors = themeProvider.stateColors;
     final Color bgColor = stateColors.bgColor;
     final LinearGradient? bgGradient = stateColors.gradient;
