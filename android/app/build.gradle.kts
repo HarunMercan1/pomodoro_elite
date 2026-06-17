@@ -50,6 +50,9 @@ android {
     }
 
     buildTypes {
+        getByName("debug") {
+            signingConfig = signingConfigs.getByName("release")
+        }
         release {
             // 🔥 BURASI ARTIK 'release' İMZASI KULLANACAK (Debug değil!)
             signingConfig = signingConfigs.getByName("release")

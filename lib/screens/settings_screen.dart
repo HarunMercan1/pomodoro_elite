@@ -178,6 +178,51 @@ class _SettingsScreenState extends State<SettingsScreen>
 
                       return Column(
                         children: [
+                          // 🔥 KULLANICI PROFİLİ
+                          if (!context.watch<AuthProvider>().isGuest)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 24.0, top: 8.0),
+                              child: Row(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 30,
+                                    backgroundColor: itemColor.withOpacity(0.1),
+                                    backgroundImage: context.watch<AuthProvider>().avatarUrl != null
+                                        ? NetworkImage(context.watch<AuthProvider>().avatarUrl!)
+                                        : null,
+                                    child: context.watch<AuthProvider>().avatarUrl == null
+                                        ? Icon(Icons.person, size: 30, color: itemColor)
+                                        : null,
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          context.watch<AuthProvider>().displayName,
+                                          style: AppFonts.poppins(
+                                            context: context,
+                                            color: itemColor,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 18,
+                                          ),
+                                        ),
+                                        Text(
+                                          context.watch<AuthProvider>().user?.email ?? '',
+                                          style: AppFonts.poppins(
+                                            context: context,
+                                            color: itemColor.withOpacity(0.5),
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
                           // SÜRE AYARLARI
                           Card(
                             color: cardColor,
@@ -404,8 +449,35 @@ class _SettingsScreenState extends State<SettingsScreen>
                                 ),
                               ),
                               onTap: () {
-                                context.read<AuthProvider>().signOut();
-                                Navigator.of(context).popUntil((route) => route.isFirst);
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    backgroundColor: themeProvider.settingsBgColor,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                    title: Text(
+                                      context.read<AuthProvider>().isGuest ? 'Exit Guest Mode?' : 'Log Out?',
+                                      style: AppFonts.poppins(context: context, color: itemColor, fontWeight: FontWeight.bold),
+                                    ),
+                                    content: Text(
+                                      'Are you sure you want to log out?',
+                                      style: AppFonts.poppins(context: context, color: itemColor.withOpacity(0.8)),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        child: Text('Cancel', style: AppFonts.poppins(context: context, color: itemColor.withOpacity(0.6))),
+                                      ),
+                                      ElevatedButton(
+                                        style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+                                        onPressed: () {
+                                          context.read<AuthProvider>().signOut();
+                                          Navigator.of(context).popUntil((route) => route.isFirst);
+                                        },
+                                        child: Text('Log Out', style: AppFonts.poppins(context: context, color: Colors.white)),
+                                      ),
+                                    ],
+                                  ),
+                                );
                               },
                             ),
                           ),

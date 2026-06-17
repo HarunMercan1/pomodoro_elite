@@ -47,6 +47,7 @@ flutter:
     - assets/sounds/bell/
     - assets/translations/
     - assets/icon/
+    - assets/icons/
 
   fonts:
     - family: BebasNeue

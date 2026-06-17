@@ -88,7 +88,7 @@ class StatsScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                        Icon(Icons.local_fire_department, size: 64, color: accentColor.withOpacity(0.2)),
+                        Icon(Icons.local_fire_department, size: 64, color: Colors.deepOrange.withOpacity(0.3)),
                       ],
                     ),
                   ),
