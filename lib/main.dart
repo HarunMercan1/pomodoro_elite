@@ -10,7 +10,12 @@ import 'providers/settings_provider.dart';
 import 'providers/stats_provider.dart';
 import 'providers/ad_manager.dart';
 import 'providers/theme_provider.dart';
+import 'providers/auth_provider.dart';
 import 'screens/splash_screen.dart';
+import 'screens/auth_screen.dart';
+
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'core/constants/supabase_constants.dart';
 
 // main artık hafifledi, bekleme yapmıyor
 void main() async {
@@ -21,6 +26,12 @@ void main() async {
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
+
+  // 🔥 Supabase'i Başlat
+  await Supabase.initialize(
+    url: SupabaseConstants.supabaseUrl,
+    anonKey: SupabaseConstants.supabaseAnonKey,
+  );
 
   // 🔥 Timezone başlat (zamanlanmış bildirimler için gerekli)
   tz.initializeTimeZones();
@@ -65,6 +76,7 @@ void main() async {
           ChangeNotifierProvider(create: (_) => TimerProvider()),
           ChangeNotifierProvider(create: (_) => SettingsProvider()),
           ChangeNotifierProvider(create: (_) => StatsProvider()),
+          ChangeNotifierProvider(create: (_) => AuthProvider()),
           ChangeNotifierProvider(
               create: (_) => ThemeProvider()), // 🎨 Tema yöneticisi
           ChangeNotifierProvider(

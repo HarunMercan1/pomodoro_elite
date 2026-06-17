@@ -9,7 +9,9 @@ import 'duration_settings_screen.dart';
 import 'sound_settings_screen.dart';
 import 'theme_selection_screen.dart';
 import '../providers/theme_provider.dart';
+import '../providers/auth_provider.dart';
 import '../utils/app_fonts.dart';
+import 'package:in_app_review/in_app_review.dart';
 
 import 'package:pomodoro_elite/screens/language_selection_screen.dart';
 
@@ -350,14 +352,69 @@ class _SettingsScreenState extends State<SettingsScreen>
                               },
                             ),
                           ),
+                          // BİZİ DEĞERLENDİRİN BUTONU
+                          Card(
+                            color: cardColor,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              side: BorderSide(color: borderColor, width: 1),
+                            ),
+                            child: ListTile(
+                              contentPadding: EdgeInsets.symmetric(horizontal: 16),
+                              leading: Icon(Icons.star_rate_rounded, color: Colors.amber, size: iconSize),
+                              title: Text(
+                                'Rate Us',
+                                style: AppFonts.poppins(
+                                  context: context,
+                                  color: itemColor,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: titleSize,
+                                ),
+                              ),
+                              trailing: Icon(Icons.arrow_forward_ios, size: trailingIconSize, color: itemColor),
+                              onTap: () async {
+                                final InAppReview inAppReview = InAppReview.instance;
+                                if (await inAppReview.isAvailable()) {
+                                  inAppReview.requestReview();
+                                }
+                              },
+                            ),
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          // LOGOUT BUTONU
+                          Card(
+                            color: Colors.redAccent.withOpacity(0.1),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              side: const BorderSide(color: Colors.redAccent, width: 1),
+                            ),
+                            child: ListTile(
+                              contentPadding: EdgeInsets.symmetric(horizontal: 16),
+                              leading: const Icon(Icons.logout, color: Colors.redAccent),
+                              title: Text(
+                                context.watch<AuthProvider>().isGuest ? 'Exit Guest Mode' : 'Log Out',
+                                style: AppFonts.poppins(
+                                  context: context,
+                                  color: Colors.redAccent,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              onTap: () {
+                                context.read<AuthProvider>().signOut();
+                                Navigator.of(context).popUntil((route) => route.isFirst);
+                              },
+                            ),
+                          ),
                         ],
                       );
                     },
                   ),
 
                   const SizedBox(height: 20),
-
-                  const SizedBox(height: 30),
 
                   const SizedBox(height: 30),
                 ],

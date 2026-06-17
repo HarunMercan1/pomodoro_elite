@@ -4,7 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import '../utils/notification_service.dart';
 import '../utils/app_fonts.dart';
-import 'home_screen.dart';
+import 'auth_wrapper.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -66,7 +66,7 @@ class _SplashScreenState extends State<SplashScreen>
     if (mounted) {
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
-          pageBuilder: (_, __, ___) => const HomeScreen(),
+          pageBuilder: (_, __, ___) => const AuthWrapper(),
           transitionsBuilder: (_, animation, __, child) {
             return FadeTransition(opacity: animation, child: child);
           },

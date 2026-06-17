@@ -32,7 +32,7 @@ android {
 
     defaultConfig {
         applicationId = "com.mercansoftware.pomodoro_elite"
-        minSdk = 21
+        minSdk = 24
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
