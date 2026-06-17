@@ -61,12 +61,15 @@ class _HomeScreenState extends State<HomeScreen> {
         final isAlarmPlaying = timerProvider.isAlarmPlaying;
         final modeString = timerProvider.currentMode.toString().split('.').last;
 
-        context.read<ThemeProvider>().updateFromTimer(
-              isRunning: isTimerRunning,
-              isPaused: isPaused,
-              isAlarmPlaying: isAlarmPlaying,
-              mode: modeString,
-            );
+        Future.microtask(() {
+          if (!mounted) return;
+          context.read<ThemeProvider>().updateFromTimer(
+                isRunning: isTimerRunning,
+                isPaused: isPaused,
+                isAlarmPlaying: isAlarmPlaying,
+                mode: modeString,
+              );
+        });
 
         if (timerProvider.remainingSeconds == 0 &&
             timerProvider.currentDuration != 0 &&
@@ -113,19 +116,13 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final settingsProvider = context.watch<SettingsProvider>();
     final themeProvider = context.watch<ThemeProvider>();
-    final currentMode =
-        context.select<TimerProvider, TimerMode>((p) => p.currentMode);
-
-    final bool isTimerRunning =
-        context.select<TimerProvider, bool>((p) => p.isRunning);
-    final bool isAlarmPlaying =
-        context.select<TimerProvider, bool>((p) => p.isAlarmPlaying);
-    final int currentDuration =
-        context.select<TimerProvider, int>((p) => p.currentDuration);
-    final int remainingSeconds =
-        context.select<TimerProvider, int>((p) => p.remainingSeconds);
-    final String currentMotivation =
-        context.select<TimerProvider, String>((p) => p.currentMotivation);
+    final timerProvider = context.watch<TimerProvider>();
+    final currentMode = timerProvider.currentMode;
+    final bool isTimerRunning = timerProvider.isRunning;
+    final bool isAlarmPlaying = timerProvider.isAlarmPlaying;
+    final int currentDuration = timerProvider.currentDuration;
+    final int remainingSeconds = timerProvider.remainingSeconds;
+    final String currentMotivation = timerProvider.currentMotivation;
 
     final bool isPaused = !isTimerRunning &&
         !isAlarmPlaying &&
