@@ -114,12 +114,13 @@ class _AuthScreenState extends State<AuthScreen> {
                                   ),
                                 ),
                                 const SizedBox(width: 12),
-                                const Text(
-                                  'Continue with Google',
-                                  style: TextStyle(
+                                Text(
+                                  'continue_with_google'.tr(),
+                                  style: AppFonts.poppins(
+                                    context: context,
+                                    color: theme.idleTextColor,
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
-                                    color: Colors.black87,
                                   ),
                                 ),
                               ],
@@ -127,20 +128,48 @@ class _AuthScreenState extends State<AuthScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 16),
 
-                  // 🔥 GUEST MODE
-                  TextButton(
+                  // OR divider
+                  Row(
+                    children: [
+                      Expanded(child: Divider(color: theme.settingsBorderColor)),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(
+                          'or'.tr(),
+                          style: AppFonts.poppins(
+                            context: context,
+                            color: theme.idleTextColor.withAlpha(128),
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                      Expanded(child: Divider(color: theme.settingsBorderColor)),
+                    ],
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Misafir Olarak Devam Et Butonu
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      side: BorderSide(color: theme.settingsBorderColor ?? Colors.white12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      backgroundColor: Colors.transparent,
+                    ),
                     onPressed: () {
                       context.read<AuthProvider>().continueAsGuest();
                     },
                     child: Text(
-                      'Continue as Guest',
-                      style: TextStyle(
-                        fontSize: 15,
+                      'continue_as_guest'.tr(),
+                      style: AppFonts.poppins(
+                        context: context,
                         color: isDark ? Colors.white38 : Colors.black38,
-                        decoration: TextDecoration.underline,
-                        decorationColor: isDark ? Colors.white38 : Colors.black38,
+                        fontSize: 15,
                       ),
                     ),
                   ),

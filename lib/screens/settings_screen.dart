@@ -409,7 +409,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                               contentPadding: EdgeInsets.symmetric(horizontal: 16),
                               leading: Icon(Icons.star_rate_rounded, color: Colors.amber, size: iconSize),
                               title: Text(
-                                'Rate Us',
+                                'rate_us'.tr(),
                                 style: AppFonts.poppins(
                                   context: context,
                                   color: itemColor,
@@ -441,7 +441,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                               contentPadding: EdgeInsets.symmetric(horizontal: 16),
                               leading: const Icon(Icons.logout, color: Colors.redAccent),
                               title: Text(
-                                context.watch<AuthProvider>().isGuest ? 'Exit Guest Mode' : 'Log Out',
+                                context.watch<AuthProvider>().isGuest ? 'exit_guest_mode'.tr() : 'log_out'.tr(),
                                 style: AppFonts.poppins(
                                   context: context,
                                   color: Colors.redAccent,
@@ -455,17 +455,17 @@ class _SettingsScreenState extends State<SettingsScreen>
                                     backgroundColor: themeProvider.settingsBgColor,
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                                     title: Text(
-                                      context.read<AuthProvider>().isGuest ? 'Exit Guest Mode?' : 'Log Out?',
+                                      context.read<AuthProvider>().isGuest ? 'exit_guest_mode_title'.tr() : 'log_out_title'.tr(),
                                       style: AppFonts.poppins(context: context, color: itemColor, fontWeight: FontWeight.bold),
                                     ),
                                     content: Text(
-                                      'Are you sure you want to log out?',
+                                      'log_out_confirm'.tr(),
                                       style: AppFonts.poppins(context: context, color: itemColor.withOpacity(0.8)),
                                     ),
                                     actions: [
                                       TextButton(
                                         onPressed: () => Navigator.pop(context),
-                                        child: Text('Cancel', style: AppFonts.poppins(context: context, color: itemColor.withOpacity(0.6))),
+                                        child: Text('cancel'.tr(), style: AppFonts.poppins(context: context, color: itemColor.withOpacity(0.6))),
                                       ),
                                       ElevatedButton(
                                         style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
@@ -473,7 +473,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                                           context.read<AuthProvider>().signOut();
                                           Navigator.of(context).popUntil((route) => route.isFirst);
                                         },
-                                        child: Text('Log Out', style: AppFonts.poppins(context: context, color: Colors.white)),
+                                        child: Text('log_out'.tr(), style: AppFonts.poppins(context: context, color: Colors.white)),
                                       ),
                                     ],
                                   ),
