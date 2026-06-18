@@ -1,4 +1,4 @@
-{
+﻿{
   "app_name": "POMODORO",
   "app_subtitle": "ELITE",
   "developed_by": "by Mercan Software",
@@ -211,5 +211,6 @@
   "exit_guest_mode": "Misafir Modundan \u00c7\u0131k",
   "log_out_title": "\u00c7\u0131k\u0131\u015f Yap?",
   "exit_guest_mode_title": "Misafir Modundan \u00c7\u0131k?",
-  "log_out_confirm": "\u00c7\u0131k\u0131\u015f yapmak istedi\u011finize emin misiniz?"
+  "log_out_confirm": "\u00c7\u0131k\u0131\u015f yapmak istedi\u011finize emin misiniz?",
+  "focus_grow_achieve": "Odaklan. B\u00fcy\u00fc. Ba\u015far."
 }

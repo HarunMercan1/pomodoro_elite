@@ -1,4 +1,4 @@
-{
+﻿{
   "app_name": "番茄钟",
   "app_subtitle": "精英",
   "developed_by": "Mercan Software 开发",
@@ -214,5 +214,6 @@
   "exit_guest_mode": "退出访客模式",
   "log_out_title": "退出登录？",
   "exit_guest_mode_title": "退出访客模式？",
-  "log_out_confirm": "您确定要退出登录吗？"
+  "log_out_confirm": "您确定要退出登录吗？",
+  "focus_grow_achieve": "Focus. Grow. Achieve."
 }

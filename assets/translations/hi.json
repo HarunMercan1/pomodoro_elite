@@ -1,4 +1,4 @@
-{
+﻿{
   "app_name": "पोमोडोरो",
   "app_subtitle": "एलीट",
   "developed_by": "Mercan Software द्वारा",
@@ -214,5 +214,6 @@
   "exit_guest_mode": "अतिथि मोड से बाहर निकलें",
   "log_out_title": "लॉग आउट?",
   "exit_guest_mode_title": "अतिथि मोड से बाहर निकलें?",
-  "log_out_confirm": "क्या आप वाकई लॉग आउट करना चाहते हैं?"
+  "log_out_confirm": "क्या आप वाकई लॉग आउट करना चाहते हैं?",
+  "focus_grow_achieve": "Focus. Grow. Achieve."
 }

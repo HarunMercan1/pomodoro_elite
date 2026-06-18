@@ -1,4 +1,4 @@
-{
+﻿{
   "app_name": "POMODORO",
   "app_subtitle": "ELITE",
   "developed_by": "door Mercan Software",
@@ -214,5 +214,6 @@
   "exit_guest_mode": "Gastmodus verlaten",
   "log_out_title": "Uitloggen?",
   "exit_guest_mode_title": "Gastmodus verlaten?",
-  "log_out_confirm": "Weet u zeker dat u wilt uitloggen?"
+  "log_out_confirm": "Weet u zeker dat u wilt uitloggen?",
+  "focus_grow_achieve": "Focus. Grow. Achieve."
 }

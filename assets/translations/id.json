@@ -1,4 +1,4 @@
-{
+﻿{
   "app_name": "POMODORO",
   "app_subtitle": "ELITE",
   "developed_by": "oleh Mercan Software",
@@ -214,5 +214,6 @@
   "exit_guest_mode": "Keluar dari mode tamu",
   "log_out_title": "Keluar?",
   "exit_guest_mode_title": "Keluar dari mode tamu?",
-  "log_out_confirm": "Apakah Anda yakin ingin keluar?"
+  "log_out_confirm": "Apakah Anda yakin ingin keluar?",
+  "focus_grow_achieve": "Focus. Grow. Achieve."
 }

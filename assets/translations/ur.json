@@ -1,4 +1,4 @@
-{
+﻿{
   "app_name": "پومودورو",
   "app_subtitle": "ایلیٹ",
   "developed_by": "Mercan Software کی طرف سے",
@@ -214,5 +214,6 @@
   "exit_guest_mode": "مہمان موڈ سے باہر نکلیں",
   "log_out_title": "لاگ آؤٹ؟",
   "exit_guest_mode_title": "مہمان موڈ سے باہر نکلیں؟",
-  "log_out_confirm": "کیا آپ واقعی لاگ آؤٹ کرنا چاہتے ہیں؟"
+  "log_out_confirm": "کیا آپ واقعی لاگ آؤٹ کرنا چاہتے ہیں؟",
+  "focus_grow_achieve": "Focus. Grow. Achieve."
 }

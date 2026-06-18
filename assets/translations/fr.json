@@ -1,4 +1,4 @@
-{
+﻿{
   "app_name": "POMODORO",
   "app_subtitle": "ELITE",
   "developed_by": "par Mercan Software",
@@ -214,5 +214,6 @@
   "exit_guest_mode": "Quitter le mode invité",
   "log_out_title": "Déconnexion ?",
   "exit_guest_mode_title": "Quitter le mode invité ?",
-  "log_out_confirm": "Êtes-vous sûr de vouloir vous déconnecter ?"
+  "log_out_confirm": "Êtes-vous sûr de vouloir vous déconnecter ?",
+  "focus_grow_achieve": "Focus. Grow. Achieve."
 }

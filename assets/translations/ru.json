@@ -1,4 +1,4 @@
-{
+﻿{
   "app_name": "ПОМОДОРО",
   "app_subtitle": "ЭЛИТ",
   "developed_by": "от Mercan Software",
@@ -214,5 +214,6 @@
   "exit_guest_mode": "Выйти из гостевого режима",
   "log_out_title": "Выйти?",
   "exit_guest_mode_title": "Выйти из гостевого режима?",
-  "log_out_confirm": "Вы уверены, что хотите выйти?"
+  "log_out_confirm": "Вы уверены, что хотите выйти?",
+  "focus_grow_achieve": "Focus. Grow. Achieve."
 }

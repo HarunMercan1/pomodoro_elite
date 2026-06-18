@@ -1,4 +1,4 @@
-{
+﻿{
   "app_name": "POMODORO",
   "app_subtitle": "ELITE",
   "developed_by": "από Mercan Software",
@@ -214,5 +214,6 @@
   "exit_guest_mode": "Έξοδος από τη λειτουργία επισκέπτη",
   "log_out_title": "Αποσύνδεση;",
   "exit_guest_mode_title": "Έξοδος από τη λειτουργία επισκέπτη;",
-  "log_out_confirm": "Είστε σίγουροι ότι θέλετε να αποσυνδεθείτε;"
+  "log_out_confirm": "Είστε σίγουροι ότι θέλετε να αποσυνδεθείτε;",
+  "focus_grow_achieve": "Focus. Grow. Achieve."
 }

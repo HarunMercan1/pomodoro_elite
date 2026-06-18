@@ -1,4 +1,4 @@
-{
+﻿{
   "app_name": "포모도로",
   "app_subtitle": "엘리트",
   "developed_by": "Mercan Software 제작",
@@ -214,5 +214,6 @@
   "exit_guest_mode": "게스트 모드 나가기",
   "log_out_title": "로그아웃하시겠습니까?",
   "exit_guest_mode_title": "게스트 모드를 나가시겠습니까?",
-  "log_out_confirm": "로그아웃하시겠습니까?"
+  "log_out_confirm": "로그아웃하시겠습니까?",
+  "focus_grow_achieve": "Focus. Grow. Achieve."
 }

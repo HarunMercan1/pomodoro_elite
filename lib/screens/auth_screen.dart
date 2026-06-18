@@ -76,7 +76,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'Focus. Grow. Achieve.',
+                    'focus_grow_achieve'.tr(),
                     style: TextStyle(
                       fontSize: 16,
                       color: isDark ? Colors.white38 : Colors.black38,
@@ -123,7 +123,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                   'continue_with_google'.tr(),
                                   style: AppFonts.poppins(
                                     context: context,
-                                    color: themeProvider.idleTextColor,
+                                    color: Colors.black87,
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
                                   ),

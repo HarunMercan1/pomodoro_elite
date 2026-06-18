@@ -1,4 +1,4 @@
-{
+﻿{
   "app_name": "পোমোডোরো",
   "app_subtitle": "এলিট",
   "developed_by": "Mercan Software দ্বারা",
@@ -214,5 +214,6 @@
   "exit_guest_mode": "অতিথি মোড থেকে বের হন",
   "log_out_title": "লগ আউট?",
   "exit_guest_mode_title": "অতিথি মোড থেকে বের হন?",
-  "log_out_confirm": "আপনি কি নিশ্চিত যে লগ আউট করতে চান?"
+  "log_out_confirm": "আপনি কি নিশ্চিত যে লগ আউট করতে চান?",
+  "focus_grow_achieve": "Focus. Grow. Achieve."
 }

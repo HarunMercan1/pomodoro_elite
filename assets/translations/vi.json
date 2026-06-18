@@ -1,4 +1,4 @@
-{
+﻿{
   "app_name": "POMODORO",
   "app_subtitle": "ELITE",
   "developed_by": "bởi Mercan Software",
@@ -214,5 +214,6 @@
   "exit_guest_mode": "Thoát chế độ khách",
   "log_out_title": "Đăng xuất?",
   "exit_guest_mode_title": "Thoát chế độ khách?",
-  "log_out_confirm": "Bạn có chắc chắn muốn đăng xuất không?"
+  "log_out_confirm": "Bạn có chắc chắn muốn đăng xuất không?",
+  "focus_grow_achieve": "Focus. Grow. Achieve."
 }

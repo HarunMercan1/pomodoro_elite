@@ -1,4 +1,4 @@
-{
+﻿{
   "app_name": "بومودورو",
   "app_subtitle": "إيليت",
   "developed_by": "بواسطة Mercan Software",
@@ -214,5 +214,6 @@
   "exit_guest_mode": "الخروج من وضع الضيف",
   "log_out_title": "تسجيل الخروج؟",
   "exit_guest_mode_title": "الخروج من وضع الضيف؟",
-  "log_out_confirm": "هل أنت متأكد أنك تريد تسجيل الخروج؟"
+  "log_out_confirm": "هل أنت متأكد أنك تريد تسجيل الخروج؟",
+  "focus_grow_achieve": "Focus. Grow. Achieve."
 }

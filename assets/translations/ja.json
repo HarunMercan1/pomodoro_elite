@@ -1,4 +1,4 @@
-{
+﻿{
   "app_name": "ポモドーロ",
   "app_subtitle": "エリート",
   "developed_by": "Mercan Software 製",
@@ -214,5 +214,6 @@
   "exit_guest_mode": "ゲストモードを終了",
   "log_out_title": "ログアウトしますか？",
   "exit_guest_mode_title": "ゲストモードを終了しますか？",
-  "log_out_confirm": "ログアウトしてもよろしいですか？"
+  "log_out_confirm": "ログアウトしてもよろしいですか？",
+  "focus_grow_achieve": "Focus. Grow. Achieve."
 }

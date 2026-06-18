@@ -1,4 +1,4 @@
-{
+﻿{
   "app_name": "โพโมโดโร",
   "app_subtitle": "อีลิท",
   "developed_by": "โดย Mercan Software",
@@ -214,5 +214,6 @@
   "exit_guest_mode": "ออกจากโหมดแขก",
   "log_out_title": "ออกจากระบบ?",
   "exit_guest_mode_title": "ออกจากโหมดแขก?",
-  "log_out_confirm": "คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบ?"
+  "log_out_confirm": "คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบ?",
+  "focus_grow_achieve": "Focus. Grow. Achieve."
 }
