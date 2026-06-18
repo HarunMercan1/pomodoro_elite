@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../providers/auth_provider.dart';
+import '../providers/theme_provider.dart';
+import '../utils/app_fonts.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({Key? key}) : super(key: key);
@@ -34,6 +37,8 @@ class _AuthScreenState extends State<AuthScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final primaryColor = Theme.of(context).colorScheme.primary;
+    final themeProvider = context.watch<ThemeProvider>();
+    final theme = themeProvider.currentTheme;
 
     return Scaffold(
       body: Container(
@@ -118,7 +123,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                   'continue_with_google'.tr(),
                                   style: AppFonts.poppins(
                                     context: context,
-                                    color: theme.idleTextColor,
+                                    color: themeProvider.idleTextColor,
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -140,7 +145,7 @@ class _AuthScreenState extends State<AuthScreen> {
                           'or'.tr(),
                           style: AppFonts.poppins(
                             context: context,
-                            color: theme.idleTextColor.withAlpha(128),
+                            color: themeProvider.idleTextColor.withAlpha(128),
                             fontSize: 12,
                           ),
                         ),
