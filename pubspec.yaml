@@ -1,7 +1,7 @@
 name: pomodoro_elite
 description: "Odaklanmayı ve verimliliği artıran profesyonel Pomodoro uygulaması."
 publish_to: 'none'
-version: 2.1.5+9
+version: 3.0.0+10
 
 environment:
   sdk: ^3.0.0
