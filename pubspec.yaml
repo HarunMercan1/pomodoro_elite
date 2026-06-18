@@ -29,6 +29,7 @@ dependencies:
   timezone: ^0.9.4
   supabase_flutter: ^2.15.0
   google_sign_in: ^7.2.0
+  in_app_update: ^4.2.5
 
 dev_dependencies:
   flutter_test:

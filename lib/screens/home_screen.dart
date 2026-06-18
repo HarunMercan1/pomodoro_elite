@@ -13,6 +13,7 @@ import '../screens/stats_screen.dart';
 import '../widgets/time_option_button.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../utils/app_fonts.dart';
+import 'package:in_app_update/in_app_update.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -28,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    _checkForUpdate();
     _confettiController =
         ConfettiController(duration: const Duration(seconds: 2));
 
@@ -563,5 +565,20 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: padding,
       onTap: () => context.read<TimerProvider>().setTime(time, mode),
     );
+  }
+  Future<void> _checkForUpdate() async {
+    try {
+      final info = await InAppUpdate.checkForUpdate();
+      if (info.updateAvailability == UpdateAvailability.updateAvailable) {
+        if (info.immediateUpdateAllowed) {
+          await InAppUpdate.performImmediateUpdate();
+        } else if (info.flexibleUpdateAllowed) {
+          await InAppUpdate.startFlexibleUpdate();
+          await InAppUpdate.completeFlexibleUpdate();
+        }
+      }
+    } catch (e) {
+      debugPrint("InAppUpdate Error: $e");
+    }
   }
 }
