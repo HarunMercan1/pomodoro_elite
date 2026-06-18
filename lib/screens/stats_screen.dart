@@ -19,9 +19,9 @@ class StatsScreen extends StatelessWidget {
         final isDark = Theme.of(context).brightness == Brightness.dark;
         
         // Colors
-        final bgColor = theme.idle.bgColor ?? (isDark ? const Color(0xFF1E1E2C) : const Color(0xFFF0F2F5));
+        final bgColor = theme.idle.bgColor;
         final textColor = theme.settingsItemColor ?? (isDark ? Colors.white : Colors.black87);
-        final accentColor = theme.idle.accentColor ?? const Color(0xFF6C63FF);
+        final accentColor = theme.idle.accentColor;
 
         // Data processing
         List<int> minutesList = stats.thisWeekStats.map((e) => e['minutes'] as int).toList();

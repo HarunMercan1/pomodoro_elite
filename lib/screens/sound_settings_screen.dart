@@ -203,9 +203,8 @@ class _SoundSettingsScreenState extends State<SoundSettingsScreen> {
                                     itemColor: itemColor,
                                     fontSize: titleSize,
                                     contentPadding: EdgeInsets.symmetric(
-                                        vertical: contentPaddingV),
                                   );
-                                }).toList(),
+                                }),
                               ],
                             ],
                           ),
