@@ -1,4 +1,4 @@
-﻿{
+{
   "app_name": "پومودورو",
   "app_subtitle": "ایلیٹ",
   "developed_by": "Mercan Software کی طرف سے",
@@ -205,6 +205,14 @@
   "theme_name_nordic_snow": "شمالی برف",
   "theme_vibe_nordic_snow": "کم سے کم، تضاد",
   "theme_name_volcano": "آتش فشاں",
-  "theme_vibe_volcano": "طاقت، توانائی"
+  "theme_vibe_volcano": "طاقت، توانائی",
+  "continue_with_google": "Google کے ساتھ جاری رکھیں",
+  "continue_as_guest": "بطور مہمان جاری رکھیں",
+  "or": "یا",
+  "rate_us": "ہماری درجہ بندی کریں",
+  "log_out": "لاگ آؤٹ",
+  "exit_guest_mode": "مہمان موڈ سے باہر نکلیں",
+  "log_out_title": "لاگ آؤٹ؟",
+  "exit_guest_mode_title": "مہمان موڈ سے باہر نکلیں؟",
+  "log_out_confirm": "کیا آپ واقعی لاگ آؤٹ کرنا چاہتے ہیں؟"
 }
-

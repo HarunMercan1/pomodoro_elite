@@ -1,4 +1,4 @@
-﻿{
+{
   "app_name": "ПОМОДОРО",
   "app_subtitle": "ЭЛИТ",
   "developed_by": "от Mercan Software",
@@ -205,6 +205,14 @@
   "theme_name_nordic_snow": "Северный снег",
   "theme_vibe_nordic_snow": "Минимализм, Контраст",
   "theme_name_volcano": "Вулкан",
-  "theme_vibe_volcano": "Сила, Энергия"
+  "theme_vibe_volcano": "Сила, Энергия",
+  "continue_with_google": "Продолжить с Google",
+  "continue_as_guest": "Продолжить как гость",
+  "or": "или",
+  "rate_us": "Оцените нас",
+  "log_out": "Выйти",
+  "exit_guest_mode": "Выйти из гостевого режима",
+  "log_out_title": "Выйти?",
+  "exit_guest_mode_title": "Выйти из гостевого режима?",
+  "log_out_confirm": "Вы уверены, что хотите выйти?"
 }
-

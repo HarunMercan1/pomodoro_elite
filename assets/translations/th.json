@@ -1,4 +1,4 @@
-﻿{
+{
   "app_name": "โพโมโดโร",
   "app_subtitle": "อีลิท",
   "developed_by": "โดย Mercan Software",
@@ -205,6 +205,14 @@
   "theme_name_nordic_snow": "หิมะนอร์ดิก",
   "theme_vibe_nordic_snow": "มินิมอล, คอนทราสต์",
   "theme_name_volcano": "ภูเขาไฟ",
-  "theme_vibe_volcano": "พลัง, พลังงาน"
+  "theme_vibe_volcano": "พลัง, พลังงาน",
+  "continue_with_google": "ดำเนินการต่อด้วย Google",
+  "continue_as_guest": "ดำเนินการต่อในฐานะแขก",
+  "or": "หรือ",
+  "rate_us": "ให้คะแนนเรา",
+  "log_out": "ออกจากระบบ",
+  "exit_guest_mode": "ออกจากโหมดแขก",
+  "log_out_title": "ออกจากระบบ?",
+  "exit_guest_mode_title": "ออกจากโหมดแขก?",
+  "log_out_confirm": "คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบ?"
 }
-

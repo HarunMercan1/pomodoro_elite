@@ -1,4 +1,4 @@
-﻿{
+{
   "app_name": "بومودورو",
   "app_subtitle": "إيليت",
   "developed_by": "بواسطة Mercan Software",
@@ -205,6 +205,14 @@
   "theme_name_nordic_snow": "ثلج الشمال",
   "theme_vibe_nordic_snow": "بسيط، تباين",
   "theme_name_volcano": "بركان",
-  "theme_vibe_volcano": "قوة، طاقة"
+  "theme_vibe_volcano": "قوة، طاقة",
+  "continue_with_google": "المتابعة مع Google",
+  "continue_as_guest": "المتابعة كضيف",
+  "or": "أو",
+  "rate_us": "قيمنا",
+  "log_out": "تسجيل الخروج",
+  "exit_guest_mode": "الخروج من وضع الضيف",
+  "log_out_title": "تسجيل الخروج؟",
+  "exit_guest_mode_title": "الخروج من وضع الضيف؟",
+  "log_out_confirm": "هل أنت متأكد أنك تريد تسجيل الخروج؟"
 }
-

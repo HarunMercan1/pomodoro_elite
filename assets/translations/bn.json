@@ -1,4 +1,4 @@
-﻿{
+{
   "app_name": "পোমোডোরো",
   "app_subtitle": "এলিট",
   "developed_by": "Mercan Software দ্বারা",
@@ -205,6 +205,14 @@
   "theme_name_nordic_snow": "নর্ডিক স্নো",
   "theme_vibe_nordic_snow": "ন্যূনতম, বৈপরীত্য",
   "theme_name_volcano": "আগ্নেয়গিরি",
-  "theme_vibe_volcano": "শক্তি, শক্তি"
+  "theme_vibe_volcano": "শক্তি, শক্তি",
+  "continue_with_google": "Google দিয়ে চালিয়ে যান",
+  "continue_as_guest": "অতিথি হিসেবে চালিয়ে যান",
+  "or": "অথবা",
+  "rate_us": "আমাদের রেটিং দিন",
+  "log_out": "লগ আউট",
+  "exit_guest_mode": "অতিথি মোড থেকে বের হন",
+  "log_out_title": "লগ আউট?",
+  "exit_guest_mode_title": "অতিথি মোড থেকে বের হন?",
+  "log_out_confirm": "আপনি কি নিশ্চিত যে লগ আউট করতে চান?"
 }
-

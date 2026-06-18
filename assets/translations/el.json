@@ -1,4 +1,4 @@
-﻿{
+{
   "app_name": "POMODORO",
   "app_subtitle": "ELITE",
   "developed_by": "από Mercan Software",
@@ -205,6 +205,14 @@
   "theme_name_nordic_snow": "Σκανδιναβικό Χιόνι",
   "theme_vibe_nordic_snow": "Μινιμαλ, Αντίθεση",
   "theme_name_volcano": "Ηφαίστειο",
-  "theme_vibe_volcano": "Δύναμη, Ενέργεια"
+  "theme_vibe_volcano": "Δύναμη, Ενέργεια",
+  "continue_with_google": "Συνέχεια με Google",
+  "continue_as_guest": "Συνέχεια ως επισκέπτης",
+  "or": "ή",
+  "rate_us": "Αξιολογήστε μας",
+  "log_out": "Αποσύνδεση",
+  "exit_guest_mode": "Έξοδος από τη λειτουργία επισκέπτη",
+  "log_out_title": "Αποσύνδεση;",
+  "exit_guest_mode_title": "Έξοδος από τη λειτουργία επισκέπτη;",
+  "log_out_confirm": "Είστε σίγουροι ότι θέλετε να αποσυνδεθείτε;"
 }
-

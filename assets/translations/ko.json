@@ -1,4 +1,4 @@
-﻿{
+{
   "app_name": "포모도로",
   "app_subtitle": "엘리트",
   "developed_by": "Mercan Software 제작",
@@ -205,6 +205,14 @@
   "theme_name_nordic_snow": "노르딕 스노우",
   "theme_vibe_nordic_snow": "미니멀, 대비",
   "theme_name_volcano": "볼케이노",
-  "theme_vibe_volcano": "파워, 에너지"
+  "theme_vibe_volcano": "파워, 에너지",
+  "continue_with_google": "Google로 계속하기",
+  "continue_as_guest": "게스트로 계속하기",
+  "or": "또는",
+  "rate_us": "평가하기",
+  "log_out": "로그아웃",
+  "exit_guest_mode": "게스트 모드 나가기",
+  "log_out_title": "로그아웃하시겠습니까?",
+  "exit_guest_mode_title": "게스트 모드를 나가시겠습니까?",
+  "log_out_confirm": "로그아웃하시겠습니까?"
 }
-

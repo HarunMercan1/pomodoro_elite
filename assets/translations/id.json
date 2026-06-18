@@ -1,4 +1,4 @@
-﻿{
+{
   "app_name": "POMODORO",
   "app_subtitle": "ELITE",
   "developed_by": "oleh Mercan Software",
@@ -205,6 +205,14 @@
   "theme_name_nordic_snow": "Salju Nordik",
   "theme_vibe_nordic_snow": "Minimal, Kontras",
   "theme_name_volcano": "Gunung Berapi",
-  "theme_vibe_volcano": "Kekuatan, Energi"
+  "theme_vibe_volcano": "Kekuatan, Energi",
+  "continue_with_google": "Lanjutkan dengan Google",
+  "continue_as_guest": "Lanjutkan sebagai tamu",
+  "or": "atau",
+  "rate_us": "Beri Nilai",
+  "log_out": "Keluar",
+  "exit_guest_mode": "Keluar dari mode tamu",
+  "log_out_title": "Keluar?",
+  "exit_guest_mode_title": "Keluar dari mode tamu?",
+  "log_out_confirm": "Apakah Anda yakin ingin keluar?"
 }
-

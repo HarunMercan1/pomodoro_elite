@@ -1,4 +1,4 @@
-﻿{
+{
   "app_name": "ポモドーロ",
   "app_subtitle": "エリート",
   "developed_by": "Mercan Software 製",
@@ -205,6 +205,14 @@
   "theme_name_nordic_snow": "ノルディックスノー",
   "theme_vibe_nordic_snow": "ミニマル、コントラスト",
   "theme_name_volcano": "ボルケーノ",
-  "theme_vibe_volcano": "パワー、エネルギー"
+  "theme_vibe_volcano": "パワー、エネルギー",
+  "continue_with_google": "Googleで続ける",
+  "continue_as_guest": "ゲストとして続ける",
+  "or": "または",
+  "rate_us": "評価する",
+  "log_out": "ログアウト",
+  "exit_guest_mode": "ゲストモードを終了",
+  "log_out_title": "ログアウトしますか？",
+  "exit_guest_mode_title": "ゲストモードを終了しますか？",
+  "log_out_confirm": "ログアウトしてもよろしいですか？"
 }
-

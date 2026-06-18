@@ -1,4 +1,4 @@
-﻿{
+{
   "app_name": "POMODORO",
   "app_subtitle": "ELITE",
   "developed_by": "bởi Mercan Software",
@@ -205,6 +205,14 @@
   "theme_name_nordic_snow": "Tuyết Bắc Âu",
   "theme_vibe_nordic_snow": "Tối giản, Tương phản",
   "theme_name_volcano": "Núi lửa",
-  "theme_vibe_volcano": "Sức mạnh, Năng lượng"
+  "theme_vibe_volcano": "Sức mạnh, Năng lượng",
+  "continue_with_google": "Tiếp tục với Google",
+  "continue_as_guest": "Tiếp tục với tư cách khách",
+  "or": "hoặc",
+  "rate_us": "Đánh giá chúng tôi",
+  "log_out": "Đăng xuất",
+  "exit_guest_mode": "Thoát chế độ khách",
+  "log_out_title": "Đăng xuất?",
+  "exit_guest_mode_title": "Thoát chế độ khách?",
+  "log_out_confirm": "Bạn có chắc chắn muốn đăng xuất không?"
 }
-

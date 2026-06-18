@@ -1,4 +1,4 @@
-﻿{
+{
   "app_name": "POMODORO",
   "app_subtitle": "ELITE",
   "developed_by": "przez Mercan Software",
@@ -205,6 +205,14 @@
   "theme_name_nordic_snow": "Nordycki Śnieg",
   "theme_vibe_nordic_snow": "Minimalizm, Kontrast",
   "theme_name_volcano": "Wulkan",
-  "theme_vibe_volcano": "Moc, Energia"
+  "theme_vibe_volcano": "Moc, Energia",
+  "continue_with_google": "Kontynuuj z Google",
+  "continue_as_guest": "Kontynuuj jako gość",
+  "or": "lub",
+  "rate_us": "Oceń nas",
+  "log_out": "Wyloguj się",
+  "exit_guest_mode": "Wyjdź z trybu gościa",
+  "log_out_title": "Wylogować się?",
+  "exit_guest_mode_title": "Wyjść z trybu gościa?",
+  "log_out_confirm": "Czy na pewno chcesz się wylogować?"
 }
-

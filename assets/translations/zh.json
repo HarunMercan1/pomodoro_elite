@@ -1,4 +1,4 @@
-﻿{
+{
   "app_name": "番茄钟",
   "app_subtitle": "精英",
   "developed_by": "Mercan Software 开发",
@@ -205,6 +205,14 @@
   "theme_name_nordic_snow": "北欧雪",
   "theme_vibe_nordic_snow": "极简、对比",
   "theme_name_volcano": "火山",
-  "theme_vibe_volcano": "力量、能量"
+  "theme_vibe_volcano": "力量、能量",
+  "continue_with_google": "使用Google继续",
+  "continue_as_guest": "以访客身份继续",
+  "or": "或",
+  "rate_us": "评价我们",
+  "log_out": "退出登录",
+  "exit_guest_mode": "退出访客模式",
+  "log_out_title": "退出登录？",
+  "exit_guest_mode_title": "退出访客模式？",
+  "log_out_confirm": "您确定要退出登录吗？"
 }
-

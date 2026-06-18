@@ -1,4 +1,4 @@
-﻿{
+{
   "app_name": "पोमोडोरो",
   "app_subtitle": "एलीट",
   "developed_by": "Mercan Software द्वारा",
@@ -205,6 +205,14 @@
   "theme_name_nordic_snow": "नॉर्डिक बर्फ",
   "theme_vibe_nordic_snow": "न्यूनतम, कंट्रास्ट",
   "theme_name_volcano": "ज्वालामुखी",
-  "theme_vibe_volcano": "शक्ति, ऊर्जा"
+  "theme_vibe_volcano": "शक्ति, ऊर्जा",
+  "continue_with_google": "Google से जारी रखें",
+  "continue_as_guest": "अतिथि के रूप में जारी रखें",
+  "or": "या",
+  "rate_us": "हमें रेट करें",
+  "log_out": "लॉग आउट",
+  "exit_guest_mode": "अतिथि मोड से बाहर निकलें",
+  "log_out_title": "लॉग आउट?",
+  "exit_guest_mode_title": "अतिथि मोड से बाहर निकलें?",
+  "log_out_confirm": "क्या आप वाकई लॉग आउट करना चाहते हैं?"
 }
-
