@@ -6,7 +6,7 @@ import '../providers/theme_provider.dart';
 import '../utils/app_fonts.dart';
 
 class AuthScreen extends StatefulWidget {
-  const AuthScreen({Key? key}) : super(key: key);
+  const AuthScreen({super.key});
 
   @override
   State<AuthScreen> createState() => _AuthScreenState();
@@ -14,6 +14,7 @@ class AuthScreen extends StatefulWidget {
 
 class _AuthScreenState extends State<AuthScreen> {
   bool _isLoading = false;
+  bool _isGuestLoading = false;
 
   Future<void> _handleGoogleSignIn() async {
     setState(() => _isLoading = true);
@@ -22,14 +23,35 @@ class _AuthScreenState extends State<AuthScreen> {
     } catch (e) {
       if (mounted) {
         final msg = e.toString();
-        if (!msg.contains('cancelled')) {
+        // Kullanıcı iptal ettiyse mesaj gösterme
+        if (!msg.contains('cancelled') && !msg.contains('canceled')) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(msg), backgroundColor: Colors.red),
+            SnackBar(
+              content: Text('sign_in_error'.tr()),
+              backgroundColor: Colors.red.shade700,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              margin: const EdgeInsets.all(16),
+            ),
           );
         }
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _handleGuestSignIn() async {
+    setState(() => _isGuestLoading = true);
+    // 1 saniyelik yapay gecikme
+    await Future.delayed(const Duration(seconds: 1));
+    if (mounted) {
+      await context.read<AuthProvider>().continueAsGuest();
+      // Auth statemangament dinleyicisi zaten ana sayfaya yönlendirecek,
+      // ama biz yine de loading'i kapatalım
+      setState(() => _isGuestLoading = false);
     }
   }
 
@@ -157,25 +179,33 @@ class _AuthScreenState extends State<AuthScreen> {
                   const SizedBox(height: 16),
 
                   // Misafir Olarak Devam Et Butonu
-                  OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      side: BorderSide(color: theme.settingsBorderColor ?? Colors.white12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                        side: BorderSide(color: theme.settingsBorderColor ?? Colors.white12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        backgroundColor: Colors.transparent,
                       ),
-                      backgroundColor: Colors.transparent,
-                    ),
-                    onPressed: () {
-                      context.read<AuthProvider>().continueAsGuest();
-                    },
-                    child: Text(
-                      'continue_as_guest'.tr(),
-                      style: AppFonts.poppins(
-                        context: context,
-                        color: isDark ? Colors.white38 : Colors.black38,
-                        fontSize: 15,
-                      ),
+                      onPressed: (_isLoading || _isGuestLoading) ? null : _handleGuestSignIn,
+                      child: _isGuestLoading
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : Text(
+                              'continue_as_guest'.tr(),
+                              style: AppFonts.poppins(
+                                context: context,
+                                color: isDark ? Colors.white38 : Colors.black38,
+                                fontSize: 15,
+                              ),
+                            ),
                     ),
                   ),
                 ],

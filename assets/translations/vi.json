@@ -1,4 +1,4 @@
-﻿{
+{
   "app_name": "POMODORO",
   "app_subtitle": "ELITE",
   "developed_by": "bởi Mercan Software",
@@ -215,5 +215,28 @@
   "log_out_title": "Đăng xuất?",
   "exit_guest_mode_title": "Thoát chế độ khách?",
   "log_out_confirm": "Bạn có chắc chắn muốn đăng xuất không?",
-  "focus_grow_achieve": "Focus. Grow. Achieve."
+  "focus_grow_achieve": "Focus. Grow. Achieve.",
+  "sign_in_error": "Đăng nhập thất bại. Vui lòng thử lại.",
+  "premium_active": "💎 Hoạt động cao cấp",
+  "get_premium": "💎 Lên bản cao cấp",
+  "premium_thanks": "Cảm ơn sự hỗ trợ của bạn! Tất cả các tính năng đều mở.",
+  "premium_desc": "Đưa trải nghiệm Pomodoro Elite đến giới hạn của nó.",
+  "premium_feature_updates": "Truy cập ngay vào tất cả các bản cập nhật sắp tới và các tính năng mới",
+  "premium_feature_ads": "Trải nghiệm không có quảng cáo mãi mãi",
+  "premium_feature_themes": "Mở khóa tất cả các chủ đề độc quyền",
+  "premium_feature_support": "Hỗ trợ trực tiếp nhà phát triển",
+  "get_unlimited_premium": "Nhận phí bảo hiểm không giới hạn",
+  "packages_loading": "Đang cài đặt gói... Kiểm tra kết nối internet của bạn.",
+  "restore_purchases_btn": "Khôi phục mua hàng",
+  "support_developer": "Hỗ trợ nhà phát triển ❤️",
+  "support_desc": "Bạn có thể hỗ trợ chúng tôi đóng góp vào sự phát triển của ứng dụng và cung cấp các tính năng tốt hơn.",
+  "thanks_title": "Cảm ơn! 🎉",
+  "purchase_success": "Việc mua hàng của bạn đã được thực hiện thành công. Chúng tôi rất biết ơn sự hỗ trợ của bạn.",
+  "transaction_failed": "Giao dịch không thành công",
+  "purchase_cancelled": "Giao dịch mua đã bị hủy hoặc đã xảy ra lỗi.",
+  "success_title": "Thành công! 🔄",
+  "restore_success": "Giao dịch mua hàng của bạn đã được khôi phục thành công và ghi có vào tài khoản của bạn.",
+  "not_found_title": "Không tìm thấy",
+  "restore_not_found": "Không tìm thấy hồ sơ mua hàng Premium trước đây cho tài khoản này.",
+  "ok_btn": "Được rồi"
 }

@@ -44,6 +44,16 @@ class AdHelper {
       'ca-app-pub-3820038977003119/5632131784';
 
   // ============================================================
+  // 🔥 BÜYÜK BANNER ID'LERİ (Ayarlar vs.)
+  // ============================================================
+  
+  static const String _testLargeBannerIdAndroid = 'ca-app-pub-3940256099942544/6300978111'; // Standart test banner ID kullanılabilir
+  static const String _testLargeBannerIdIOS = 'ca-app-pub-3940256099942544/2934735716';
+
+  static const String _realLargeBannerIdAndroid = 'ca-app-pub-3820038977003119/7568534212';
+  static const String _realLargeBannerIdIOS = 'ca-app-pub-3820038977003119/7568534212';
+
+  // ============================================================
   // 🎁 REWARDED AD ID'LERİ (Tema kilidi açmak için)
   // ============================================================
 
@@ -86,6 +96,17 @@ class AdHelper {
       return isTestMode ? _testBannerIdAndroid : _realBannerIdAndroid;
     } else if (Platform.isIOS) {
       return isTestMode ? _testBannerIdIOS : _realBannerIdIOS;
+    } else {
+      throw UnsupportedError('Bu platform desteklenmiyor');
+    }
+  }
+
+  /// Büyük Banner reklam ID'sini döndürür.
+  static String get largeBannerAdUnitId {
+    if (Platform.isAndroid) {
+      return isTestMode ? _testLargeBannerIdAndroid : _realLargeBannerIdAndroid;
+    } else if (Platform.isIOS) {
+      return isTestMode ? _testLargeBannerIdIOS : _realLargeBannerIdIOS;
     } else {
       throw UnsupportedError('Bu platform desteklenmiyor');
     }

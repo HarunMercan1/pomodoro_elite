@@ -1,4 +1,4 @@
-﻿{
+{
   "app_name": "POMODORO",
   "app_subtitle": "ELITE",
   "developed_by": "door Mercan Software",
@@ -215,5 +215,28 @@
   "log_out_title": "Uitloggen?",
   "exit_guest_mode_title": "Gastmodus verlaten?",
   "log_out_confirm": "Weet u zeker dat u wilt uitloggen?",
-  "focus_grow_achieve": "Focus. Grow. Achieve."
+  "focus_grow_achieve": "Focus. Grow. Achieve.",
+  "sign_in_error": "Aanmelden mislukt. Probeer het opnieuw.",
+  "premium_active": "💎 Premium Actief",
+  "get_premium": "💎 Ga voor Premium",
+  "premium_thanks": "Bedankt voor uw steun! Alle functies zijn geopend.",
+  "premium_desc": "Breng de Pomodoro Elite-ervaring tot het uiterste.",
+  "premium_feature_updates": "Directe toegang tot alle aankomende updates en nieuwe functies",
+  "premium_feature_ads": "Voor altijd een advertentievrije ervaring",
+  "premium_feature_themes": "Ontgrendel alle exclusieve thema's",
+  "premium_feature_support": "Ondersteun de ontwikkelaar rechtstreeks",
+  "get_unlimited_premium": "Ontvang onbeperkte premie",
+  "packages_loading": "Pakketten installeren... Controleer uw internetverbinding.",
+  "restore_purchases_btn": "Aankopen herstellen",
+  "support_developer": "Steun de ontwikkelaar ❤️",
+  "support_desc": "U kunt ons steunen om bij te dragen aan de ontwikkeling van de applicatie en betere functies te bieden.",
+  "thanks_title": "Bedankt! 🎉",
+  "purchase_success": "Uw aankoop is succesvol gedaan. Wij zijn dankbaar voor uw steun.",
+  "transaction_failed": "Transactie mislukt",
+  "purchase_cancelled": "De aankoop is geannuleerd of er is een fout opgetreden.",
+  "success_title": "Succesvol! 🔄",
+  "restore_success": "Uw aankopen zijn succesvol hersteld en bijgeschreven op uw account.",
+  "not_found_title": "Niet gevonden",
+  "restore_not_found": "Er zijn geen eerdere Premium-aankoopgegevens gevonden voor dit account.",
+  "ok_btn": "OK"
 }

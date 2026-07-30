@@ -3,7 +3,9 @@ import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../providers/theme_provider.dart';
 import '../providers/ad_manager.dart';
+import '../providers/purchase_provider.dart';
 import '../utils/app_fonts.dart';
+import 'premium_screen.dart';
 
 class ThemeSelectionScreen extends StatefulWidget {
   const ThemeSelectionScreen({super.key});
@@ -25,6 +27,7 @@ class _ThemeSelectionScreenState extends State<ThemeSelectionScreen> {
   Widget build(BuildContext context) {
     final themeProvider = context.watch<ThemeProvider>();
     final adManager = context.watch<AdManager>();
+    final purchaseProvider = context.watch<PurchaseProvider>();
 
     return Scaffold(
       backgroundColor: themeProvider.settingsBgColor, // 🔥 Tema bazlı arka plan
@@ -52,7 +55,7 @@ class _ThemeSelectionScreenState extends State<ThemeSelectionScreen> {
         itemBuilder: (context, index) {
           final theme = AppThemes.all[index];
           final isSelected = themeProvider.currentThemeId == theme.id;
-          final isUnlocked = themeProvider.isThemeUnlocked(theme.id);
+          final isUnlocked = themeProvider.isThemeUnlocked(theme.id) || purchaseProvider.isPremium;
 
           return Padding(
             padding: const EdgeInsets.only(bottom: 12),
@@ -101,6 +104,8 @@ class _ThemeSelectionScreenState extends State<ThemeSelectionScreen> {
     ThemeProvider themeProvider,
     AdManager adManager,
   ) {
+    // If premium, it shouldn't even reach here, but just in case:
+    if (context.read<PurchaseProvider>().isPremium) return;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -178,59 +183,73 @@ class _ThemeSelectionScreenState extends State<ThemeSelectionScreen> {
               style: const TextStyle(color: Colors.grey),
             ),
           ),
-          ElevatedButton.icon(
-            onPressed: () async {
-              Navigator.pop(ctx);
-
-              final success = await adManager.showRewardedAd(
-                onRewardEarned: () async {
-                  await themeProvider.unlockTheme(theme.id);
-
-                  if (context.mounted) {
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const PremiumScreen()));
+                },
+                icon: const Icon(Icons.workspace_premium, color: Colors.white),
+                label: Text('unlock_premium'.tr(), style: const TextStyle(fontWeight: FontWeight.bold)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.amber, // Premium color
+                  foregroundColor: Colors.black,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+              const SizedBox(height: 10),
+              ElevatedButton.icon(
+                onPressed: () async {
+                  Navigator.pop(ctx);
+                  final success = await adManager.showRewardedAd(
+                    onRewardEarned: () async {
+                      await themeProvider.unlockTheme(theme.id);
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Row(
+                              children: [
+                                const Icon(Icons.lock_open, color: Colors.white),
+                                const SizedBox(width: 8),
+                                Expanded(child: Text('${'theme_name_${theme.id}'.tr()} ${"theme_unlocked_72h".tr()}')),
+                              ],
+                            ),
+                            backgroundColor: theme.focus.bgColor,
+                          ),
+                        );
+                      }
+                    },
+                  );
+                  if (!success && context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Row(
                           children: [
-                            const Icon(Icons.lock_open, color: Colors.white),
+                            const Icon(Icons.hourglass_empty, color: Colors.white),
                             const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                  '${'theme_name_${theme.id}'.tr()} ${"theme_unlocked_72h".tr()}'),
-                            ),
+                            Text('ad_loading'.tr()),
                           ],
                         ),
-                        backgroundColor: theme.focus.bgColor,
+                        backgroundColor: Colors.orange,
+                        duration: const Duration(seconds: 2),
                       ),
                     );
                   }
                 },
-              );
-
-              if (!success && context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Row(
-                      children: [
-                        const Icon(Icons.hourglass_empty, color: Colors.white),
-                        const SizedBox(width: 8),
-                        Text('ad_loading'.tr()),
-                      ],
-                    ),
-                    backgroundColor: Colors.orange,
-                    duration: const Duration(seconds: 2),
-                  ),
-                );
-              }
-            },
-            icon: const Icon(Icons.play_circle_outline),
-            label: Text('watch_ad'.tr()),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: theme.focus.effectiveButtonBg,
-              foregroundColor: theme.focus.effectiveButtonTextColor,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                icon: const Icon(Icons.play_circle_outline),
+                label: Text('watch_ad'.tr()),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.focus.effectiveButtonBg,
+                  foregroundColor: theme.focus.effectiveButtonTextColor,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
               ),
-            ),
+            ],
           ),
         ],
       ),

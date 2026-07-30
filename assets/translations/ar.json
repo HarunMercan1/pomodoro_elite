@@ -1,4 +1,4 @@
-﻿{
+{
   "app_name": "بومودورو",
   "app_subtitle": "إيليت",
   "developed_by": "بواسطة Mercan Software",
@@ -215,5 +215,28 @@
   "log_out_title": "تسجيل الخروج؟",
   "exit_guest_mode_title": "الخروج من وضع الضيف؟",
   "log_out_confirm": "هل أنت متأكد أنك تريد تسجيل الخروج؟",
-  "focus_grow_achieve": "Focus. Grow. Achieve."
+  "focus_grow_achieve": "Focus. Grow. Achieve.",
+  "sign_in_error": "فشل تسجيل الدخول. يرجى المحاولة مرة أخرى.",
+  "premium_active": "💎 بريميوم أكتيف",
+  "get_premium": "💎 انتقل إلى الإصدار المميز",
+  "premium_thanks": "شكرا لدعمكم! جميع الميزات مفتوحة.",
+  "premium_desc": "خذ تجربة بومودورو إيليت إلى أقصى حدودها.",
+  "premium_feature_updates": "الوصول الفوري إلى كافة التحديثات القادمة والميزات الجديدة",
+  "premium_feature_ads": "تجربة خالية من الإعلانات إلى الأبد",
+  "premium_feature_themes": "فتح جميع المواضيع الحصرية",
+  "premium_feature_support": "دعم المطور مباشرة",
+  "get_unlimited_premium": "احصل على قسط غير محدود",
+  "packages_loading": "جارٍ تثبيت الحزم... تحقق من اتصالك بالإنترنت.",
+  "restore_purchases_btn": "استعادة المشتريات",
+  "support_developer": "دعم المطور ❤️",
+  "support_desc": "يمكنك دعمنا للمساهمة في تطوير التطبيق وتقديم ميزات أفضل.",
+  "thanks_title": "شكرًا! 🎉",
+  "purchase_success": "لقد تمت عملية الشراء بنجاح. نحن ممتنون لدعمكم.",
+  "transaction_failed": "فشلت الصفقة",
+  "purchase_cancelled": "تم إلغاء عملية الشراء أو حدث خطأ.",
+  "success_title": "ناجح! 🔄",
+  "restore_success": "تمت استعادة مشترياتك بنجاح وإضافتها إلى حسابك.",
+  "not_found_title": "لم يتم العثور عليه",
+  "restore_not_found": "لم يتم العثور على سجلات شراء Premium سابقة لهذا الحساب.",
+  "ok_btn": "نعم"
 }

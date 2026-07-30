@@ -1,4 +1,4 @@
-﻿{
+{
   "app_name": "番茄钟",
   "app_subtitle": "精英",
   "developed_by": "Mercan Software 开发",
@@ -215,5 +215,28 @@
   "log_out_title": "退出登录？",
   "exit_guest_mode_title": "退出访客模式？",
   "log_out_confirm": "您确定要退出登录吗？",
-  "focus_grow_achieve": "Focus. Grow. Achieve."
+  "focus_grow_achieve": "Focus. Grow. Achieve.",
+  "sign_in_error": "登录失败，请重试。",
+  "premium_active": "💎 高级活性",
+  "get_premium": "💎 升级至高级版",
+  "premium_thanks": "感谢您的支持！所有功能均开放。",
+  "premium_desc": "将番茄钟精英体验发挥到极致。",
+  "premium_feature_updates": "即时访问所有即将推出的更新和新功能",
+  "premium_feature_ads": "永远无广告体验",
+  "premium_feature_themes": "解锁所有独家主题",
+  "premium_feature_support": "直接支持开发商",
+  "get_unlimited_premium": "获得无限保费",
+  "packages_loading": "正在安装软件包...检查您的互联网连接。",
+  "restore_purchases_btn": "恢复购买",
+  "support_developer": "支持开发者❤️",
+  "support_desc": "您可以支持我们为应用程序的开发做出贡献并提供更好的功能。",
+  "thanks_title": "谢谢！ 🎉",
+  "purchase_success": "您的购买已成功。我们感谢您的支持。",
+  "transaction_failed": "交易失败",
+  "purchase_cancelled": "购买被取消或发生错误。",
+  "success_title": "成功的！ 🔄",
+  "restore_success": "您的购买已成功恢复并记入您的帐户。",
+  "not_found_title": "未找到",
+  "restore_not_found": "找不到该帐户过去的 Premium 购买记录。",
+  "ok_btn": "好的"
 }

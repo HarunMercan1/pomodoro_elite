@@ -1,4 +1,4 @@
-﻿{
+{
   "app_name": "POMODORO",
   "app_subtitle": "ELITE",
   "developed_by": "oleh Mercan Software",
@@ -215,5 +215,28 @@
   "log_out_title": "Keluar?",
   "exit_guest_mode_title": "Keluar dari mode tamu?",
   "log_out_confirm": "Apakah Anda yakin ingin keluar?",
-  "focus_grow_achieve": "Focus. Grow. Achieve."
+  "focus_grow_achieve": "Focus. Grow. Achieve.",
+  "sign_in_error": "Gagal masuk. Silakan coba lagi.",
+  "premium_active": "💎 Premium Aktif",
+  "get_premium": "💎 Gunakan Premium",
+  "premium_thanks": "Terima kasih atas dukungan Anda! Semua fitur terbuka.",
+  "premium_desc": "Manfaatkan pengalaman Pomodoro Elite hingga batas maksimalnya.",
+  "premium_feature_updates": "Akses instan ke semua pembaruan mendatang dan fitur baru",
+  "premium_feature_ads": "Pengalaman bebas iklan selamanya",
+  "premium_feature_themes": "Buka kunci semua tema eksklusif",
+  "premium_feature_support": "Dukung pengembang secara langsung",
+  "get_unlimited_premium": "Dapatkan Premium Tanpa Batas",
+  "packages_loading": "Menginstal paket... Periksa koneksi internet Anda.",
+  "restore_purchases_btn": "Kembalikan Pembelian",
+  "support_developer": "Dukung Pengembang ❤️",
+  "support_desc": "Anda dapat mendukung kami untuk berkontribusi dalam pengembangan aplikasi dan menyediakan fitur yang lebih baik.",
+  "thanks_title": "Terima kasih! 🎉",
+  "purchase_success": "Pembelian Anda telah berhasil dilakukan. Kami berterima kasih atas dukungan Anda.",
+  "transaction_failed": "Transaksi Gagal",
+  "purchase_cancelled": "Pembelian dibatalkan atau terjadi kesalahan.",
+  "success_title": "Berhasil! 🔄",
+  "restore_success": "Pembelian Anda telah berhasil dipulihkan dan dikreditkan ke akun Anda.",
+  "not_found_title": "Tidak Ditemukan",
+  "restore_not_found": "Tidak ditemukan catatan pembelian Premium sebelumnya untuk akun ini.",
+  "ok_btn": "Oke"
 }

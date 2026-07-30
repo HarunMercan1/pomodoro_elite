@@ -1,4 +1,4 @@
-﻿{
+{
   "app_name": "POMODORO",
   "app_subtitle": "ELITE",
   "developed_by": "por Mercan Software",
@@ -215,5 +215,28 @@
   "log_out_title": "¿Cerrar sesión?",
   "exit_guest_mode_title": "¿Salir del modo invitado?",
   "log_out_confirm": "¿Estás seguro de que quieres cerrar sesión?",
-  "focus_grow_achieve": "Focus. Grow. Achieve."
+  "focus_grow_achieve": "Focus. Grow. Achieve.",
+  "sign_in_error": "Error al iniciar sesión. Inténtalo de nuevo.",
+  "premium_active": "💎 Premium Activo",
+  "get_premium": "💎 Hazte Premium",
+  "premium_thanks": "¡Gracias por tu apoyo! Todas las funciones están abiertas.",
+  "premium_desc": "Lleva la experiencia Pomodoro Elite al límite.",
+  "premium_feature_updates": "Acceso instantáneo a todas las próximas actualizaciones y nuevas funciones.",
+  "premium_feature_ads": "Experiencia sin publicidad para siempre",
+  "premium_feature_themes": "Desbloquea todos los temas exclusivos",
+  "premium_feature_support": "Apoyar al desarrollador directamente",
+  "get_unlimited_premium": "Obtenga prima ilimitada",
+  "packages_loading": "Instalando paquetes... Verifique su conexión a Internet.",
+  "restore_purchases_btn": "Restaurar compras",
+  "support_developer": "Apoye al desarrollador ❤️",
+  "support_desc": "Puede apoyarnos para contribuir al desarrollo de la aplicación y brindar mejores funciones.",
+  "thanks_title": "¡Gracias! 🎉",
+  "purchase_success": "Tu compra se ha realizado con éxito. Estamos agradecidos por su apoyo.",
+  "transaction_failed": "Transacción fallida",
+  "purchase_cancelled": "La compra fue cancelada o ocurrió un error.",
+  "success_title": "¡Exitoso! 🔄",
+  "restore_success": "Sus compras han sido restauradas y acreditadas exitosamente en su cuenta.",
+  "not_found_title": "Extraviado",
+  "restore_not_found": "No se encontraron registros de compras Premium anteriores para esta cuenta.",
+  "ok_btn": "De acuerdo"
 }

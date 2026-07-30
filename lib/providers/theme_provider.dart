@@ -831,8 +831,7 @@ class ThemeProvider with ChangeNotifier {
   static const int _unlockDurationHours = 72;
 
   // 🔥 Her temanın kilit açma bitiş zamanı (tema_id -> bitiş zamanı)
-  Map<String, DateTime> _themeUnlockExpiry = {};
-
+  final Map<String, DateTime> _themeUnlockExpiry = {};
   TimerState _timerState = TimerState.idle;
 
   ThemeProvider() {
@@ -892,7 +891,7 @@ class ThemeProvider with ChangeNotifier {
     if (_timerState != state) {
       _timerState = state;
       debugPrint(
-          '🎨 Timer durumu: $state → BG: ${bgColor.value.toRadixString(16)}');
+          '🎨 Timer durumu: $state → BG: ${bgColor.toARGB32().toRadixString(16)}');
       notifyListeners();
     }
   }

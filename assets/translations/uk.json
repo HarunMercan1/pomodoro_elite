@@ -1,4 +1,4 @@
-﻿{
+{
   "app_name": "ПОМОДОРО",
   "app_subtitle": "ЕЛІТ",
   "developed_by": "від Mercan Software",
@@ -215,5 +215,28 @@
   "log_out_title": "Вийти?",
   "exit_guest_mode_title": "Вийти з гостьового режиму?",
   "log_out_confirm": "Ви впевнені, що хочете вийти?",
-  "focus_grow_achieve": "Focus. Grow. Achieve."
+  "focus_grow_achieve": "Focus. Grow. Achieve.",
+  "sign_in_error": "Помилка входу. Спробуйте ще раз.",
+  "premium_active": "💎 Premium Active",
+  "get_premium": "💎 Переходьте на Premium",
+  "premium_thanks": "Дякуємо за підтримку! Усі функції відкриті.",
+  "premium_desc": "Доведіть досвід Pomodoro Elite до своїх меж.",
+  "premium_feature_updates": "Миттєвий доступ до всіх майбутніх оновлень і нових функцій",
+  "premium_feature_ads": "Назавжди без реклами",
+  "premium_feature_themes": "Розблокуйте всі ексклюзивні теми",
+  "premium_feature_support": "Підтримуйте безпосередньо розробника",
+  "get_unlimited_premium": "Отримайте необмежений преміум",
+  "packages_loading": "Встановлення пакетів... Перевірте підключення до Інтернету.",
+  "restore_purchases_btn": "Відновити покупки",
+  "support_developer": "Підтримайте розробника ❤️",
+  "support_desc": "Ви можете підтримати нас, щоб зробити свій внесок у розвиток програми та надати кращі функції.",
+  "thanks_title": "дякую 🎉",
+  "purchase_success": "Ваша покупка успішно зроблена. Ми вдячні за вашу підтримку.",
+  "transaction_failed": "Помилка транзакції",
+  "purchase_cancelled": "Покупку скасовано або сталася помилка.",
+  "success_title": "Успішно! 🔄",
+  "restore_success": "Ваші покупки успішно відновлено та зараховано на ваш рахунок.",
+  "not_found_title": "Не знайдено",
+  "restore_not_found": "Для цього облікового запису не знайдено попередніх записів про покупки Premium.",
+  "ok_btn": "Гаразд"
 }

@@ -1,4 +1,4 @@
-﻿{
+{
   "app_name": "ポモドーロ",
   "app_subtitle": "エリート",
   "developed_by": "Mercan Software 製",
@@ -215,5 +215,28 @@
   "log_out_title": "ログアウトしますか？",
   "exit_guest_mode_title": "ゲストモードを終了しますか？",
   "log_out_confirm": "ログアウトしてもよろしいですか？",
-  "focus_grow_achieve": "Focus. Grow. Achieve."
+  "focus_grow_achieve": "Focus. Grow. Achieve.",
+  "sign_in_error": "サインインに失敗しました。もう一度お試しください。",
+  "premium_active": "💎 プレミアムアクティブ",
+  "get_premium": "💎 プレミアムに行く",
+  "premium_thanks": "ご支援ありがとうございます!すべての機能がオープンです。",
+  "premium_desc": "ポモドーロ エリートのエクスペリエンスを限界まで高めましょう。",
+  "premium_feature_updates": "今後のすべてのアップデートと新機能に即座にアクセス",
+  "premium_feature_ads": "永遠に広告なしのエクスペリエンス",
+  "premium_feature_themes": "すべての限定テーマをアンロックする",
+  "premium_feature_support": "開発者を直接サポートする",
+  "get_unlimited_premium": "無制限のプレミアムを入手",
+  "packages_loading": "パッケージをインストールしています... インターネット接続を確認してください。",
+  "restore_purchases_btn": "購入を復元する",
+  "support_developer": "開発者をサポートしてください❤️",
+  "support_desc": "アプリケーションの開発に貢献し、より良い機能を提供するために私たちをサポートしてください。",
+  "thanks_title": "ありがとう！ 🎉",
+  "purchase_success": "購入は正常に完了しました。皆様のご支援に感謝いたします。",
+  "transaction_failed": "トランザクションが失敗しました",
+  "purchase_cancelled": "購入がキャンセルされたか、エラーが発生しました。",
+  "success_title": "成功！ 🔄",
+  "restore_success": "購入は正常に復元され、アカウントに入金されました。",
+  "not_found_title": "見つかりません",
+  "restore_not_found": "このアカウントには過去のプレミアム購入記録が見つかりません。",
+  "ok_btn": "わかりました"
 }

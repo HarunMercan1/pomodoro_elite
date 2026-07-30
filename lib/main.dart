@@ -11,9 +11,8 @@ import 'providers/stats_provider.dart';
 import 'providers/ad_manager.dart';
 import 'providers/theme_provider.dart';
 import 'providers/auth_provider.dart';
+import 'providers/purchase_provider.dart';
 import 'screens/splash_screen.dart';
-import 'screens/auth_screen.dart';
-
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/constants/supabase_constants.dart';
 
@@ -30,7 +29,11 @@ void main() async {
   // 🔥 Supabase'i Başlat
   await Supabase.initialize(
     url: SupabaseConstants.supabaseUrl,
-    anonKey: SupabaseConstants.supabaseAnonKey,
+    // anonKey is deprecated, using publishableKey for newer Supabase SDK versions
+    // but preserving anonKey if necessary, wait, if it warns about anonKey, let's just pass anonKey if publishableKey is not fully integrated in old versions.
+    // Actually, I'll just change anonKey: to anonKey: SupabaseConstants.supabaseAnonKey for now.
+    // Wait, the warning says "Use publishableKey instead", so I will use it.
+    publishableKey: SupabaseConstants.supabaseAnonKey,
   );
 
   // 🔥 Timezone başlat (zamanlanmış bildirimler için gerekli)
@@ -77,10 +80,16 @@ void main() async {
           ChangeNotifierProvider(create: (_) => SettingsProvider()),
           ChangeNotifierProvider(create: (_) => StatsProvider()),
           ChangeNotifierProvider(create: (_) => AuthProvider()),
+          ChangeNotifierProvider(create: (_) => PurchaseProvider()),
           ChangeNotifierProvider(
               create: (_) => ThemeProvider()), // 🎨 Tema yöneticisi
-          ChangeNotifierProvider(
-              create: (_) => AdManager()), // 🔥 Reklam yöneticisi
+          ChangeNotifierProxyProvider<PurchaseProvider, AdManager>(
+            create: (_) => AdManager(),
+            update: (_, purchaseProvider, adManager) {
+              return (adManager ?? AdManager())
+                ..updatePremiumStatus(purchaseProvider.isPremium);
+            },
+          ), // 🔥 Reklam yöneticisi
         ],
         child: const MyApp(),
       ),

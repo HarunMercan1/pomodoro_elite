@@ -6,6 +6,8 @@ import 'package:easy_localization/easy_localization.dart';
 import '../providers/settings_provider.dart';
 import '../providers/timer_provider.dart';
 import '../providers/theme_provider.dart';
+import '../providers/ad_manager.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../utils/app_fonts.dart';
 
 class SoundSettingsScreen extends StatefulWidget {
@@ -18,6 +20,34 @@ class SoundSettingsScreen extends StatefulWidget {
 class _SoundSettingsScreenState extends State<SoundSettingsScreen> {
   // Slider'ın akıcı olması için yerel değişken
   double? _currentSliderValue;
+
+  late AdManager _adManager;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _adManager = context.read<AdManager>();
+  }
+
+  @override
+  void dispose() {
+    try {
+      _adManager.disposeSoundBanner();
+    } catch (e) {
+      debugPrint("SoundSettingsScreen Dispose Hatası: $e");
+    }
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // 🔥 Sound ekranı için büyük banner reklamı yükle
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final width = MediaQuery.of(context).size.width;
+      context.read<AdManager>().loadSoundBanner(width);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -256,6 +286,23 @@ class _SoundSettingsScreenState extends State<SoundSettingsScreen> {
                   ),
                 ),
               ),
+            ),
+            
+            // 🔥 BANNER REKLAM ALANI (Büyük Boyutlu)
+            Consumer<AdManager>(
+              builder: (context, adManager, child) {
+                if (adManager.isSoundBannerLoaded &&
+                    adManager.soundBannerAd != null) {
+                  return Container(
+                    width: adManager.soundBannerAd!.size.width.toDouble(),
+                    height: adManager.soundBannerAd!.size.height.toDouble(),
+                    margin: const EdgeInsets.only(bottom: 10),
+                    child: AdWidget(ad: adManager.soundBannerAd!),
+                  );
+                }
+                // Reklam yüklenmediyse boş alan
+                return const SizedBox(height: 50);
+              },
             ),
           ],
         );

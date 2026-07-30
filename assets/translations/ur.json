@@ -1,4 +1,4 @@
-﻿{
+{
   "app_name": "پومودورو",
   "app_subtitle": "ایلیٹ",
   "developed_by": "Mercan Software کی طرف سے",
@@ -215,5 +215,28 @@
   "log_out_title": "لاگ آؤٹ؟",
   "exit_guest_mode_title": "مہمان موڈ سے باہر نکلیں؟",
   "log_out_confirm": "کیا آپ واقعی لاگ آؤٹ کرنا چاہتے ہیں؟",
-  "focus_grow_achieve": "Focus. Grow. Achieve."
+  "focus_grow_achieve": "Focus. Grow. Achieve.",
+  "sign_in_error": "سائن ان ناکام۔ براہ کرم دوبارہ کوشش کریں۔",
+  "premium_active": "💎 پریمیم ایکٹو",
+  "get_premium": "💎 Go Premium",
+  "premium_thanks": "آپ کی حمایت کے لئے شکریہ! تمام خصوصیات کھلی ہیں۔",
+  "premium_desc": "پومودورو ایلیٹ کے تجربے کو اس کی حدود تک لے جائیں۔",
+  "premium_feature_updates": "تمام آنے والی تازہ کاریوں اور نئی خصوصیات تک فوری رسائی",
+  "premium_feature_ads": "ہمیشہ کے لیے اشتہار سے پاک تجربہ",
+  "premium_feature_themes": "تمام خصوصی تھیمز کو غیر مقفل کریں۔",
+  "premium_feature_support": "ڈویلپر کو براہ راست سپورٹ کریں۔",
+  "get_unlimited_premium": "لامحدود پریمیم حاصل کریں۔",
+  "packages_loading": "پیکجز انسٹال ہو رہے ہیں... اپنا انٹرنیٹ کنکشن چیک کریں۔",
+  "restore_purchases_btn": "خریداریوں کو بحال کریں۔",
+  "support_developer": "ڈویلپر کو سپورٹ کریں ❤️",
+  "support_desc": "آپ ایپلی کیشن کی ترقی میں حصہ ڈالنے اور بہتر خصوصیات فراہم کرنے میں ہماری مدد کر سکتے ہیں۔",
+  "thanks_title": "شکریہ! 🎉",
+  "purchase_success": "آپ کی خریداری کامیابی سے ہو گئی ہے۔ ہم آپ کے تعاون کے شکر گزار ہیں۔",
+  "transaction_failed": "لین دین ناکام ہو گیا۔",
+  "purchase_cancelled": "خریداری منسوخ کر دی گئی تھی یا کوئی خرابی پیش آ گئی تھی۔",
+  "success_title": "کامیاب! 🔄",
+  "restore_success": "آپ کی خریداریوں کو کامیابی کے ساتھ بحال اور آپ کے اکاؤنٹ میں کریڈٹ کر دیا گیا ہے۔",
+  "not_found_title": "نہیں ملا",
+  "restore_not_found": "اس اکاؤنٹ کے لیے کوئی سابقہ ​​پریمیم خریداری کا ریکارڈ نہیں ملا۔",
+  "ok_btn": "ٹھیک ہے"
 }

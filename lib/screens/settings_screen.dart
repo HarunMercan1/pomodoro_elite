@@ -12,8 +12,11 @@ import '../providers/theme_provider.dart';
 import '../providers/auth_provider.dart';
 import '../utils/app_fonts.dart';
 import 'package:in_app_review/in_app_review.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import 'package:pomodoro_elite/screens/language_selection_screen.dart';
+import 'package:pomodoro_elite/screens/premium_screen.dart';
+import '../providers/purchase_provider.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -223,6 +226,57 @@ class _SettingsScreenState extends State<SettingsScreen>
                               ),
                             ),
 
+                            // PREMIUM BUTONU
+                            Card(
+                              color: context.watch<PurchaseProvider>().isPremium 
+                                  ? Colors.amber.withOpacity(0.1) 
+                                  : Colors.amber.withOpacity(0.8),
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                side: const BorderSide(color: Colors.amber, width: 1),
+                              ),
+                              child: ListTile(
+                                contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: isTablet ? 8 : 0),
+                                leading: Icon(
+                                  Icons.workspace_premium_rounded,
+                                  color: context.watch<PurchaseProvider>().isPremium ? Colors.amber : Colors.black87,
+                                  size: iconSize,
+                                ),
+                                title: Text(
+                                  context.watch<PurchaseProvider>().isPremium 
+                                      ? '👑 Premium Aktif'
+                                      : '👑 Premium\'a Geç',
+                                  style: AppFonts.poppins(
+                                    context: context,
+                                    color: context.watch<PurchaseProvider>().isPremium ? Colors.amber : Colors.black87,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: titleSize,
+                                  ),
+                                ),
+                                subtitle: context.watch<PurchaseProvider>().isPremium 
+                                  ? null 
+                                  : Text(
+                                      'Reklamları kaldır, temaları aç',
+                                      style: AppFonts.poppins(
+                                        context: context,
+                                        fontSize: subtitleSize,
+                                        color: Colors.black87.withOpacity(0.7),
+                                      ),
+                                    ),
+                                trailing: Icon(Icons.arrow_forward_ios_rounded,
+                                    size: trailingIconSize, 
+                                    color: context.watch<PurchaseProvider>().isPremium ? Colors.amber : Colors.black87),
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => const PremiumScreen()),
+                                  );
+                                },
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+
                           // SÜRE AYARLARI
                           Card(
                             color: cardColor,
@@ -421,7 +475,9 @@ class _SettingsScreenState extends State<SettingsScreen>
                               onTap: () async {
                                 final InAppReview inAppReview = InAppReview.instance;
                                 if (await inAppReview.isAvailable()) {
-                                  inAppReview.requestReview();
+                                  // requestReview kotaya takılıp sessizce başarısız olabileceği için
+                                  // ayarlardan tıklandığında her zaman doğrudan mağaza sayfasını açıyoruz.
+                                  inAppReview.openStoreListing();
                                 }
                               },
                             ),
@@ -488,7 +544,30 @@ class _SettingsScreenState extends State<SettingsScreen>
 
                   const SizedBox(height: 20),
 
-                  const SizedBox(height: 30),
+                  // App Version Display
+                  FutureBuilder<PackageInfo>(
+                    future: PackageInfo.fromPlatform(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        final version = snapshot.data!.version;
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 20.0),
+                          child: Center(
+                            child: Text(
+                              'v$version',
+                              style: AppFonts.poppins(
+                                context: context,
+                                color: themeProvider.settingsTextColor.withValues(alpha: 0.5),
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    },
+                  ),
+                  const SizedBox(height: 10),
                 ],
               ),
             ),

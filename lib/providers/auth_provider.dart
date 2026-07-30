@@ -73,13 +73,30 @@ class AuthProvider extends ChangeNotifier {
   // 🔥 GOOGLE SIGN IN
   Future<void> signInWithGoogle() async {
     await _ensureGoogleInitialized();
+    
+    try {
+      await _performGoogleSignIn();
+    } catch (e) {
+      // Stale session durumunda: signOut yapıp tekrar dene
+      final errorStr = e.toString().toLowerCase();
+      if (errorStr.contains('canceled') || errorStr.contains('sign_in_failed')) {
+        try {
+          await GoogleSignIn.instance.signOut();
+        } catch (_) {}
 
-    final googleUser = await GoogleSignIn.instance.authenticate();
-    if (googleUser == null) {
-      throw Exception('Google Sign-In cancelled');
+        // Tekrar dene
+        await _performGoogleSignIn();
+      } else {
+        rethrow;
+      }
     }
+  }
 
-    final googleAuth = await googleUser.authentication;
+  /// Google ile giriş akışını gerçekleştirir
+  Future<void> _performGoogleSignIn() async {
+    final googleUser = await GoogleSignIn.instance.authenticate();
+
+    final googleAuth = googleUser.authentication;
     final idToken = googleAuth.idToken;
 
     if (idToken == null) {

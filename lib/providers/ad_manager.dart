@@ -5,6 +5,16 @@ import '../utils/ad_helper.dart';
 /// Banner reklamları yöneten provider.
 /// Her ekran için ayrı BannerAd nesnesi oluşturulur.
 class AdManager extends ChangeNotifier {
+  bool _isPremium = false;
+
+  void updatePremiumStatus(bool isPremium) {
+    _isPremium = isPremium;
+    if (isPremium) {
+      disposeSettingsBanner();
+      disposeDurationBanner();
+      disposeSoundBanner();
+    }
+  }
   // Settings ekranı için banner
   BannerAd? _settingsBannerAd;
   bool _isSettingsBannerLoaded = false;
@@ -12,6 +22,10 @@ class AdManager extends ChangeNotifier {
   // Duration Settings ekranı için banner
   BannerAd? _durationBannerAd;
   bool _isDurationBannerLoaded = false;
+
+  // Sound Settings ekranı için banner
+  BannerAd? _soundBannerAd;
+  bool _isSoundBannerLoaded = false;
 
   AdSize? _adSize;
 
@@ -23,10 +37,15 @@ class AdManager extends ChangeNotifier {
   BannerAd? get durationBannerAd => _durationBannerAd;
   bool get isDurationBannerLoaded => _isDurationBannerLoaded;
 
+  // Sound banner getter'ları
+  BannerAd? get soundBannerAd => _soundBannerAd;
+  bool get isSoundBannerLoaded => _isSoundBannerLoaded;
+
   AdSize? get adSize => _adSize;
 
   /// Ayarlar sayfası için adaptive banner reklamı yükler.
   Future<void> loadSettingsBanner(double width) async {
+    if (_isPremium) return;
     if (_settingsBannerAd != null) return;
 
     debugPrint('🔄 Settings Banner yükleniyor... (width: $width)');
@@ -60,21 +79,18 @@ class AdManager extends ChangeNotifier {
     _settingsBannerAd!.load();
   }
 
-  /// Süre ayarları sayfası için adaptive banner reklamı yükler.
+  /// Süre ayarları sayfası için büyük banner (medium rectangle) reklamı yükler.
   Future<void> loadDurationBanner(double width) async {
+    if (_isPremium) return;
     if (_durationBannerAd != null) return;
 
     debugPrint('🔄 Duration Banner yükleniyor... (width: $width)');
 
-    final AdSize? adaptiveSize = await AdSize.getAnchoredAdaptiveBannerAdSize(
-      Orientation.portrait,
-      width.truncate(),
-    );
-
-    final size = adaptiveSize ?? AdSize.banner;
+    // Büyük boyutlu banner (300x250)
+    final size = AdSize.mediumRectangle;
 
     _durationBannerAd = BannerAd(
-      adUnitId: AdHelper.bannerAdUnitId,
+      adUnitId: AdHelper.largeBannerAdUnitId,
       size: size,
       request: const AdRequest(),
       listener: BannerAdListener(
@@ -100,7 +116,7 @@ class AdManager extends ChangeNotifier {
     _settingsBannerAd?.dispose();
     _settingsBannerAd = null;
     _isSettingsBannerLoaded = false;
-    notifyListeners();
+    Future.microtask(() => notifyListeners());
   }
 
   /// Duration banner'ını manuel olarak temizle
@@ -108,7 +124,47 @@ class AdManager extends ChangeNotifier {
     _durationBannerAd?.dispose();
     _durationBannerAd = null;
     _isDurationBannerLoaded = false;
-    notifyListeners();
+    Future.microtask(() => notifyListeners());
+  }
+
+  /// Ses ayarları sayfası için büyük banner (medium rectangle) reklamı yükler.
+  Future<void> loadSoundBanner(double width) async {
+    if (_isPremium) return;
+    if (_soundBannerAd != null) return;
+
+    debugPrint('🔄 Sound Banner yükleniyor... (width: $width)');
+
+    // Büyük boyutlu banner (300x250)
+    final size = AdSize.mediumRectangle;
+
+    _soundBannerAd = BannerAd(
+      adUnitId: AdHelper.largeBannerAdUnitId,
+      size: size,
+      request: const AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          debugPrint('✅ Sound Banner yüklendi');
+          _isSoundBannerLoaded = true;
+          notifyListeners();
+        },
+        onAdFailedToLoad: (ad, error) {
+          debugPrint('❌ Sound Banner yüklenemedi: ${error.message}');
+          ad.dispose();
+          _soundBannerAd = null;
+          _isSoundBannerLoaded = false;
+          notifyListeners();
+        },
+      ),
+    );
+    _soundBannerAd!.load();
+  }
+
+  /// Sound banner'ını manuel olarak temizle
+  void disposeSoundBanner() {
+    _soundBannerAd?.dispose();
+    _soundBannerAd = null;
+    _isSoundBannerLoaded = false;
+    Future.microtask(() => notifyListeners());
   }
 
   // ============================================================
@@ -200,6 +256,7 @@ class AdManager extends ChangeNotifier {
 
   /// Interstitial reklam yükle
   void loadInterstitialAd() {
+    if (_isPremium) return;
     debugPrint('🔄 Interstitial Ad yükleniyor...');
 
     InterstitialAd.load(
@@ -225,6 +282,8 @@ class AdManager extends ChangeNotifier {
   /// Pomodoro tamamlandığında çağır
   /// Her 3-4 pomodorodan sonra reklam gösterir
   Future<void> onPomodoroCompleted() async {
+    if (_isPremium) return;
+    
     _pomodorosSinceLastAd++;
     debugPrint('🍅 Pomodoro sayısı: $_pomodorosSinceLastAd');
 
@@ -237,6 +296,8 @@ class AdManager extends ChangeNotifier {
 
   /// Interstitial reklam göster
   Future<bool> showInterstitialAd() async {
+    if (_isPremium) return false;
+    
     if (_interstitialAd == null) {
       debugPrint('⚠️ Interstitial Ad hazır değil');
       loadInterstitialAd();

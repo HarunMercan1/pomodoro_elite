@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
+import 'package:in_app_update/in_app_update.dart';
 import '../utils/notification_service.dart';
 import '../utils/app_fonts.dart';
 import 'auth_wrapper.dart';
@@ -44,6 +45,9 @@ class _SplashScreenState extends State<SplashScreen>
 
   // --- HATA KORUMALI BAŞLATMA ---
   Future<void> _initApp() async {
+    // 🔥 Önce zorunlu güncellemeleri kontrol et
+    await _checkForUpdate();
+
     try {
       await NotificationService().init();
     } catch (e) {
@@ -73,6 +77,24 @@ class _SplashScreenState extends State<SplashScreen>
           transitionDuration: const Duration(milliseconds: 1000),
         ),
       );
+    }
+  }
+
+  Future<void> _checkForUpdate() async {
+    try {
+      final info = await InAppUpdate.checkForUpdate();
+      if (info.updateAvailability == UpdateAvailability.updateAvailable) {
+        if (info.immediateUpdateAllowed) {
+          // Zorunlu güncelleme! Kullanıcı iptal edemez
+          await InAppUpdate.performImmediateUpdate();
+        } else if (info.flexibleUpdateAllowed) {
+          // Arka planda güncelleme
+          await InAppUpdate.startFlexibleUpdate();
+          await InAppUpdate.completeFlexibleUpdate();
+        }
+      }
+    } catch (e) {
+      debugPrint("InAppUpdate Error: $e");
     }
   }
 

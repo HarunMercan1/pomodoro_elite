@@ -33,7 +33,7 @@ android {
     defaultConfig {
         applicationId = "com.mercansoftware.pomodoro_elite"
         minSdk = 24
-        targetSdk = flutter.targetSdkVersion
+        targetSdk = 36 // Google Play Android 16 (API 36) zorunluluğu için güncellendi
         versionCode = flutter.versionCode
         versionName = flutter.versionName
         multiDexEnabled = true

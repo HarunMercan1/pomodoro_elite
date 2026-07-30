@@ -1,4 +1,4 @@
-﻿{
+{
   "app_name": "पोमोडोरो",
   "app_subtitle": "एलीट",
   "developed_by": "Mercan Software द्वारा",
@@ -215,5 +215,28 @@
   "log_out_title": "लॉग आउट?",
   "exit_guest_mode_title": "अतिथि मोड से बाहर निकलें?",
   "log_out_confirm": "क्या आप वाकई लॉग आउट करना चाहते हैं?",
-  "focus_grow_achieve": "Focus. Grow. Achieve."
+  "focus_grow_achieve": "Focus. Grow. Achieve.",
+  "sign_in_error": "साइन इन विफल। कृपया पुनः प्रयास करें।",
+  "premium_active": "💎 प्रीमियम सक्रिय",
+  "get_premium": "💎गो प्रीमियम",
+  "premium_thanks": "आपके समर्थन के लिए धन्यवाद! सभी सुविधाएं खुली हैं.",
+  "premium_desc": "पोमोडोरो एलीट अनुभव को उसकी सीमा तक ले जाएं।",
+  "premium_feature_updates": "सभी आगामी अपडेट और नई सुविधाओं तक त्वरित पहुंच",
+  "premium_feature_ads": "हमेशा के लिए विज्ञापन-मुक्त अनुभव",
+  "premium_feature_themes": "सभी विशिष्ट थीम अनलॉक करें",
+  "premium_feature_support": "सीधे डेवलपर का समर्थन करें",
+  "get_unlimited_premium": "असीमित प्रीमियम प्राप्त करें",
+  "packages_loading": "पैकेज स्थापित कर रहा है... अपना इंटरनेट कनेक्शन जांचें।",
+  "restore_purchases_btn": "खरीदारी वापस लौटाएं",
+  "support_developer": "डेवलपर का समर्थन करें ❤️",
+  "support_desc": "आप एप्लिकेशन के विकास में योगदान देने और बेहतर सुविधाएँ प्रदान करने में हमारा समर्थन कर सकते हैं।",
+  "thanks_title": "धन्यवाद! 🎉",
+  "purchase_success": "आपकी खरीदारी सफलतापूर्वक हो गई है. हम आपके समर्थन के लिए आभारी हैं.",
+  "transaction_failed": "लेन - देन विफल",
+  "purchase_cancelled": "खरीदारी रद्द कर दी गई या कोई त्रुटि हुई.",
+  "success_title": "सफल! 🔄",
+  "restore_success": "आपकी खरीदारी सफलतापूर्वक बहाल कर दी गई है और आपके खाते में जमा कर दी गई है।",
+  "not_found_title": "नहीं मिला",
+  "restore_not_found": "इस खाते के लिए कोई पिछला प्रीमियम खरीद रिकॉर्ड नहीं मिला।",
+  "ok_btn": "ठीक है"
 }
