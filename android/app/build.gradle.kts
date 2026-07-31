@@ -75,4 +75,8 @@ flutter {
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
     implementation("androidx.multidex:multidex:2.0.1")
+    // Keep this aligned with the BillingClient version used by RevenueCat.
+    // It is queried read-only as a fallback when RevenueCat and Play ownership
+    // temporarily disagree after a refund/restore operation.
+    implementation("com.android.billingclient:billing:8.3.0")
 }

@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 import 'package:pomodoro_elite/providers/purchase_provider.dart';
+import 'package:pomodoro_elite/services/play_store_ownership_gateway.dart';
 import 'package:pomodoro_elite/services/revenuecat_gateway.dart';
 
 void main() {
@@ -190,6 +191,57 @@ void main() {
       expect(gateway.resyncCalls, 1);
     });
 
+    test('grants Premium when Play verifies an active lifetime purchase',
+        () async {
+      final gateway = _FakeRevenueCatGateway(
+        purchaseError: PlatformException(
+          code:
+              PurchasesErrorCode.productAlreadyPurchasedError.index.toString(),
+        ),
+        restoreState: const RevenueCatCustomerState(isPremium: false),
+        resyncState: const RevenueCatCustomerState(isPremium: false),
+      );
+      final ownership = _FakePlayStoreOwnershipGateway(isPremiumOwned: true);
+      final provider = PurchaseProvider(
+        revenueCat: gateway,
+        playStoreOwnership: ownership,
+        currentUserId: () => 'user-a',
+        userIdChanges: authChanges.stream,
+      );
+      addTearDown(provider.dispose);
+
+      await provider.initialized;
+      final outcome = await provider.purchasePackage(_TestPackage());
+
+      expect(outcome, PurchaseOutcome.restored);
+      expect(provider.isPremium, isTrue);
+      expect(ownership.queryCalls, greaterThanOrEqualTo(1));
+    });
+
+    test('restore re-syncs RevenueCat then checks active Play ownership',
+        () async {
+      final gateway = _FakeRevenueCatGateway(
+        restoreState: const RevenueCatCustomerState(isPremium: false),
+        resyncState: const RevenueCatCustomerState(isPremium: false),
+      );
+      final ownership = _FakePlayStoreOwnershipGateway(isPremiumOwned: true);
+      final provider = PurchaseProvider(
+        revenueCat: gateway,
+        playStoreOwnership: ownership,
+        currentUserId: () => 'user-a',
+        userIdChanges: authChanges.stream,
+      );
+      addTearDown(provider.dispose);
+
+      await provider.initialized;
+      final restored = await provider.restorePurchases();
+
+      expect(restored, isTrue);
+      expect(provider.isPremium, isTrue);
+      expect(gateway.restoreCalls, 1);
+      expect(gateway.resyncCalls, 1);
+    });
+
     test('distinguishes user cancellation from a purchase failure', () async {
       final gateway = _FakeRevenueCatGateway(
         purchaseError: PlatformException(
@@ -318,4 +370,17 @@ class _FakeRevenueCatGateway implements RevenueCatGateway {
 class _TestPackage implements Package {
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _FakePlayStoreOwnershipGateway implements PlayStoreOwnershipGateway {
+  final bool isPremiumOwned;
+  int queryCalls = 0;
+
+  _FakePlayStoreOwnershipGateway({this.isPremiumOwned = false});
+
+  @override
+  Future<bool> hasActivePremiumPurchase() async {
+    queryCalls++;
+    return isPremiumOwned;
+  }
 }

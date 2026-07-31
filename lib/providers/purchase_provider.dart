@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../services/play_store_ownership_gateway.dart';
 import '../services/revenuecat_gateway.dart';
 
 enum PurchaseOutcome {
@@ -20,6 +21,7 @@ enum PurchaseOutcome {
 
 class PurchaseProvider extends ChangeNotifier {
   final RevenueCatGateway _revenueCat;
+  final PlayStoreOwnershipGateway _playStoreOwnership;
 
   late final Future<void> _initialization;
   late final StreamSubscription<String?> _authSubscription;
@@ -32,6 +34,8 @@ class PurchaseProvider extends ChangeNotifier {
   bool _isIdentitySyncInProgress = false;
   int _pendingIdentitySyncCount = 0;
   bool _isPurchaseInProgress = false;
+  bool _hasRevenueCatPremium = false;
+  bool _hasPlayStorePremium = false;
   bool _isPremium = false;
   bool _isDisposed = false;
   String? _lastError;
@@ -50,10 +54,13 @@ class PurchaseProvider extends ChangeNotifier {
 
   PurchaseProvider({
     RevenueCatGateway? revenueCat,
+    PlayStoreOwnershipGateway? playStoreOwnership,
     SupabaseClient? supabaseClient,
     Stream<String?>? userIdChanges,
     String? Function()? currentUserId,
-  }) : _revenueCat = revenueCat ?? PurchasesRevenueCatGateway() {
+  })  : _revenueCat = revenueCat ?? PurchasesRevenueCatGateway(),
+        _playStoreOwnership =
+            playStoreOwnership ?? MethodChannelPlayStoreOwnershipGateway() {
     final needsSupabase = userIdChanges == null || currentUserId == null;
     final auth = needsSupabase
         ? (supabaseClient ?? Supabase.instance.client).auth
@@ -86,6 +93,7 @@ class PurchaseProvider extends ChangeNotifier {
 
       await _synchronizeLatestIdentity();
       await _refreshCustomerState();
+      await _refreshPlayStoreOwnership();
       await _fetchOfferingsInternal();
     } catch (error, stackTrace) {
       _lastError = 'RevenueCat initialization error: $error';
@@ -103,7 +111,8 @@ class PurchaseProvider extends ChangeNotifier {
 
     // Never expose the previous account's entitlement while identities are
     // changing. The new CustomerInfo will restore premium if applicable.
-    _isPremium = false;
+    _hasRevenueCatPremium = false;
+    _recomputePremiumStatus();
     _pendingIdentitySyncCount++;
     _isIdentitySyncInProgress = true;
     _notifyListeners();
@@ -162,8 +171,28 @@ class PurchaseProvider extends ChangeNotifier {
   }
 
   void _applyCustomerState(RevenueCatCustomerState customerState) {
-    if (_isPremium == customerState.isPremium) return;
-    _isPremium = customerState.isPremium;
+    _hasRevenueCatPremium = customerState.isPremium;
+    _recomputePremiumStatus();
+  }
+
+  Future<bool> _refreshPlayStoreOwnership() async {
+    try {
+      _hasPlayStorePremium =
+          await _playStoreOwnership.hasActivePremiumPurchase();
+      _recomputePremiumStatus();
+      return _hasPlayStorePremium;
+    } catch (error, stackTrace) {
+      // RevenueCat remains the primary source of truth. A temporary Play
+      // connection failure must not revoke access that was already resolved.
+      debugPrint('Google Play ownership query error: $error\n$stackTrace');
+      return _hasPlayStorePremium;
+    }
+  }
+
+  void _recomputePremiumStatus() {
+    final nextValue = _hasRevenueCatPremium || _hasPlayStorePremium;
+    if (_isPremium == nextValue) return;
+    _isPremium = nextValue;
     _notifyListeners();
   }
 
@@ -252,8 +281,11 @@ class PurchaseProvider extends ChangeNotifier {
       }
 
       _applyCustomerState(customerState);
+      if (!customerState.isPremium) {
+        await _refreshPlayStoreOwnership();
+      }
       _lastError = null;
-      return customerState.isPremium
+      return _isPremium
           ? PurchaseOutcome.restored
           : PurchaseOutcome.alreadyOwnedButInactive;
     } catch (error, stackTrace) {
@@ -291,10 +323,16 @@ class PurchaseProvider extends ChangeNotifier {
 
   Future<bool> _restorePurchasesInternal() async {
     try {
-      final customerState = await _revenueCat.restorePurchases();
+      var customerState = await _revenueCat.restorePurchases();
+      if (!customerState.isPremium) {
+        customerState = await _revenueCat.resyncPurchases();
+      }
       _applyCustomerState(customerState);
+      if (!customerState.isPremium) {
+        await _refreshPlayStoreOwnership();
+      }
       _lastError = null;
-      return customerState.isPremium;
+      return _isPremium;
     } catch (error, stackTrace) {
       _lastError = 'RevenueCat restore error: $error';
       debugPrint('$_lastError\n$stackTrace');
