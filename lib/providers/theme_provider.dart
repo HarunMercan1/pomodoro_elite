@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/app_colors.dart';
@@ -66,8 +68,6 @@ class ThemeStateColors {
 /// Ana tema modeli
 class AppTheme {
   final String id;
-  final String name;
-  final String vibe;
   final ThemeStateColors idle; // Boşta
   final ThemeStateColors focus; // Odaklanma
   final ThemeStateColors breakState; // Mola
@@ -82,8 +82,6 @@ class AppTheme {
 
   const AppTheme({
     required this.id,
-    required this.name,
-    required this.vibe,
     required this.idle,
     required this.focus,
     required this.breakState,
@@ -121,8 +119,6 @@ class AppThemes {
     // ============================================================
     AppTheme(
       id: 'elite',
-      name: 'Elite',
-      vibe: 'Orijinal, Klasik',
       isLocked: false,
       settingsCardColor: Color(0xFF202020),
       settingsBorderColor: Color(0x0FFFFFFF), // White with 0.06 opacity
@@ -182,8 +178,6 @@ class AppThemes {
     // ============================================================
     AppTheme(
       id: 'classic_elite',
-      name: 'Klasik',
-      vibe: 'Güven, Sade',
       // 🔥 Ayarlar ekranı renkleri - Açık mavi tonlarında
       settingsBgColor: Color(0xFFE3F2FD), // Açık mavi-beyaz arka plan
       settingsCardColor: Color(0xFFBBDEFB), // Açık mavi kart (beyaz-mavi arası)
@@ -249,8 +243,6 @@ class AppThemes {
     // ============================================================
     AppTheme(
       id: 'stranger_things',
-      name: 'Stranger Things',
-      vibe: 'Gerilim, Gizem, 80ler',
       settingsCardColor: Color(0xFF1A0000),
       settingsBorderColor: Color(0x33B71C1C), // Deep red with opacity
       idle: ThemeStateColors(
@@ -306,8 +298,6 @@ class AppThemes {
     // ============================================================
     AppTheme(
       id: 'heisenberg',
-      name: 'Heisenberg',
-      vibe: 'Kristal Mavi, Sarı Tulum',
       settingsBgColor: Color(0xFF00363A), // Daha Koyu Teal (Zemin)
       settingsCardColor: Color(0xFF005662), // Ayırt edilebilir Teal (Kart)
       settingsBorderColor: Color(0xFF00E676), // Neon Yeşil Border (Vurgu)
@@ -371,8 +361,6 @@ class AppThemes {
     // ============================================================
     AppTheme(
       id: 'deep_ocean',
-      name: 'Deep Ocean',
-      vibe: 'Derinlik, Odak',
       settingsBgColor: Color(0xFF000A12), // Neredeyse Siyah Lacivert (Zemin)
       settingsCardColor: Color(0xFF011E32), // Koyu Lacivert (Kart)
       settingsBorderColor: Color(0xFF00E5FF), // Neon Turkuaz (Border)
@@ -434,8 +422,6 @@ class AppThemes {
     // ============================================================
     AppTheme(
       id: 'mystic_forest',
-      name: 'Mystic Forest',
-      vibe: 'Doğa, Huzur',
       settingsBgColor: Color(0xFF0D2111), // Çok koyu zemin
       settingsCardColor: Color(0xFF1B5E20), // Belirgin Orman Yeşili Kart
       settingsBorderColor: Color(0xFF76FF03), // Canlı Yeşil Border
@@ -498,8 +484,6 @@ class AppThemes {
     // ============================================================
     AppTheme(
       id: 'cyberpunk',
-      name: 'Cyberpunk 2077',
-      vibe: 'Neon, Gelecek',
       settingsBgColor: Color(0xFF000000), // Tam Siyah (Zemin)
       settingsCardColor: Color(0xFF1A1A1A), // Koyu Gri (Kart)
       settingsBorderColor: Color(0xFFD500F9), // Neon Pembe Border
@@ -562,8 +546,6 @@ class AppThemes {
     // ============================================================
     AppTheme(
       id: 'royal_gold',
-      name: 'Royal Gold',
-      vibe: 'Lüks, Başarı',
       settingsBgColor: Color(0xFF000000), // Mat Siyah Zemin
       settingsCardColor: Color(0xFF1C1C1C), // Koyu Gri Kart
       settingsBorderColor: Color(0xFFFFD700), // Altın Border
@@ -626,8 +608,6 @@ class AppThemes {
     // ============================================================
     AppTheme(
       id: 'sunset_lofi',
-      name: 'Sunset Lofi',
-      vibe: 'Estetik, Chill',
       settingsBgColor: Color(0xFF1A0520), // Çok Koyu Mürdüm (Zemin)
       settingsCardColor: Color(0xFF38006B), // Ayrık Mor Kart
       settingsBorderColor: Color(0xFFFF6D00), // Turuncu Border
@@ -686,8 +666,6 @@ class AppThemes {
     // ============================================================
     AppTheme(
       id: 'nordic_snow',
-      name: 'Nordic Snow',
-      vibe: 'Buz, Ferahlık',
       settingsBgColor: Color(0xFF0A1929), // Koyu lacivert (zemin)
       settingsCardColor: Color(0xFF1E3A5F), // Koyu buz mavisi (kart)
       settingsBorderColor: Color(0xFF4FC3F7), // Parlak buz mavisi (border)
@@ -752,8 +730,6 @@ class AppThemes {
     // ============================================================
     AppTheme(
       id: 'volcano',
-      name: 'Volcano',
-      vibe: 'Yüksek Enerji',
       settingsBgColor:
           Color(0xFF1B1B1B), // Koyu Kül Grisi (Zemin - Kırmızı Değil!)
       settingsCardColor: Color(0xFF2D1E1E), // Hafif Kızıl Kahve Gri (Kart)
@@ -822,8 +798,12 @@ class AppThemes {
 /// Tema ve Durum Yöneticisi
 class ThemeProvider with ChangeNotifier {
   late SharedPreferences _prefs;
+  late final Future<void> _initialization;
 
   String _currentThemeId = 'elite';
+  bool _hasPremiumAccess = false;
+  bool _hasResolvedPremiumStatus = false;
+  bool _themeDataLoaded = false;
   // 🔥 Kalıcı ücretsiz temalar
   static const Set<String> _permanentlyFreeThemes = {'elite', 'classic_elite'};
 
@@ -835,7 +815,7 @@ class ThemeProvider with ChangeNotifier {
   TimerState _timerState = TimerState.idle;
 
   ThemeProvider() {
-    _loadThemeData();
+    _initialization = _loadThemeData();
   }
 
   // ============================================================
@@ -843,8 +823,35 @@ class ThemeProvider with ChangeNotifier {
   // ============================================================
 
   String get currentThemeId => _currentThemeId;
+  bool get hasPremiumAccess => _hasPremiumAccess;
+  Future<void> get initialized => _initialization;
   AppTheme get currentTheme => AppThemes.getById(_currentThemeId);
   TimerState get timerState => _timerState;
+
+  /// RevenueCat premium durumunu tema erişimiyle senkronize eder.
+  ///
+  /// İlk kesin sonuç ayrıca tutulur; daha sonraki satın alma/geri yükleme
+  /// işlemleri sırasında oluşan geçici loading durumu seçili temayı sıfırlamaz.
+  void updatePremiumStatus({
+    required bool isPremium,
+    required bool isLoading,
+  }) {
+    final premiumStatusChanged = _hasPremiumAccess != isPremium;
+    _hasPremiumAccess = isPremium;
+
+    if (!isLoading) {
+      _hasResolvedPremiumStatus = true;
+    }
+
+    var selectedThemeChanged = false;
+    if (_themeDataLoaded && _hasResolvedPremiumStatus && !isLoading) {
+      selectedThemeChanged = _resetCurrentThemeIfUnavailable();
+    }
+
+    if (premiumStatusChanged || selectedThemeChanged) {
+      notifyListeners();
+    }
+  }
 
   /// Mevcut durumun renk paleti
   ThemeStateColors get stateColors => currentTheme.getStateColors(_timerState);
@@ -936,6 +943,11 @@ class ThemeProvider with ChangeNotifier {
     return DateTime.now().isBefore(expiry);
   }
 
+  /// Tema geçici olarak açıksa veya kullanıcı premium ise erişilebilir.
+  bool isThemeAvailable(String themeId) {
+    return _hasPremiumAccess || isThemeUnlocked(themeId);
+  }
+
   /// 🔥 Belirli bir tema için kalan süre
   Duration getRemainingTimeForTheme(String themeId) {
     final expiry = _themeUnlockExpiry[themeId];
@@ -977,17 +989,20 @@ class ThemeProvider with ChangeNotifier {
       }
     }
 
-    // Eğer kullanıcının mevcut teması süresi dolmuşsa, varsayılana dön
-    if (!isThemeUnlocked(_currentThemeId)) {
-      _currentThemeId = 'elite';
-      await _prefs.setString('current_theme', 'elite');
+    _themeDataLoaded = true;
+
+    // RevenueCat sonucu beklenirken kayıtlı premium temayı yanlışlıkla silme.
+    if (_hasResolvedPremiumStatus) {
+      _resetCurrentThemeIfUnavailable();
     }
 
     notifyListeners();
   }
 
   Future<void> selectTheme(String themeId) async {
-    if (!isThemeUnlocked(themeId)) {
+    await _initialization;
+
+    if (!isThemeAvailable(themeId)) {
       debugPrint('❌ Tema kilidi açık değil: $themeId');
       return;
     }
@@ -999,8 +1014,20 @@ class ThemeProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  bool _resetCurrentThemeIfUnavailable() {
+    if (isThemeAvailable(_currentThemeId)) return false;
+
+    _currentThemeId = 'elite';
+    // Bellekteki değer senkron değişir; disk yazımı provider ağacındaki
+    // entitlement yayılımını bekletmek zorunda değildir.
+    unawaited(_prefs.setString('current_theme', 'elite'));
+    return true;
+  }
+
   /// 🔥 Belirli bir temayı 72 saat boyunca aç
   Future<void> unlockTheme(String themeId) async {
+    await _initialization;
+
     final expiry = DateTime.now().add(Duration(hours: _unlockDurationHours));
     _themeUnlockExpiry[themeId] = expiry;
     await _prefs.setString('theme_unlock_$themeId', expiry.toIso8601String());

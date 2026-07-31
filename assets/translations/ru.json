@@ -25,6 +25,7 @@
   "background_music": "МУЗЫКА КОНЦЕНТРАЦИИ",
   "enable_music": "Фоновая Музыка",
   "notification_sound": "ЗВУК УВЕДОМЛЕНИЯ",
+  "notification_channel_description": "Уведомления о завершении таймера в фоновом режиме",
   "music_lock_msg": "Остановите таймер, чтобы изменить музыку.",
   "stats_title": "Статистика",
   "total_focus": "Общий Фокус",
@@ -174,6 +175,7 @@
   "theme_elite": "Элит",
   "theme_applied": "применена!",
   "theme_unlocked": "разблокирована!",
+  "theme_unlocked_72h": "разблокировано на 72 часа!",
   "unlock_theme_msg": "Посмотрите короткое видео или получите Premium, чтобы разблокировать эту тему.",
   "watch_ad": "Смотреть Рекламу",
   "recommended_sound": "Рекомендуемый",
@@ -215,7 +217,7 @@
   "log_out_title": "Выйти?",
   "exit_guest_mode_title": "Выйти из гостевого режима?",
   "log_out_confirm": "Вы уверены, что хотите выйти?",
-  "focus_grow_achieve": "Focus. Grow. Achieve.",
+  "focus_grow_achieve": "Сосредоточься. Развивайся. Достигай.",
   "sign_in_error": "Ошибка входа. Попробуйте снова.",
   "premium_active": "💎 Вы - Premium пользователь",
   "get_premium": "💎 Перейти Премиум",
@@ -241,8 +243,10 @@
   "ok_btn": "Хорошо",
   "premium_subtitle": "Удалить рекламу, разблокировать темы",
   "star_supporter": "Звездный спонсор",
-  "super_star_supporter": "Супер Звездный спонсор",
+  "super_supporter": "Супер-спонсор",
+  "mega_supporter": "Мега-спонсор",
   "login_required": "Требуется вход",
   "premium_login_required_desc": "Пожалуйста, войдите в свою учетную запись, чтобы приобрести или использовать функции Premium.",
-  "unlock_premium": "Разблокировать Premium"
+  "unlock_premium": "Разблокировать Premium",
+  "privacy_options": "Настройки конфиденциальности"
 }

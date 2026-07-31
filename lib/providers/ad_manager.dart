@@ -1,341 +1,325 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+
 import '../utils/ad_helper.dart';
 
-/// Banner reklamları yöneten provider.
-/// Her ekran için ayrı BannerAd nesnesi oluşturulur.
 class AdManager extends ChangeNotifier {
   bool _isPremium = false;
+  bool _adServingAllowed = false;
+  bool _disposed = false;
 
-  void updatePremiumStatus(bool isPremium) {
-    _isPremium = isPremium;
-    if (isPremium) {
-      disposeSettingsBanner();
-      disposeDurationBanner();
-      disposeSoundBanner();
-    }
-  }
-  // Settings ekranı için banner
+  bool get _canLoadAds => !_isPremium && _adServingAllowed && !_disposed;
+
   BannerAd? _settingsBannerAd;
-  bool _isSettingsBannerLoaded = false;
-
-  // Duration Settings ekranı için banner
   BannerAd? _durationBannerAd;
-  bool _isDurationBannerLoaded = false;
-
-  // Sound Settings ekranı için banner
   BannerAd? _soundBannerAd;
+  bool _isSettingsBannerLoaded = false;
+  bool _isDurationBannerLoaded = false;
   bool _isSoundBannerLoaded = false;
-
   AdSize? _adSize;
 
-  // Settings banner getter'ları
+  RewardedAd? _rewardedAd;
+  bool _isRewardedAdReady = false;
+  bool _isRewardedAdLoading = false;
+
+  InterstitialAd? _interstitialAd;
+  bool _isInterstitialAdReady = false;
+  bool _isInterstitialAdLoading = false;
+  int _pomodorosSinceLastAd = 0;
+
   BannerAd? get settingsBannerAd => _settingsBannerAd;
   bool get isSettingsBannerLoaded => _isSettingsBannerLoaded;
-
-  // Duration banner getter'ları
   BannerAd? get durationBannerAd => _durationBannerAd;
   bool get isDurationBannerLoaded => _isDurationBannerLoaded;
-
-  // Sound banner getter'ları
   BannerAd? get soundBannerAd => _soundBannerAd;
   bool get isSoundBannerLoaded => _isSoundBannerLoaded;
-
   AdSize? get adSize => _adSize;
+  bool get isRewardedAdReady => _isRewardedAdReady;
+  bool get isInterstitialAdReady => _isInterstitialAdReady;
 
-  /// Ayarlar sayfası için adaptive banner reklamı yükler.
+  void updatePremiumStatus(bool isPremium) {
+    if (_isPremium == isPremium) return;
+    _isPremium = isPremium;
+    if (isPremium) _disposeAllAds();
+  }
+
+  void updateAdServingAllowed(bool allowed) {
+    if (_adServingAllowed == allowed) return;
+    _adServingAllowed = allowed;
+    if (!allowed) _disposeAllAds();
+  }
+
   Future<void> loadSettingsBanner(double width) async {
-    if (_isPremium) return;
-    if (_settingsBannerAd != null) return;
+    if (!_canLoadAds || _settingsBannerAd != null) return;
 
-    debugPrint('🔄 Settings Banner yükleniyor... (width: $width)');
-
-    final AdSize? adaptiveSize = await AdSize.getAnchoredAdaptiveBannerAdSize(
+    final adaptiveSize = await AdSize.getAnchoredAdaptiveBannerAdSize(
       Orientation.portrait,
       width.truncate(),
     );
+    if (!_canLoadAds) return;
 
     _adSize = adaptiveSize ?? AdSize.banner;
-
-    _settingsBannerAd = BannerAd(
+    late final BannerAd banner;
+    banner = BannerAd(
       adUnitId: AdHelper.bannerAdUnitId,
       size: _adSize!,
       request: const AdRequest(),
       listener: BannerAdListener(
-        onAdLoaded: (ad) {
-          debugPrint('✅ Settings Banner yüklendi');
+        onAdLoaded: (_) {
+          if (!_canLoadAds || _settingsBannerAd != banner) {
+            banner.dispose();
+            if (_settingsBannerAd == banner) _settingsBannerAd = null;
+            return;
+          }
           _isSettingsBannerLoaded = true;
-          notifyListeners();
+          _safeNotify();
         },
-        onAdFailedToLoad: (ad, error) {
-          debugPrint('❌ Settings Banner yüklenemedi: ${error.message}');
-          ad.dispose();
-          _settingsBannerAd = null;
+        onAdFailedToLoad: (_, error) {
+          debugPrint('Settings banner yüklenemedi: ${error.message}');
+          banner.dispose();
+          if (_settingsBannerAd == banner) _settingsBannerAd = null;
           _isSettingsBannerLoaded = false;
-          notifyListeners();
+          _safeNotify();
         },
       ),
     );
-    _settingsBannerAd!.load();
+    _settingsBannerAd = banner;
+    await banner.load();
   }
 
-  /// Süre ayarları sayfası için büyük banner (medium rectangle) reklamı yükler.
   Future<void> loadDurationBanner(double width) async {
-    if (_isPremium) return;
-    if (_durationBannerAd != null) return;
-
-    debugPrint('🔄 Duration Banner yükleniyor... (width: $width)');
-
-    // Büyük boyutlu banner (300x250)
-    final size = AdSize.mediumRectangle;
-
-    _durationBannerAd = BannerAd(
+    if (!_canLoadAds || _durationBannerAd != null) return;
+    late final BannerAd banner;
+    banner = BannerAd(
       adUnitId: AdHelper.largeBannerAdUnitId,
-      size: size,
+      size: AdSize.mediumRectangle,
       request: const AdRequest(),
       listener: BannerAdListener(
-        onAdLoaded: (ad) {
-          debugPrint('✅ Duration Banner yüklendi');
+        onAdLoaded: (_) {
+          if (!_canLoadAds || _durationBannerAd != banner) {
+            banner.dispose();
+            if (_durationBannerAd == banner) _durationBannerAd = null;
+            return;
+          }
           _isDurationBannerLoaded = true;
-          notifyListeners();
+          _safeNotify();
         },
-        onAdFailedToLoad: (ad, error) {
-          debugPrint('❌ Duration Banner yüklenemedi: ${error.message}');
-          ad.dispose();
-          _durationBannerAd = null;
+        onAdFailedToLoad: (_, error) {
+          debugPrint('Duration banner yüklenemedi: ${error.message}');
+          banner.dispose();
+          if (_durationBannerAd == banner) _durationBannerAd = null;
           _isDurationBannerLoaded = false;
-          notifyListeners();
+          _safeNotify();
         },
       ),
     );
-    _durationBannerAd!.load();
+    _durationBannerAd = banner;
+    await banner.load();
   }
 
-  /// Settings banner'ını manuel olarak temizle
-  void disposeSettingsBanner() {
-    _settingsBannerAd?.dispose();
-    _settingsBannerAd = null;
-    _isSettingsBannerLoaded = false;
-    Future.microtask(() => notifyListeners());
-  }
-
-  /// Duration banner'ını manuel olarak temizle
-  void disposeDurationBanner() {
-    _durationBannerAd?.dispose();
-    _durationBannerAd = null;
-    _isDurationBannerLoaded = false;
-    Future.microtask(() => notifyListeners());
-  }
-
-  /// Ses ayarları sayfası için büyük banner (medium rectangle) reklamı yükler.
   Future<void> loadSoundBanner(double width) async {
-    if (_isPremium) return;
-    if (_soundBannerAd != null) return;
-
-    debugPrint('🔄 Sound Banner yükleniyor... (width: $width)');
-
-    // Büyük boyutlu banner (300x250)
-    final size = AdSize.mediumRectangle;
-
-    _soundBannerAd = BannerAd(
+    if (!_canLoadAds || _soundBannerAd != null) return;
+    late final BannerAd banner;
+    banner = BannerAd(
       adUnitId: AdHelper.largeBannerAdUnitId,
-      size: size,
+      size: AdSize.mediumRectangle,
       request: const AdRequest(),
       listener: BannerAdListener(
-        onAdLoaded: (ad) {
-          debugPrint('✅ Sound Banner yüklendi');
+        onAdLoaded: (_) {
+          if (!_canLoadAds || _soundBannerAd != banner) {
+            banner.dispose();
+            if (_soundBannerAd == banner) _soundBannerAd = null;
+            return;
+          }
           _isSoundBannerLoaded = true;
-          notifyListeners();
+          _safeNotify();
         },
-        onAdFailedToLoad: (ad, error) {
-          debugPrint('❌ Sound Banner yüklenemedi: ${error.message}');
-          ad.dispose();
-          _soundBannerAd = null;
+        onAdFailedToLoad: (_, error) {
+          debugPrint('Sound banner yüklenemedi: ${error.message}');
+          banner.dispose();
+          if (_soundBannerAd == banner) _soundBannerAd = null;
           _isSoundBannerLoaded = false;
-          notifyListeners();
+          _safeNotify();
         },
       ),
     );
-    _soundBannerAd!.load();
+    _soundBannerAd = banner;
+    await banner.load();
   }
 
-  /// Sound banner'ını manuel olarak temizle
-  void disposeSoundBanner() {
-    _soundBannerAd?.dispose();
-    _soundBannerAd = null;
-    _isSoundBannerLoaded = false;
-    Future.microtask(() => notifyListeners());
-  }
-
-  // ============================================================
-  // 🎁 REWARDED ADS (Tema kilidi için)
-  // ============================================================
-
-  RewardedAd? _rewardedAd;
-  bool _isRewardedAdReady = false;
-
-  bool get isRewardedAdReady => _isRewardedAdReady;
-
-  /// Rewarded reklam yükle
   void loadRewardedAd() {
-    debugPrint('🔄 Rewarded Ad yükleniyor...');
-
+    if (!_canLoadAds || _rewardedAd != null || _isRewardedAdLoading) return;
+    _isRewardedAdLoading = true;
     RewardedAd.load(
       adUnitId: AdHelper.rewardedAdUnitId,
       request: const AdRequest(),
       rewardedAdLoadCallback: RewardedAdLoadCallback(
         onAdLoaded: (ad) {
-          debugPrint('✅ Rewarded Ad yüklendi');
+          _isRewardedAdLoading = false;
+          if (!_canLoadAds) {
+            ad.dispose();
+            return;
+          }
           _rewardedAd = ad;
           _isRewardedAdReady = true;
-          notifyListeners();
+          _safeNotify();
         },
         onAdFailedToLoad: (error) {
-          debugPrint('❌ Rewarded Ad yüklenemedi: ${error.message}');
-          _rewardedAd = null;
+          debugPrint('Rewarded ad yüklenemedi: ${error.message}');
+          _isRewardedAdLoading = false;
           _isRewardedAdReady = false;
-          notifyListeners();
+          _safeNotify();
         },
       ),
     );
   }
 
-  /// Rewarded reklam göster ve ödül callback'i çalıştır
   Future<bool> showRewardedAd({
     required VoidCallback onRewardEarned,
     VoidCallback? onAdDismissed,
   }) async {
-    if (_rewardedAd == null) {
-      debugPrint('⚠️ Rewarded Ad hazır değil, yükleniyor...');
+    if (!_canLoadAds) return false;
+    final ad = _rewardedAd;
+    if (ad == null) {
       loadRewardedAd();
       return false;
     }
 
-    _rewardedAd!.fullScreenContentCallback = FullScreenContentCallback(
-      onAdShowedFullScreenContent: (ad) {
-        debugPrint('📺 Rewarded Ad gösterildi');
-      },
-      onAdDismissedFullScreenContent: (ad) {
-        debugPrint('👋 Rewarded Ad kapatıldı');
-        ad.dispose();
-        _rewardedAd = null;
-        _isRewardedAdReady = false;
-        loadRewardedAd(); // Sonraki için yeni reklam yükle
-        onAdDismissed?.call();
-        notifyListeners();
-      },
-      onAdFailedToShowFullScreenContent: (ad, error) {
-        debugPrint('❌ Rewarded Ad gösterilemedi: ${error.message}');
-        ad.dispose();
-        _rewardedAd = null;
-        _isRewardedAdReady = false;
+    _rewardedAd = null;
+    _isRewardedAdReady = false;
+    ad.fullScreenContentCallback = FullScreenContentCallback(
+      onAdDismissedFullScreenContent: (shownAd) {
+        shownAd.dispose();
         loadRewardedAd();
-        notifyListeners();
+        onAdDismissed?.call();
+        _safeNotify();
+      },
+      onAdFailedToShowFullScreenContent: (shownAd, error) {
+        debugPrint('Rewarded ad gösterilemedi: ${error.message}');
+        shownAd.dispose();
+        loadRewardedAd();
+        _safeNotify();
       },
     );
-
-    await _rewardedAd!.show(
-      onUserEarnedReward: (ad, reward) {
-        debugPrint('🎁 Ödül kazanıldı: ${reward.amount} ${reward.type}');
-        onRewardEarned();
-      },
-    );
-
+    ad.show(onUserEarnedReward: (_, __) => onRewardEarned());
     return true;
   }
 
-  // ============================================================
-  // 🎬 INTERSTITIAL ADS (Pomodoro sonrası)
-  // ============================================================
-
-  InterstitialAd? _interstitialAd;
-  bool _isInterstitialAdReady = false;
-  int _pomodorosSinceLastAd = 0;
-
-  bool get isInterstitialAdReady => _isInterstitialAdReady;
-
-  /// Interstitial reklam yükle
   void loadInterstitialAd() {
-    if (_isPremium) return;
-    debugPrint('🔄 Interstitial Ad yükleniyor...');
-
+    if (!_canLoadAds || _interstitialAd != null || _isInterstitialAdLoading) {
+      return;
+    }
+    _isInterstitialAdLoading = true;
     InterstitialAd.load(
       adUnitId: AdHelper.interstitialAdUnitId,
       request: const AdRequest(),
       adLoadCallback: InterstitialAdLoadCallback(
         onAdLoaded: (ad) {
-          debugPrint('✅ Interstitial Ad yüklendi');
+          _isInterstitialAdLoading = false;
+          if (!_canLoadAds) {
+            ad.dispose();
+            return;
+          }
           _interstitialAd = ad;
           _isInterstitialAdReady = true;
-          notifyListeners();
+          _safeNotify();
         },
         onAdFailedToLoad: (error) {
-          debugPrint('❌ Interstitial Ad yüklenemedi: ${error.message}');
-          _interstitialAd = null;
+          debugPrint('Interstitial ad yüklenemedi: ${error.message}');
+          _isInterstitialAdLoading = false;
           _isInterstitialAdReady = false;
-          notifyListeners();
+          _safeNotify();
         },
       ),
     );
   }
 
-  /// Pomodoro tamamlandığında çağır
-  /// Her 3-4 pomodorodan sonra reklam gösterir
   Future<void> onPomodoroCompleted() async {
-    if (_isPremium) return;
-    
+    if (!_canLoadAds) return;
     _pomodorosSinceLastAd++;
-    debugPrint('🍅 Pomodoro sayısı: $_pomodorosSinceLastAd');
-
-    // Her 2 pomodorodan sonra reklam göster
     if (_pomodorosSinceLastAd >= 2) {
-      await showInterstitialAd();
-      _pomodorosSinceLastAd = 0;
+      final shown = await showInterstitialAd();
+      if (shown) _pomodorosSinceLastAd = 0;
     }
   }
 
-  /// Interstitial reklam göster
   Future<bool> showInterstitialAd() async {
-    if (_isPremium) return false;
-    
-    if (_interstitialAd == null) {
-      debugPrint('⚠️ Interstitial Ad hazır değil');
+    if (!_canLoadAds) return false;
+    final ad = _interstitialAd;
+    if (ad == null) {
       loadInterstitialAd();
       return false;
     }
 
-    _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
-      onAdShowedFullScreenContent: (ad) {
-        debugPrint('📺 Interstitial Ad gösterildi');
-      },
-      onAdDismissedFullScreenContent: (ad) {
-        debugPrint('👋 Interstitial Ad kapatıldı');
-        ad.dispose();
-        _interstitialAd = null;
-        _isInterstitialAdReady = false;
-        loadInterstitialAd(); // Sonraki için yükle
-        notifyListeners();
-      },
-      onAdFailedToShowFullScreenContent: (ad, error) {
-        debugPrint('❌ Interstitial Ad gösterilemedi: ${error.message}');
-        ad.dispose();
-        _interstitialAd = null;
-        _isInterstitialAdReady = false;
+    _interstitialAd = null;
+    _isInterstitialAdReady = false;
+    ad.fullScreenContentCallback = FullScreenContentCallback(
+      onAdDismissedFullScreenContent: (shownAd) {
+        shownAd.dispose();
         loadInterstitialAd();
-        notifyListeners();
+        _safeNotify();
+      },
+      onAdFailedToShowFullScreenContent: (shownAd, error) {
+        debugPrint('Interstitial ad gösterilemedi: ${error.message}');
+        shownAd.dispose();
+        loadInterstitialAd();
+        _safeNotify();
       },
     );
-
-    await _interstitialAd!.show();
+    ad.show();
     return true;
+  }
+
+  void disposeSettingsBanner() {
+    _settingsBannerAd?.dispose();
+    _settingsBannerAd = null;
+    _isSettingsBannerLoaded = false;
+    _safeNotify();
+  }
+
+  void disposeDurationBanner() {
+    _durationBannerAd?.dispose();
+    _durationBannerAd = null;
+    _isDurationBannerLoaded = false;
+    _safeNotify();
+  }
+
+  void disposeSoundBanner() {
+    _soundBannerAd?.dispose();
+    _soundBannerAd = null;
+    _isSoundBannerLoaded = false;
+    _safeNotify();
+  }
+
+  void _disposeAllAds() {
+    _settingsBannerAd?.dispose();
+    _durationBannerAd?.dispose();
+    _soundBannerAd?.dispose();
+    _rewardedAd?.dispose();
+    _interstitialAd?.dispose();
+    _settingsBannerAd = null;
+    _durationBannerAd = null;
+    _soundBannerAd = null;
+    _rewardedAd = null;
+    _interstitialAd = null;
+    _isSettingsBannerLoaded = false;
+    _isDurationBannerLoaded = false;
+    _isSoundBannerLoaded = false;
+    _isRewardedAdReady = false;
+    _isRewardedAdLoading = false;
+    _isInterstitialAdReady = false;
+    _isInterstitialAdLoading = false;
+    _safeNotify();
+  }
+
+  void _safeNotify() {
+    if (!_disposed) notifyListeners();
   }
 
   @override
   void dispose() {
-    disposeSettingsBanner();
-    disposeDurationBanner();
-    _rewardedAd?.dispose();
-    _interstitialAd?.dispose();
+    _disposed = true;
+    _disposeAllAds();
     super.dispose();
   }
 }

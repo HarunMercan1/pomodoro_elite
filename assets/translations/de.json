@@ -25,6 +25,7 @@
   "background_music": "FOKUS-MUSIK",
   "enable_music": "Hintergrundmusik",
   "notification_sound": "BENACHRICHTIGUNGSTON",
+  "notification_channel_description": "Benachrichtigungen, wenn ein Timer im Hintergrund endet",
   "music_lock_msg": "Stoppe den Timer, um die Musik zu ändern.",
   "stats_title": "Statistiken",
   "total_focus": "Gesamtfokus",
@@ -174,6 +175,7 @@
   "theme_elite": "Elite",
   "theme_applied": "angewendet!",
   "theme_unlocked": "freigeschaltet!",
+  "theme_unlocked_72h": "für 72 Stunden freigeschaltet!",
   "unlock_theme_msg": "Schauen Sie sich ein kurzes Video an oder holen Sie sich Premium, um dieses Design freizuschalten.",
   "watch_ad": "Werbung ansehen",
   "recommended_sound": "Empfohlen",
@@ -215,7 +217,7 @@
   "log_out_title": "Abmelden?",
   "exit_guest_mode_title": "Gastmodus verlassen?",
   "log_out_confirm": "Sind Sie sicher, dass Sie sich abmelden wollen?",
-  "focus_grow_achieve": "Focus. Grow. Achieve.",
+  "focus_grow_achieve": "Fokussieren. Wachsen. Erreichen.",
   "sign_in_error": "Anmeldung fehlgeschlagen. Bitte versuchen Sie es erneut.",
   "premium_active": "💎 Sie sind ein Premium-Benutzer",
   "get_premium": "💎 Gehen Sie Premium",
@@ -241,8 +243,10 @@
   "ok_btn": "OK",
   "premium_subtitle": "Werbung entfernen, Themen freischalten",
   "star_supporter": "Sterne-Unterstützer",
-  "super_star_supporter": "Super-Sterne-Unterstützer",
+  "super_supporter": "Super-Unterstützer",
+  "mega_supporter": "Mega-Unterstützer",
   "login_required": "Anmeldung Erforderlich",
   "premium_login_required_desc": "Bitte melden Sie sich an, um Premium-Funktionen zu kaufen oder zu nutzen.",
-  "unlock_premium": "Premium Freischalten"
+  "unlock_premium": "Premium Freischalten",
+  "privacy_options": "Datenschutzoptionen"
 }

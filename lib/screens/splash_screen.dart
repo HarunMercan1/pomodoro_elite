@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:in_app_update/in_app_update.dart';
+import 'package:provider/provider.dart';
+import '../services/ad_consent_service.dart';
 import '../utils/notification_service.dart';
 import '../utils/app_fonts.dart';
 import 'auth_wrapper.dart';
@@ -40,13 +42,21 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller.forward();
 
-    _initApp(); // Yüklemeleri başlat
+    // UMP formunun görünür bir Activity üzerinde açılması için ilk frame'i bekle.
+    WidgetsBinding.instance.addPostFrameCallback((_) => _initApp());
   }
 
   // --- HATA KORUMALI BAŞLATMA ---
   Future<void> _initApp() async {
+    final adConsentService = context.read<AdConsentService>();
     // 🔥 Önce zorunlu güncellemeleri kontrol et
     await _checkForUpdate();
+
+    try {
+      await adConsentService.gatherConsent();
+    } catch (e) {
+      debugPrint('UMP izin hatası: $e');
+    }
 
     try {
       await NotificationService().init();

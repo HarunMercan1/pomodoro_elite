@@ -1,195 +1,132 @@
 import 'dart:async';
 import 'dart:math';
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
+
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
+
+import '../services/countdown_engine.dart';
+import '../services/timer_audio_gateway.dart';
 import '../utils/notification_service.dart';
 import 'settings_provider.dart';
 import 'stats_provider.dart';
 
 enum TimerMode { work, shortBreak, longBreak }
 
+typedef PeriodicTimerFactory = Timer Function(
+  Duration duration,
+  void Function(Timer timer) callback,
+);
+typedef TimerTextResolver = String Function(String key);
+
+class TimerRunConfiguration {
+  final String notificationSound;
+  final bool isBackgroundMusicEnabled;
+  final double backgroundVolume;
+  final Future<String?> Function()? resolveMusicFilePath;
+  final Future<void> Function(int minutes) recordSession;
+
+  const TimerRunConfiguration({
+    required this.notificationSound,
+    required this.isBackgroundMusicEnabled,
+    required this.backgroundVolume,
+    required this.recordSession,
+    this.resolveMusicFilePath,
+  });
+}
+
 class TimerProvider with ChangeNotifier, WidgetsBindingObserver {
   static const int defaultWorkTime = 25;
 
-  int _remainingSeconds = defaultWorkTime * 60;
+  final CountdownEngine _countdown;
+  final TimerNotificationGateway _notifications;
+  final TimerAudioGateway _audio;
+  final PeriodicTimerFactory _periodicTimerFactory;
+  final TimerTextResolver _resolveText;
+  final bool _observeLifecycle;
+
   int _selectedTimeInMinutes = defaultWorkTime;
   TimerMode _currentMode = TimerMode.work;
-  String _currentMotivation = "start_message";
-  DateTime? _backgroundExitTime; // Arkaplana giriş zamanı
-
+  String _currentMotivation = 'start_message';
   Timer? _timer;
-  bool _isRunning = false;
+  TimerRunConfiguration? _activeRunConfiguration;
   bool _isAlarmPlaying = false;
+  bool _completionHandled = false;
+  bool _isInBackground = false;
+  bool _hasScheduledNotification = false;
+  bool _isDisposed = false;
+  int _notificationGeneration = 0;
   int _completedRounds = 0;
 
-  final AudioPlayer _alarmPlayer = AudioPlayer();
-  final AudioPlayer _musicPlayer = AudioPlayer();
-
-  // Arka plan tamamlanma mantığı için provider referansları
-  SettingsProvider? _lastSettings;
-  StatsProvider? _lastStats;
-
-  TimerProvider() {
-    WidgetsBinding.instance.addObserver(this);
+  TimerProvider({
+    CountdownEngine? countdown,
+    TimerNotificationGateway? notifications,
+    TimerAudioGateway? audio,
+    PeriodicTimerFactory? periodicTimerFactory,
+    TimerTextResolver? textResolver,
+    bool observeLifecycle = true,
+  })  : _countdown =
+            countdown ?? CountdownEngine(initialSeconds: defaultWorkTime * 60),
+        _notifications = notifications ?? NotificationService(),
+        _audio = audio ?? AudioPlayersTimerAudioGateway(),
+        _periodicTimerFactory = periodicTimerFactory ?? Timer.periodic,
+        _resolveText = textResolver ?? ((key) => key.tr()),
+        _observeLifecycle = observeLifecycle {
+    if (_observeLifecycle) {
+      WidgetsBinding.instance.addObserver(this);
+    }
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
+    _isDisposed = true;
+    if (_observeLifecycle) {
+      WidgetsBinding.instance.removeObserver(this);
+    }
     _timer?.cancel();
-    _alarmPlayer.dispose();
-    _musicPlayer.dispose();
+    _cancelScheduledNotification();
+    _runSafely(_audio.dispose(), 'Audio dispose');
     super.dispose();
   }
 
-  // --- LIFECYCLE (ARKAPLAN) YÖNETİMİ ---
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused) {
-      // Uygulama arka plana geçiyor
-      if (_isRunning) {
-        _backgroundExitTime = DateTime.now();
-        debugPrint("⏸️ Uygulama arka plana geçti, sayaç çalışıyor.");
-      }
-    } else if (state == AppLifecycleState.resumed) {
-      // Uygulama ön plana döndü
-      if (_isRunning && _backgroundExitTime != null) {
-        final timePassed =
-            DateTime.now().difference(_backgroundExitTime!).inSeconds;
-        _backgroundExitTime = null;
+      _isInBackground = true;
+      if (!_countdown.isRunning) return;
 
-        if (timePassed > 0) {
-          _remainingSeconds -= timePassed;
-          debugPrint("⏳ Arkaplanda geçen süre: $timePassed sn, Kalan: $_remainingSeconds sn");
-
-          if (_remainingSeconds <= 0) {
-            _remainingSeconds = 0;
-
-            // --- SÜRE ARKAPLANDA BİTTİ: TAM TAMAMLANMA MANTIĞI ---
-            _timer?.cancel();
-            _timer = null;
-
-            // Zamanlanmış bildirimi iptal et (zaten gelmiş olmalı)
-            NotificationService().cancelScheduledNotification();
-
-            _handleTimerCompletion();
-          } else {
-            // Süre hâlâ devam ediyor — Timer.periodic'i yeniden kontrol et
-            _ensureTimerRunning();
-
-            // Zamanlanmış bildirimi güncelle (kalan süreye göre)
-            _scheduleEndNotification();
-          }
-        }
-      }
-
-      // Uygulama ön plana döndü, zamanlanmış bildirimi iptal et
-      // (artık uygulama açık, anlık bildirim yeterli)
-      if (!_isRunning || _remainingSeconds <= 0) {
-        NotificationService().cancelScheduledNotification();
-      }
-    }
-  }
-
-  /// Timer.periodic'in çalıştığını doğrular, çalışmıyorsa yeniden başlatır.
-  void _ensureTimerRunning() {
-    if (_timer == null || !_timer!.isActive) {
-      debugPrint("🔄 Timer.periodic yeniden başlatılıyor...");
       _timer?.cancel();
-      _timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
-        if (_remainingSeconds > 0) {
-          _remainingSeconds--;
-          notifyListeners();
-        } else {
-          timer.cancel();
-          _timer = null;
-          NotificationService().cancelScheduledNotification();
-          _handleTimerCompletion();
-        }
-      });
-    }
-  }
-
-  /// Timer tamamlandığında çalışan ortak mantık.
-  /// Hem ön plan (Timer.periodic) hem arka plan (resume) tarafından çağrılır.
-  void _handleTimerCompletion() {
-    _isRunning = false;
-    _isAlarmPlaying = true;
-    _currentMotivation = "congrats";
-
-    _musicPlayer.stop();
-
-    // --- BİLDİRİM METNİNİ AYARLA ---
-    String notifTitle = "";
-    String notifBody = "";
-
-    if (_currentMode == TimerMode.work) {
-      // İŞ BİTTİ
-      _completedRounds++;
-      if (_selectedTimeInMinutes > 0 && _lastStats != null) {
-        _lastStats!.addSession(_selectedTimeInMinutes);
+      _timer = null;
+      final update = _countdown.update();
+      if (update == CountdownUpdate.completed) {
+        _completeTimer(completedInBackground: false);
+      } else {
+        _scheduleBackgroundNotification();
+        _notifyListeners();
       }
-      notifTitle = "work_completed_title".tr();
-      notifBody = "work_completed_msg".tr();
-    } else {
-      // MOLA BİTTİ
-      notifTitle = "break_over_title".tr();
-      notifBody = "break_over_msg".tr();
+      return;
     }
 
-    // Bildirimi Gönder (Anlık)
-    NotificationService().showNotification(
-      title: notifTitle,
-      body: notifBody,
-    );
+    if (state == AppLifecycleState.resumed) {
+      final notificationWasScheduled = _hasScheduledNotification;
+      _isInBackground = false;
+      _cancelScheduledNotification();
 
-    // Alarmı Çal
-    _playAlarm();
+      if (!_countdown.isRunning) return;
 
-    notifyListeners();
-  }
-
-  /// Alarm sesini çalar
-  Future<void> _playAlarm() async {
-    try {
-      final soundFile = _lastSettings?.notificationSound ?? 'zil1.mp3';
-      await _alarmPlayer.stop();
-      await _alarmPlayer.setSource(
-          AssetSource('sounds/bell/$soundFile'));
-      await _alarmPlayer.setVolume(1.0);
-      await _alarmPlayer.setReleaseMode(ReleaseMode.stop);
-      await _alarmPlayer.resume();
-    } catch (e) {
-      debugPrint("❌ Alarm Hatası: $e");
+      final update = _countdown.update();
+      if (update == CountdownUpdate.completed) {
+        _completeTimer(
+          completedInBackground: notificationWasScheduled,
+        );
+      } else {
+        _startPeriodicTimer();
+        _notifyListeners();
+      }
     }
   }
 
-  /// Kalan süreye göre bitiş bildirimi planlar
-  void _scheduleEndNotification() {
-    if (_remainingSeconds <= 0) return;
-
-    String title;
-    String body;
-
-    if (_currentMode == TimerMode.work) {
-      title = "work_completed_title".tr();
-      body = "work_completed_msg".tr();
-    } else {
-      title = "break_over_title".tr();
-      body = "break_over_msg".tr();
-    }
-
-    NotificationService().scheduleTimerEndNotification(
-      seconds: _remainingSeconds,
-      title: title,
-      body: body,
-    );
-  }
-
-  // Getterlar
-  int get remainingSeconds => _remainingSeconds;
-  bool get isRunning => _isRunning;
+  int get remainingSeconds => _countdown.remainingSeconds;
+  bool get isRunning => _countdown.isRunning;
   String get currentMotivation => _currentMotivation;
   int get currentDuration => _selectedTimeInMinutes;
   TimerMode get currentMode => _currentMode;
@@ -198,89 +135,180 @@ class TimerProvider with ChangeNotifier, WidgetsBindingObserver {
 
   double get progress {
     if (_selectedTimeInMinutes == 0) return 0;
-    int totalSeconds = _selectedTimeInMinutes * 60;
-    return 1 - (_remainingSeconds / totalSeconds);
+    final totalSeconds = _selectedTimeInMinutes * 60;
+    return 1 - (_countdown.remainingSeconds / totalSeconds);
   }
 
   String get timeLeftString {
-    int minutes = _remainingSeconds ~/ 60;
-    int seconds = _remainingSeconds % 60;
+    final minutes = _countdown.remainingSeconds ~/ 60;
+    final seconds = _countdown.remainingSeconds % 60;
     return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
 
-  final List<String> _quotes =
-      List.generate(100, (index) => "quote_${index + 1}");
+  final List<String> _quotes = List.generate(
+    100,
+    (index) => 'quote_${index + 1}',
+  );
 
   void _changeQuote() {
     _currentMotivation = _quotes[Random().nextInt(_quotes.length)];
   }
 
-  // --- START TIMER ---
-  void startTimer(SettingsProvider settings, StatsProvider stats) async {
-    // Eğer zaten bir sayaç varsa yenisini başlatma
-    if (_timer != null) return;
+  void startTimer(SettingsProvider settings, StatsProvider stats) {
+    startCountdown(
+      TimerRunConfiguration(
+        notificationSound: settings.notificationSound,
+        isBackgroundMusicEnabled: settings.isBackgroundMusicEnabled,
+        backgroundVolume: settings.backgroundVolume,
+        resolveMusicFilePath: () {
+          return settings.getMusicFilePath(settings.backgroundMusic);
+        },
+        recordSession: stats.addSession,
+      ),
+    );
+  }
+
+  void startCountdown(TimerRunConfiguration configuration) {
+    if (_countdown.isRunning) return;
 
     if (_isAlarmPlaying) {
-      _alarmPlayer.stop();
+      _runSafely(_audio.stopAlarm(), 'Alarm stop');
       _isAlarmPlaying = false;
       resetTimer();
-      notifyListeners();
       return;
     }
 
-    // Provider referanslarını sakla (arka plan tamamlanma için)
-    _lastSettings = settings;
-    _lastStats = stats;
+    _activeRunConfiguration = configuration;
+    _completionHandled = false;
+    if (!_countdown.start()) return;
 
-    _isRunning = true;
     _changeQuote();
-    notifyListeners();
+    _startPeriodicTimer();
+    _startBackgroundMusic(configuration);
+    _notifyListeners();
+  }
 
-    // MÜZİK BAŞLAT
-    if (settings.isBackgroundMusicEnabled) {
-      try {
-        final musicPath =
-            await settings.getMusicFilePath(settings.backgroundMusic);
-        if (musicPath != null) {
-          await _musicPlayer.setSource(DeviceFileSource(musicPath));
-          await _musicPlayer.setVolume(settings.backgroundVolume);
-          await _musicPlayer.setReleaseMode(ReleaseMode.loop);
-          await _musicPlayer.resume();
-        } else {
-          debugPrint(
-              "⚠️ Müzik dosyası bulunamadı: ${settings.backgroundMusic}");
-        }
-      } catch (e) {
-        debugPrint("❌ Müzik Çalma Hatası: $e");
+  void _startPeriodicTimer() {
+    if (_isInBackground || !_countdown.isRunning) return;
+
+    _timer?.cancel();
+    _timer = _periodicTimerFactory(
+      const Duration(seconds: 1),
+      _handleTimerTick,
+    );
+  }
+
+  void _handleTimerTick(Timer timer) {
+    final update = _countdown.update();
+    if (update == CountdownUpdate.completed) {
+      timer.cancel();
+      _timer = null;
+      _completeTimer(completedInBackground: false);
+    } else if (update == CountdownUpdate.updated) {
+      _notifyListeners();
+    }
+  }
+
+  void _completeTimer({required bool completedInBackground}) {
+    if (_completionHandled) return;
+    _completionHandled = true;
+
+    _timer?.cancel();
+    _timer = null;
+    _cancelScheduledNotification();
+    _isAlarmPlaying = true;
+    _currentMotivation = 'congrats';
+    _runSafely(_audio.stopMusic(), 'Music stop');
+
+    if (_currentMode == TimerMode.work) {
+      _completedRounds++;
+      final configuration = _activeRunConfiguration;
+      if (_selectedTimeInMinutes > 0 && configuration != null) {
+        _runSafely(
+          configuration.recordSession(_selectedTimeInMinutes),
+          'Session record',
+        );
       }
     }
 
-    // 📅 BİTİŞ BİLDİRİMİ PLANLA (arka planda bile çalışır)
-    _scheduleEndNotification();
+    // Arka planda planlanan bildirim sesi zaten kullanıcıyı uyardı. Uygulama
+    // açıkken ise yalnızca uygulama içi alarm çalar; ikinci sistem bildirimi yok.
+    if (!completedInBackground) {
+      final soundFile =
+          _activeRunConfiguration?.notificationSound ?? 'zil1.mp3';
+      unawaited(_playAlarm(soundFile));
+    }
 
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
-      if (_remainingSeconds > 0) {
-        _remainingSeconds--;
-        notifyListeners();
-      } else {
-        // --- SÜRE BİTTİ (ÖN PLAN) ---
-        timer.cancel();
-        _timer = null;
-
-        // Zamanlanmış bildirimi iptal et (ön planda tamamlandı)
-        NotificationService().cancelScheduledNotification();
-
-        _handleTimerCompletion();
-      }
-    });
+    _notifyListeners();
   }
 
-  void stopAlarm(
-      {required int workTime,
-      required int shortBreakTime,
-      required int longBreakTime}) {
-    _alarmPlayer.stop();
-    _musicPlayer.stop();
+  Future<void> _playAlarm(String soundFile) async {
+    try {
+      await _audio.playAlarm(soundFile);
+    } catch (error, stackTrace) {
+      debugPrint('Alarm hatası: $error\n$stackTrace');
+    }
+  }
+
+  void _startBackgroundMusic(TimerRunConfiguration configuration) {
+    if (!configuration.isBackgroundMusicEnabled ||
+        configuration.resolveMusicFilePath == null) {
+      return;
+    }
+
+    unawaited(() async {
+      try {
+        final musicPath = await configuration.resolveMusicFilePath!();
+        if (musicPath == null || !_countdown.isRunning || _isDisposed) return;
+        await _audio.playMusic(musicPath, configuration.backgroundVolume);
+      } catch (error, stackTrace) {
+        debugPrint('Müzik çalma hatası: $error\n$stackTrace');
+      }
+    }());
+  }
+
+  void _scheduleBackgroundNotification() {
+    if (_countdown.remainingSeconds <= 0) return;
+
+    final generation = ++_notificationGeneration;
+    final titleKey = _currentMode == TimerMode.work
+        ? 'work_completed_title'
+        : 'break_over_title';
+    final bodyKey = _currentMode == TimerMode.work
+        ? 'work_completed_msg'
+        : 'break_over_msg';
+
+    unawaited(() async {
+      final scheduled = await _notifications.scheduleTimerEndNotification(
+        seconds: _countdown.remainingSeconds,
+        title: _resolveText(titleKey),
+        body: _resolveText(bodyKey),
+      );
+
+      if (_isDisposed || generation != _notificationGeneration) {
+        if (scheduled) {
+          await _notifications.cancelScheduledNotification();
+        }
+        return;
+      }
+
+      _hasScheduledNotification = scheduled;
+    }());
+  }
+
+  void _cancelScheduledNotification() {
+    _notificationGeneration++;
+    _hasScheduledNotification = false;
+    unawaited(_notifications.cancelScheduledNotification());
+  }
+
+  void stopAlarm({
+    required int workTime,
+    required int shortBreakTime,
+    required int longBreakTime,
+  }) {
+    _runSafely(_audio.stopAlarm(), 'Alarm stop');
+    _runSafely(_audio.stopMusic(), 'Music stop');
     _isAlarmPlaying = false;
 
     if (_currentMode == TimerMode.work) {
@@ -292,53 +320,65 @@ class TimerProvider with ChangeNotifier, WidgetsBindingObserver {
     } else {
       setTime(workTime, TimerMode.work);
     }
-    notifyListeners();
+    _notifyListeners();
   }
 
   void stopTimer({bool reset = true}) {
+    _countdown.pause();
     _timer?.cancel();
     _timer = null;
-    _alarmPlayer.stop();
-    _musicPlayer.stop();
-    _isRunning = false;
+    _cancelScheduledNotification();
+    _runSafely(_audio.stopAlarm(), 'Alarm stop');
+    _runSafely(_audio.stopMusic(), 'Music stop');
     _isAlarmPlaying = false;
-
-    // 🚫 Zamanlanmış bildirimi iptal et
-    NotificationService().cancelScheduledNotification();
-
-    notifyListeners();
+    _notifyListeners();
   }
 
   void resetTimer() {
     stopTimer();
-    _remainingSeconds = _selectedTimeInMinutes * 60;
-    _currentMotivation = "ready";
+    _countdown.reset(_selectedTimeInMinutes * 60);
+    _currentMotivation = 'ready';
     _isAlarmPlaying = false;
-    notifyListeners();
+    _completionHandled = false;
+    _notifyListeners();
   }
 
   void setTime(int minutes, TimerMode mode) {
     stopTimer();
     _selectedTimeInMinutes = minutes;
-    _remainingSeconds = minutes * 60;
+    _countdown.reset(minutes * 60);
     _currentMode = mode;
     _changeQuote();
     _isAlarmPlaying = false;
-    notifyListeners();
+    _completionHandled = false;
+    _notifyListeners();
   }
 
   void updateDurationFromSettings(int newMinutes, TimerMode mode) {
-    if (_isRunning) return;
+    if (_countdown.isRunning) return;
     if (_currentMode == mode) {
       _selectedTimeInMinutes = newMinutes;
-      _remainingSeconds = newMinutes * 60;
-      notifyListeners();
+      _countdown.reset(newMinutes * 60);
+      _completionHandled = false;
+      _notifyListeners();
     }
   }
 
   void updateMusicVolume(double volume) {
-    if (_isRunning) {
-      _musicPlayer.setVolume(volume);
+    if (_countdown.isRunning) {
+      _runSafely(_audio.setMusicVolume(volume), 'Music volume');
     }
+  }
+
+  void _runSafely(Future<void> operation, String operationName) {
+    unawaited(
+      operation.catchError((Object error, StackTrace stackTrace) {
+        debugPrint('$operationName hatası: $error\n$stackTrace');
+      }),
+    );
+  }
+
+  void _notifyListeners() {
+    if (!_isDisposed) notifyListeners();
   }
 }

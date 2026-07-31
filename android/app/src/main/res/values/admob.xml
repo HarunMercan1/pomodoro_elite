@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Google Play'e gönderilen profile/release yapıları gerçek App ID'yi kullanır. -->
+    <string name="admob_app_id" translatable="false">ca-app-pub-3820038977003119~9164182684</string>
+</resources>

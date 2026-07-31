@@ -3,10 +3,31 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../services/guest_stats_migration_service.dart';
 
 class StatsProvider with ChangeNotifier {
+  StatsProvider({
+    SupabaseClient? supabaseClient,
+    GuestStatsMigrationService? guestStatsMigrationService,
+  })  : _supabase = supabaseClient ?? Supabase.instance.client,
+        _guestStatsMigrationService =
+            guestStatsMigrationService ?? GuestStatsMigrationService() {
+    _queueStatsLoad();
+
+    _supabase.auth.onAuthStateChange.listen((data) {
+      final event = data.event;
+      if (event == AuthChangeEvent.signedIn ||
+          event == AuthChangeEvent.signedOut) {
+        _queueStatsLoad(
+            clearLocalOnSignedOut: event == AuthChangeEvent.signedOut);
+      }
+    });
+  }
+
   late SharedPreferences _prefs;
-  final SupabaseClient _supabase = Supabase.instance.client;
+  final SupabaseClient _supabase;
+  final GuestStatsMigrationService _guestStatsMigrationService;
+  Future<void> _loadTail = Future<void>.value();
 
   Map<String, int> _dailyStats = {};
   Map<String, int> _dailySessionCounts = {};
@@ -22,16 +43,10 @@ class StatsProvider with ChangeNotifier {
   int get totalMinutes => _totalMinutes;
   int get currentStreak => _currentStreak;
 
-  StatsProvider() {
-    _loadStats();
-    
-    // Auth değiştiğinde verileri tekrar yükle (Login / Logout durumları için)
-    _supabase.auth.onAuthStateChange.listen((data) {
-      final event = data.event;
-      if (event == AuthChangeEvent.signedIn || event == AuthChangeEvent.signedOut) {
-        _loadStats();
-      }
-    });
+  void _queueStatsLoad({bool clearLocalOnSignedOut = false}) {
+    _loadTail = _loadTail
+        .catchError((_) {})
+        .then((_) => _loadStats(clearLocalOnSignedOut: clearLocalOnSignedOut));
   }
 
   int get todayMinutes {
@@ -53,18 +68,17 @@ class StatsProvider with ChangeNotifier {
     for (int i = 0; i < 7; i++) {
       DateTime date = startOfWeek.add(Duration(days: i));
       String dateKey = DateFormat('yyyy-MM-dd').format(date);
-      String dayName = DateFormat('E').format(date);
-
       stats.add({
-        'day': dayName,
+        'weekday': date.weekday,
         'minutes': _dailyStats[dateKey] ?? 0,
+        'sessions': _dailySessionCounts[dateKey] ?? 0,
         'fullDate': dateKey,
       });
     }
     return stats;
   }
 
-  Future<void> _loadStats() async {
+  Future<void> _loadStats({bool clearLocalOnSignedOut = false}) async {
     _isLoading = true;
     notifyListeners();
 
@@ -73,15 +87,20 @@ class StatsProvider with ChangeNotifier {
     final user = _supabase.auth.currentUser;
 
     if (user != null) {
-      // 1. SUPABASE'DEN ÇEK
       try {
+        if (await _guestStatsMigrationService.hasPendingBatches()) {
+          await _guestStatsMigrationService.migratePending(user.id);
+        }
         await _fetchFromSupabase(user.id);
       } catch (e) {
-        debugPrint("Supabase veri çekme hatası: $e");
-        _loadFromLocal(); // Hata olursa lokalden yükle
+        debugPrint('Stats migration/fetch error: $e');
+        // Migration tamamlanmadan lokal verinin üzerine bulut verisi yazılmaz.
+        _loadFromLocal();
       }
     } else {
-      // 2. GUEST MODU VEYA GİRİŞ YAPILMAMIŞ - SADECE LOKAL
+      if (clearLocalOnSignedOut) {
+        await _clearLocalStatsCache();
+      }
       _loadFromLocal();
     }
 
@@ -112,6 +131,15 @@ class StatsProvider with ChangeNotifier {
     _totalMinutes = _prefs.getInt('total_minutes') ?? 0;
   }
 
+  Future<void> _clearLocalStatsCache() async {
+    await Future.wait([
+      _prefs.remove('daily_stats'),
+      _prefs.remove('daily_session_counts'),
+      _prefs.remove('total_minutes'),
+      _prefs.remove('total_sessions'),
+    ]);
+  }
+
   Future<void> _fetchFromSupabase(String userId) async {
     // A) user_stats çek
     final userStatsResponse = await _supabase
@@ -138,10 +166,8 @@ class StatsProvider with ChangeNotifier {
     }
 
     // B) daily_stats çek
-    final dailyStatsResponse = await _supabase
-        .from('daily_stats')
-        .select()
-        .eq('user_id', userId);
+    final dailyStatsResponse =
+        await _supabase.from('daily_stats').select().eq('user_id', userId);
 
     _dailyStats.clear();
     _dailySessionCounts.clear();
@@ -154,7 +180,8 @@ class StatsProvider with ChangeNotifier {
 
     // Lokali güncelle
     await _prefs.setString('daily_stats', jsonEncode(_dailyStats));
-    await _prefs.setString('daily_session_counts', jsonEncode(_dailySessionCounts));
+    await _prefs.setString(
+        'daily_session_counts', jsonEncode(_dailySessionCounts));
   }
 
   Future<void> _syncToSupabase(String userId) async {
@@ -167,7 +194,7 @@ class StatsProvider with ChangeNotifier {
       'updated_at': DateTime.now().toIso8601String(),
     });
 
-    // 2. daily_stats güncelle (Sadece bugünü güncellemek performansı artırır, 
+    // 2. daily_stats güncelle (Sadece bugünü güncellemek performansı artırır,
     // ama ilk sync için tüm günleri göndermek lazım. Burada sadece bugünü gönderiyoruz)
     final todayKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
     if (_dailyStats.containsKey(todayKey)) {
@@ -205,6 +232,9 @@ class StatsProvider with ChangeNotifier {
   }
 
   Future<void> addSession(int minutes) async {
+    // Auth değişimi sırasında çalışan migration/fetch tamamlanmadan toplamları
+    // değiştirme; aksi halde eski lokal snapshot bulut toplamını ezebilir.
+    await _loadTail;
     final todayKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
     int currentTodayMinutes = _dailyStats[todayKey] ?? 0;
@@ -218,15 +248,33 @@ class StatsProvider with ChangeNotifier {
 
     // 1. LOKALDE KAYDET
     await _prefs.setString('daily_stats', jsonEncode(_dailyStats));
-    await _prefs.setString('daily_session_counts', jsonEncode(_dailySessionCounts));
+    await _prefs.setString(
+        'daily_session_counts', jsonEncode(_dailySessionCounts));
     await _prefs.setInt('total_minutes', _totalMinutes);
     await _prefs.setInt('total_sessions', _totalSessions);
 
-    _calculateStreak(); 
+    _calculateStreak();
 
-    // 2. SUPABASE'E GÖNDER
     final user = _supabase.auth.currentUser;
-    if (user != null) {
+    final hasPendingMigration =
+        await _guestStatsMigrationService.hasPendingBatches();
+
+    if (hasPendingMigration) {
+      await _guestStatsMigrationService.enqueueSessionDelta(
+        minutes: minutes,
+        dateKey: todayKey,
+        currentStreak: _currentStreak,
+      );
+
+      if (user != null) {
+        try {
+          await _guestStatsMigrationService.migratePending(user.id);
+          await _fetchFromSupabase(user.id);
+        } catch (e) {
+          debugPrint('Pending guest stats sync error: $e');
+        }
+      }
+    } else if (user != null) {
       try {
         await _syncToSupabase(user.id);
       } catch (e) {
@@ -258,10 +306,8 @@ class StatsProvider with ChangeNotifier {
     _totalSessions = 0;
     _currentStreak = 0;
 
-    await _prefs.remove('daily_stats');
-    await _prefs.remove('daily_session_counts');
-    await _prefs.remove('total_minutes');
-    await _prefs.remove('total_sessions');
+    await _clearLocalStatsCache();
+    await _guestStatsMigrationService.clearPendingBatches();
 
     final user = _supabase.auth.currentUser;
     if (user != null) {

@@ -39,7 +39,7 @@
         <!-- AdMob App ID - PRODUCTION (Gerçek ID aktif) -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3820038977003119~9164182684"/>
+            android:value="@string/admob_app_id"/>
 
     </application>
 

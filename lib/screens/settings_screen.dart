@@ -17,6 +17,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:pomodoro_elite/screens/language_selection_screen.dart';
 import 'package:pomodoro_elite/screens/premium_screen.dart';
 import '../providers/purchase_provider.dart';
+import '../services/ad_consent_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -27,6 +28,24 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen>
     with WidgetsBindingObserver {
+  bool _isGuestConnectLoading = false;
+
+  Future<void> _connectGuestWithGoogle() async {
+    if (_isGuestConnectLoading) return;
+    setState(() => _isGuestConnectLoading = true);
+    try {
+      await context.read<AuthProvider>().signInWithGoogle();
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('sign_in_error'.tr())),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isGuestConnectLoading = false);
+    }
+  }
+
   String _getLanguageName(String code) {
     switch (code) {
       case 'tr':
@@ -184,26 +203,39 @@ class _SettingsScreenState extends State<SettingsScreen>
                           // 🔥 KULLANICI PROFİLİ
                           if (!context.watch<AuthProvider>().isGuest)
                             Padding(
-                              padding: const EdgeInsets.only(bottom: 24.0, top: 8.0),
+                              padding:
+                                  const EdgeInsets.only(bottom: 24.0, top: 8.0),
                               child: Row(
                                 children: [
                                   CircleAvatar(
                                     radius: 30,
                                     backgroundColor: itemColor.withOpacity(0.1),
-                                    backgroundImage: context.watch<AuthProvider>().avatarUrl != null
-                                        ? NetworkImage(context.watch<AuthProvider>().avatarUrl!)
+                                    backgroundImage: context
+                                                .watch<AuthProvider>()
+                                                .avatarUrl !=
+                                            null
+                                        ? NetworkImage(context
+                                            .watch<AuthProvider>()
+                                            .avatarUrl!)
                                         : null,
-                                    child: context.watch<AuthProvider>().avatarUrl == null
-                                        ? Icon(Icons.person, size: 30, color: itemColor)
+                                    child: context
+                                                .watch<AuthProvider>()
+                                                .avatarUrl ==
+                                            null
+                                        ? Icon(Icons.person,
+                                            size: 30, color: itemColor)
                                         : null,
                                   ),
                                   const SizedBox(width: 16),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          context.watch<AuthProvider>().displayName,
+                                          context
+                                              .watch<AuthProvider>()
+                                              .displayName,
                                           style: AppFonts.poppins(
                                             context: context,
                                             color: itemColor,
@@ -212,7 +244,11 @@ class _SettingsScreenState extends State<SettingsScreen>
                                           ),
                                         ),
                                         Text(
-                                          context.watch<AuthProvider>().user?.email ?? '',
+                                          context
+                                                  .watch<AuthProvider>()
+                                                  .user
+                                                  ?.email ??
+                                              '',
                                           style: AppFonts.poppins(
                                             context: context,
                                             color: itemColor.withOpacity(0.5),
@@ -226,100 +262,215 @@ class _SettingsScreenState extends State<SettingsScreen>
                               ),
                             ),
 
-                            // PREMIUM BUTONU
-                            Container(
-                              decoration: BoxDecoration(
-                                gradient: context.watch<PurchaseProvider>().isPremium 
-                                    ? const LinearGradient(
-                                        colors: [Color(0xFF475569), Color(0xFF0F172A)], // Platinum/Slate
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                      )
-                                    : const LinearGradient(
-                                        colors: [Color(0xFF38BDF8), Color(0xFF3B82F6)], // Diamond Cyan/Blue
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                      ),
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(
-                                  color: context.watch<PurchaseProvider>().isPremium 
-                                      ? const Color(0xFF38BDF8).withOpacity(0.5)
-                                      : Colors.transparent,
-                                  width: 1,
-                                ),
-                                boxShadow: context.watch<PurchaseProvider>().isPremium
-                                    ? []
-                                    : [
-                                        BoxShadow(
-                                          color: const Color(0xFF38BDF8).withOpacity(0.4),
-                                          blurRadius: 12,
-                                          offset: const Offset(0, 4),
-                                        ),
-                                      ],
+                          if (context.watch<AuthProvider>().isGuest)
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                bottom: 18,
+                                top: 4,
                               ),
-                              child: Material(
-                                color: Colors.transparent,
-                                child: InkWell(
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color(0xFF38BDF8),
+                                      Color(0xFF2563EB),
+                                    ],
+                                  ),
                                   borderRadius: BorderRadius.circular(16),
-                                  onTap: () {
-                                    final isGuest = context.read<AuthProvider>().isGuest;
-                                    if (isGuest) {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) => AlertDialog(
-                                          title: Text('login_required'.tr()),
-                                          content: Text('premium_login_required_desc'.tr()),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () => Navigator.pop(context),
-                                              child: Text('ok'.tr()),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    } else {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(builder: (context) => const PremiumScreen()),
-                                      );
-                                    }
-                                  },
-                                  child: ListTile(
-                                    contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: isTablet ? 8 : 0),
-                                    leading: Icon(
-                                      Icons.diamond_rounded,
-                                      color: Colors.white,
-                                      size: iconSize,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color(0xFF38BDF8)
+                                          .withValues(alpha: 0.22),
+                                      blurRadius: 18,
+                                      offset: const Offset(0, 8),
                                     ),
-                                    title: Text(
-                                      context.watch<PurchaseProvider>().isPremium 
-                                          ? 'premium_active'.tr().replaceAll(RegExp(r'👑\s*'), '')
-                                          : 'get_premium'.tr().replaceAll(RegExp(r'👑\s*'), ''),
-                                      style: AppFonts.poppins(
-                                        context: context,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: titleSize,
+                                  ],
+                                ),
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    onTap: _isGuestConnectLoading
+                                        ? null
+                                        : _connectGuestWithGoogle,
+                                    borderRadius: BorderRadius.circular(16),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 15,
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            width: 42,
+                                            height: 42,
+                                            decoration: BoxDecoration(
+                                              color: Colors.white
+                                                  .withValues(alpha: 0.16),
+                                              borderRadius:
+                                                  BorderRadius.circular(13),
+                                            ),
+                                            child: _isGuestConnectLoading
+                                                ? const Padding(
+                                                    padding: EdgeInsets.all(11),
+                                                    child:
+                                                        CircularProgressIndicator(
+                                                      strokeWidth: 2.4,
+                                                      color: Colors.white,
+                                                    ),
+                                                  )
+                                                : Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(9),
+                                                    child: Image.asset(
+                                                      'assets/icons/google.png',
+                                                      fit: BoxFit.contain,
+                                                    ),
+                                                  ),
+                                          ),
+                                          const SizedBox(width: 14),
+                                          Expanded(
+                                            child: Text(
+                                              'continue_with_google'.tr(),
+                                              style: AppFonts.poppins(
+                                                context: context,
+                                                color: Colors.white,
+                                                fontSize: titleSize,
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                          ),
+                                          const Icon(
+                                            Icons.arrow_forward_rounded,
+                                            color: Colors.white,
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                    subtitle: context.watch<PurchaseProvider>().isPremium 
-                                      ? null 
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                          // PREMIUM BUTONU
+                          Container(
+                            decoration: BoxDecoration(
+                              gradient:
+                                  context.watch<PurchaseProvider>().isPremium
+                                      ? const LinearGradient(
+                                          colors: [
+                                            Color(0xFF475569),
+                                            Color(0xFF0F172A)
+                                          ], // Platinum/Slate
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                        )
+                                      : const LinearGradient(
+                                          colors: [
+                                            Color(0xFF38BDF8),
+                                            Color(0xFF3B82F6)
+                                          ], // Diamond Cyan/Blue
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                        ),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: context
+                                        .watch<PurchaseProvider>()
+                                        .isPremium
+                                    ? const Color(0xFF38BDF8).withOpacity(0.5)
+                                    : Colors.transparent,
+                                width: 1,
+                              ),
+                              boxShadow:
+                                  context.watch<PurchaseProvider>().isPremium
+                                      ? []
+                                      : [
+                                          BoxShadow(
+                                            color: const Color(0xFF38BDF8)
+                                                .withOpacity(0.4),
+                                            blurRadius: 12,
+                                            offset: const Offset(0, 4),
+                                          ),
+                                        ],
+                            ),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(16),
+                                onTap: () {
+                                  final isGuest =
+                                      context.read<AuthProvider>().isGuest;
+                                  if (isGuest) {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) => AlertDialog(
+                                        title: Text('login_required'.tr()),
+                                        content: Text(
+                                            'premium_login_required_desc'.tr()),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.pop(context),
+                                            child: Text('ok_btn'.tr()),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  } else {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const PremiumScreen()),
+                                    );
+                                  }
+                                },
+                                child: ListTile(
+                                  contentPadding: EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: isTablet ? 8 : 0),
+                                  leading: Icon(
+                                    Icons.diamond_rounded,
+                                    color: Colors.white,
+                                    size: iconSize,
+                                  ),
+                                  title: Text(
+                                    context.watch<PurchaseProvider>().isPremium
+                                        ? 'premium_active'
+                                            .tr()
+                                            .replaceAll(RegExp(r'👑\s*'), '')
+                                        : 'get_premium'
+                                            .tr()
+                                            .replaceAll(RegExp(r'👑\s*'), ''),
+                                    style: AppFonts.poppins(
+                                      context: context,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: titleSize,
+                                    ),
+                                  ),
+                                  subtitle: context
+                                          .watch<PurchaseProvider>()
+                                          .isPremium
+                                      ? null
                                       : Text(
                                           'premium_subtitle'.tr(),
                                           style: AppFonts.poppins(
                                             context: context,
                                             fontSize: subtitleSize,
-                                            color: Colors.white.withOpacity(0.9),
+                                            color:
+                                                Colors.white.withOpacity(0.9),
                                           ),
                                         ),
-                                    trailing: Icon(Icons.arrow_forward_ios_rounded,
-                                        size: trailingIconSize, 
-                                        color: Colors.white),
-                                  ),
+                                  trailing: Icon(
+                                      Icons.arrow_forward_ios_rounded,
+                                      size: trailingIconSize,
+                                      color: Colors.white),
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 20),
+                          ),
+                          const SizedBox(height: 20),
 
                           // SÜRE AYARLARI
                           Card(
@@ -495,6 +646,61 @@ class _SettingsScreenState extends State<SettingsScreen>
                               },
                             ),
                           ),
+                          if (context
+                              .watch<AdConsentService>()
+                              .isPrivacyOptionsRequired) ...[
+                            const SizedBox(height: 12),
+                            Card(
+                              color: cardColor,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                side: BorderSide(color: borderColor, width: 1),
+                              ),
+                              child: ListTile(
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: isTablet ? 8 : 0,
+                                ),
+                                leading: Icon(
+                                  Icons.privacy_tip_outlined,
+                                  color: itemColor,
+                                  size: iconSize,
+                                ),
+                                title: Text(
+                                  'privacy_options'.tr(),
+                                  style: AppFonts.poppins(
+                                    context: context,
+                                    color: itemColor,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: titleSize,
+                                  ),
+                                ),
+                                trailing: Icon(
+                                  Icons.arrow_forward_ios,
+                                  size: trailingIconSize,
+                                  color: itemColor,
+                                ),
+                                onTap: () async {
+                                  final consent =
+                                      context.read<AdConsentService>();
+                                  final adManager = context.read<AdManager>();
+                                  final width =
+                                      MediaQuery.sizeOf(context).width;
+                                  try {
+                                    await consent.showPrivacyOptionsForm();
+                                    if (mounted && consent.adsReady) {
+                                      await adManager.loadSettingsBanner(width);
+                                    }
+                                  } catch (error) {
+                                    debugPrint(
+                                      'Privacy options form failed: $error',
+                                    );
+                                  }
+                                },
+                              ),
+                            ),
+                          ],
                           // BİZİ DEĞERLENDİRİN BUTONU
                           Card(
                             color: cardColor,
@@ -504,8 +710,10 @@ class _SettingsScreenState extends State<SettingsScreen>
                               side: BorderSide(color: borderColor, width: 1),
                             ),
                             child: ListTile(
-                              contentPadding: EdgeInsets.symmetric(horizontal: 16),
-                              leading: Icon(Icons.star_rate_rounded, color: Colors.amber, size: iconSize),
+                              contentPadding:
+                                  EdgeInsets.symmetric(horizontal: 16),
+                              leading: Icon(Icons.star_rate_rounded,
+                                  color: Colors.amber, size: iconSize),
                               title: Text(
                                 'rate_us'.tr(),
                                 style: AppFonts.poppins(
@@ -515,9 +723,11 @@ class _SettingsScreenState extends State<SettingsScreen>
                                   fontSize: titleSize,
                                 ),
                               ),
-                              trailing: Icon(Icons.arrow_forward_ios, size: trailingIconSize, color: itemColor),
+                              trailing: Icon(Icons.arrow_forward_ios,
+                                  size: trailingIconSize, color: itemColor),
                               onTap: () async {
-                                final InAppReview inAppReview = InAppReview.instance;
+                                final InAppReview inAppReview =
+                                    InAppReview.instance;
                                 if (await inAppReview.isAvailable()) {
                                   // requestReview kotaya takılıp sessizce başarısız olabileceği için
                                   // ayarlardan tıklandığında her zaman doğrudan mağaza sayfasını açıyoruz.
@@ -535,13 +745,18 @@ class _SettingsScreenState extends State<SettingsScreen>
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
-                              side: const BorderSide(color: Colors.redAccent, width: 1),
+                              side: const BorderSide(
+                                  color: Colors.redAccent, width: 1),
                             ),
                             child: ListTile(
-                              contentPadding: EdgeInsets.symmetric(horizontal: 16),
-                              leading: const Icon(Icons.logout, color: Colors.redAccent),
+                              contentPadding:
+                                  EdgeInsets.symmetric(horizontal: 16),
+                              leading: const Icon(Icons.logout,
+                                  color: Colors.redAccent),
                               title: Text(
-                                context.watch<AuthProvider>().isGuest ? 'exit_guest_mode'.tr() : 'log_out'.tr(),
+                                context.watch<AuthProvider>().isGuest
+                                    ? 'exit_guest_mode'.tr()
+                                    : 'log_out'.tr(),
                                 style: AppFonts.poppins(
                                   context: context,
                                   color: Colors.redAccent,
@@ -552,28 +767,49 @@ class _SettingsScreenState extends State<SettingsScreen>
                                 showDialog(
                                   context: context,
                                   builder: (context) => AlertDialog(
-                                    backgroundColor: themeProvider.settingsBgColor,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                    backgroundColor:
+                                        themeProvider.settingsBgColor,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(16)),
                                     title: Text(
-                                      context.read<AuthProvider>().isGuest ? 'exit_guest_mode_title'.tr() : 'log_out_title'.tr(),
-                                      style: AppFonts.poppins(context: context, color: itemColor, fontWeight: FontWeight.bold),
+                                      context.read<AuthProvider>().isGuest
+                                          ? 'exit_guest_mode_title'.tr()
+                                          : 'log_out_title'.tr(),
+                                      style: AppFonts.poppins(
+                                          context: context,
+                                          color: itemColor,
+                                          fontWeight: FontWeight.bold),
                                     ),
                                     content: Text(
                                       'log_out_confirm'.tr(),
-                                      style: AppFonts.poppins(context: context, color: itemColor.withOpacity(0.8)),
+                                      style: AppFonts.poppins(
+                                          context: context,
+                                          color: itemColor.withOpacity(0.8)),
                                     ),
                                     actions: [
                                       TextButton(
                                         onPressed: () => Navigator.pop(context),
-                                        child: Text('cancel'.tr(), style: AppFonts.poppins(context: context, color: itemColor.withOpacity(0.6))),
+                                        child: Text('cancel'.tr(),
+                                            style: AppFonts.poppins(
+                                                context: context,
+                                                color: itemColor
+                                                    .withOpacity(0.6))),
                                       ),
                                       ElevatedButton(
-                                        style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+                                        style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.redAccent),
                                         onPressed: () {
-                                          context.read<AuthProvider>().signOut();
-                                          Navigator.of(context).popUntil((route) => route.isFirst);
+                                          context
+                                              .read<AuthProvider>()
+                                              .signOut();
+                                          Navigator.of(context).popUntil(
+                                              (route) => route.isFirst);
                                         },
-                                        child: Text('log_out'.tr(), style: AppFonts.poppins(context: context, color: Colors.white)),
+                                        child: Text('log_out'.tr(),
+                                            style: AppFonts.poppins(
+                                                context: context,
+                                                color: Colors.white)),
                                       ),
                                     ],
                                   ),
@@ -601,7 +837,8 @@ class _SettingsScreenState extends State<SettingsScreen>
                               'v$version',
                               style: AppFonts.poppins(
                                 context: context,
-                                color: themeProvider.settingsTextColor.withValues(alpha: 0.5),
+                                color: themeProvider.settingsTextColor
+                                    .withValues(alpha: 0.5),
                                 fontSize: 12,
                               ),
                             ),

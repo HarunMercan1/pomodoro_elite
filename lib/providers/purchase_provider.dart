@@ -1,132 +1,248 @@
-import 'dart:io';
-import 'package:flutter/material.dart';
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../core/constants/revenuecat_constants.dart';
+
+import '../services/revenuecat_gateway.dart';
 
 class PurchaseProvider extends ChangeNotifier {
+  final RevenueCatGateway _revenueCat;
+
+  late final Future<void> _initialization;
+  late final StreamSubscription<String?> _authSubscription;
+
+  Future<void> _identityQueue = Future<void>.value();
+  String? _desiredUserId;
+  String? _syncedUserId;
+  bool _isConfigured = false;
+  bool _isInitializing = true;
+  bool _isIdentitySyncInProgress = false;
+  int _pendingIdentitySyncCount = 0;
+  bool _isPurchaseInProgress = false;
   bool _isPremium = false;
-  bool _isLoading = true;
+  bool _isDisposed = false;
+  String? _lastError;
   Offerings? _offerings;
 
   bool get isPremium => _isPremium;
-  bool get isLoading => _isLoading;
+  bool get isLoading =>
+      _isInitializing || _isIdentitySyncInProgress || _isPurchaseInProgress;
+  bool get isReady => _isConfigured && !_isInitializing;
+  String? get lastError => _lastError;
   Offerings? get offerings => _offerings;
+  Future<void> get initialized => _initialization;
 
-  PurchaseProvider() {
-    _initRevenueCat();
+  @visibleForTesting
+  Future<void> get pendingIdentitySync => _identityQueue;
 
-    Supabase.instance.client.auth.onAuthStateChange.listen((data) {
-      final user = data.session?.user;
-      if (user != null) {
-        logIn(user.id);
-      } else {
-        logOut();
+  PurchaseProvider({
+    RevenueCatGateway? revenueCat,
+    SupabaseClient? supabaseClient,
+    Stream<String?>? userIdChanges,
+    String? Function()? currentUserId,
+  }) : _revenueCat = revenueCat ?? PurchasesRevenueCatGateway() {
+    final needsSupabase = userIdChanges == null || currentUserId == null;
+    final auth = needsSupabase
+        ? (supabaseClient ?? Supabase.instance.client).auth
+        : null;
+    final readCurrentUserId = currentUserId ?? () => auth!.currentUser?.id;
+    final authUserIdChanges = userIdChanges ??
+        auth!.onAuthStateChange.map((data) => data.session?.user.id);
+
+    _desiredUserId = readCurrentUserId();
+    _initialization = _initialize(_desiredUserId);
+    _authSubscription = authUserIdChanges.distinct().listen(
+      _handleAuthUserChanged,
+      onError: (Object error, StackTrace stackTrace) {
+        _lastError = 'Supabase auth stream error: $error';
+        debugPrint(_lastError);
+      },
+    );
+  }
+
+  Future<void> _initialize(String? initialUserId) async {
+    try {
+      // Configure receives the restored Supabase user immediately. This avoids
+      // creating an anonymous RevenueCat customer and logging in concurrently.
+      await _revenueCat.configure(appUserId: initialUserId);
+      if (_isDisposed) return;
+
+      _isConfigured = true;
+      _syncedUserId = initialUserId;
+      _revenueCat.addCustomerStateListener(_handleCustomerStateUpdate);
+
+      await _synchronizeLatestIdentity();
+      await _refreshCustomerState();
+      await _fetchOfferingsInternal();
+    } catch (error, stackTrace) {
+      _lastError = 'RevenueCat initialization error: $error';
+      debugPrint('$_lastError\n$stackTrace');
+    } finally {
+      _isInitializing = false;
+      _notifyListeners();
+    }
+  }
+
+  void _handleAuthUserChanged(String? userId) {
+    if (_isDisposed || userId == _desiredUserId) return;
+
+    _desiredUserId = userId;
+
+    // Never expose the previous account's entitlement while identities are
+    // changing. The new CustomerInfo will restore premium if applicable.
+    _isPremium = false;
+    _pendingIdentitySyncCount++;
+    _isIdentitySyncInProgress = true;
+    _notifyListeners();
+
+    _identityQueue = _identityQueue.then((_) async {
+      await _initialization;
+      if (!_isConfigured || _isDisposed) return;
+
+      try {
+        await _synchronizeLatestIdentity();
+        _lastError = null;
+      } catch (error, stackTrace) {
+        _lastError = 'RevenueCat identity sync error: $error';
+        debugPrint('$_lastError\n$stackTrace');
       }
+    }).whenComplete(() {
+      _pendingIdentitySyncCount--;
+      _isIdentitySyncInProgress = _pendingIdentitySyncCount > 0;
+      _notifyListeners();
     });
   }
 
-  Future<void> _initRevenueCat() async {
-    try {
-      if (Platform.isAndroid) {
-        await Purchases.configure(PurchasesConfiguration(RevenueCatConstants.googleApiKey));
-      } else if (Platform.isIOS) {
-        await Purchases.configure(PurchasesConfiguration(RevenueCatConstants.appleApiKey));
+  Future<void> _synchronizeLatestIdentity() async {
+    while (_isConfigured && !_isDisposed) {
+      final targetUserId = _desiredUserId;
+      if (targetUserId == _syncedUserId) return;
+
+      final RevenueCatCustomerState customerState;
+      if (targetUserId == null) {
+        customerState = await _revenueCat.logOut();
+      } else {
+        customerState = await _revenueCat.logIn(targetUserId);
       }
-      
-      await _checkPremiumStatus();
-      await fetchOfferings();
-    } catch (e) {
-      debugPrint("RevenueCat Init Error: $e");
-    } finally {
-      _isLoading = false;
-      notifyListeners();
+
+      _syncedUserId = targetUserId;
+
+      // An auth event may have arrived while the SDK operation was in flight.
+      // Ignore the stale result and continue directly to the newest identity.
+      if (targetUserId != _desiredUserId) continue;
+
+      _applyCustomerState(customerState);
+      return;
     }
   }
 
-  Future<void> logIn(String userId) async {
-    try {
-      await Purchases.logIn(userId);
-      await _checkPremiumStatus();
-    } catch (e) {
-      debugPrint("RevenueCat Login Error: $e");
+  Future<void> _refreshCustomerState() async {
+    final customerState = await _revenueCat.getCustomerState();
+    if (_desiredUserId == _syncedUserId) {
+      _applyCustomerState(customerState);
     }
   }
 
-  Future<void> logOut() async {
-    try {
-      await Purchases.logOut();
-      await _checkPremiumStatus();
-    } catch (e) {
-      debugPrint("RevenueCat Logout Error: $e");
-    }
+  void _handleCustomerStateUpdate(RevenueCatCustomerState customerState) {
+    if (_desiredUserId != _syncedUserId || _isDisposed) return;
+    _applyCustomerState(customerState);
   }
 
-  Future<void> _checkPremiumStatus() async {
+  void _applyCustomerState(RevenueCatCustomerState customerState) {
+    if (_isPremium == customerState.isPremium) return;
+    _isPremium = customerState.isPremium;
+    _notifyListeners();
+  }
+
+  Future<void> _fetchOfferingsInternal() async {
     try {
-      CustomerInfo customerInfo = await Purchases.getCustomerInfo();
-      _isPremium = customerInfo.entitlements.all[RevenueCatConstants.premiumEntitlementId]?.isActive ?? false;
-      notifyListeners();
-    } catch (e) {
-      debugPrint("Check Premium Error: $e");
+      _offerings = await _revenueCat.getOfferings();
+      _notifyListeners();
+    } catch (error, stackTrace) {
+      _lastError = 'RevenueCat offerings error: $error';
+      debugPrint('$_lastError\n$stackTrace');
     }
   }
 
   Future<void> fetchOfferings() async {
-    try {
-      _offerings = await Purchases.getOfferings();
-      notifyListeners();
-    } catch (e) {
-      debugPrint("Fetch Offerings Error: $e");
-    }
+    await _initialization;
+    if (!_isConfigured || _isDisposed) return;
+    await _fetchOfferingsInternal();
   }
 
   Future<bool> purchasePackage(Package package) async {
+    await _initialization;
+    if (!_isConfigured || _isDisposed || _isPurchaseInProgress) return false;
+
+    _isPurchaseInProgress = true;
+    _notifyListeners();
+
     try {
-      _isLoading = true;
-      notifyListeners();
-      await Purchases.purchasePackage(package);
-      CustomerInfo customerInfo = await Purchases.getCustomerInfo();
-      
-      _isPremium = customerInfo.entitlements.all[RevenueCatConstants.premiumEntitlementId]?.isActive ?? false;
-      _isLoading = false;
-      notifyListeners();
+      final customerState = await _revenueCat.purchasePackage(package);
+      _applyCustomerState(customerState);
+      _lastError = null;
       return true;
-    } on PlatformException catch (e) {
-      var errorCode = PurchasesErrorHelper.getErrorCode(e);
+    } on PlatformException catch (error, stackTrace) {
+      final errorCode = PurchasesErrorHelper.getErrorCode(error);
       if (errorCode == PurchasesErrorCode.productAlreadyPurchasedError) {
-        debugPrint("Product already purchased, attempting to restore...");
-        return await restorePurchases();
+        debugPrint('Product already purchased; restoring purchases.');
+        return _restorePurchasesInternal();
       }
-      debugPrint("Purchase Package Error: $e");
-      _isLoading = false;
-      notifyListeners();
+
+      _lastError = 'RevenueCat purchase error: $error';
+      debugPrint('$_lastError\n$stackTrace');
       return false;
-    } catch (e) {
-      debugPrint("Purchase Package Error: $e");
-      _isLoading = false;
-      notifyListeners();
+    } catch (error, stackTrace) {
+      _lastError = 'RevenueCat purchase error: $error';
+      debugPrint('$_lastError\n$stackTrace');
       return false;
+    } finally {
+      _isPurchaseInProgress = false;
+      _notifyListeners();
     }
   }
 
   Future<bool> restorePurchases() async {
+    await _initialization;
+    if (!_isConfigured || _isDisposed || _isPurchaseInProgress) return false;
+
+    _isPurchaseInProgress = true;
+    _notifyListeners();
+
     try {
-      _isLoading = true;
-      notifyListeners();
-      
-      CustomerInfo customerInfo = await Purchases.restorePurchases();
-      _isPremium = customerInfo.entitlements.all[RevenueCatConstants.premiumEntitlementId]?.isActive ?? false;
-      
-      _isLoading = false;
-      notifyListeners();
-      return _isPremium;
-    } catch (e) {
-      debugPrint("Restore Purchases Error: $e");
-      _isLoading = false;
-      notifyListeners();
+      return await _restorePurchasesInternal();
+    } finally {
+      _isPurchaseInProgress = false;
+      _notifyListeners();
+    }
+  }
+
+  Future<bool> _restorePurchasesInternal() async {
+    try {
+      final customerState = await _revenueCat.restorePurchases();
+      _applyCustomerState(customerState);
+      _lastError = null;
+      return customerState.isPremium;
+    } catch (error, stackTrace) {
+      _lastError = 'RevenueCat restore error: $error';
+      debugPrint('$_lastError\n$stackTrace');
       return false;
     }
+  }
+
+  void _notifyListeners() {
+    if (!_isDisposed) notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    unawaited(_authSubscription.cancel());
+    if (_isConfigured) {
+      _revenueCat.removeCustomerStateListener(_handleCustomerStateUpdate);
+    }
+    super.dispose();
   }
 }

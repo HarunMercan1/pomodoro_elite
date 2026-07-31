@@ -1,149 +1,53 @@
-import 'dart:io';
+import 'package:flutter/foundation.dart';
 
-/// AdMob reklam ID'lerini yöneten yardımcı sınıf.
-///
-/// Test modunda Google'ın resmi test ID'lerini kullanır.
-/// Production modunda gerçek ID'leri kullanır.
+/// Android AdMob kimliklerini yapı türüne göre güvenli biçimde seçer.
+/// Debug derlemeleri daima Google'ın resmi test kimliklerini kullanır.
 class AdHelper {
-  /// Test modu aktif mi?
-  ///
-  /// ⚠️ ÖNEMLİ: Production'da bu FALSE olmalı!
-  /// Test modunda iken gerçek ID kullanmak hesabının banlanmasına neden olabilir.
-  static const bool isTestMode =
-      false; // 🧪 TEST MODU - Production için FALSE yapıldı
-
-  // ============================================================
-  // 🧪 GOOGLE'IN RESMİ TEST ID'LERİ
-  // Bu ID'ler development sırasında güvenle kullanılabilir.
-  // ============================================================
-
-  static const String _testAppIdAndroid =
-      'ca-app-pub-3940256099942544~3347511713';
-  static const String _testBannerIdAndroid =
-      'ca-app-pub-3940256099942544/6300978111';
-
-  static const String _testAppIdIOS = 'ca-app-pub-3940256099942544~1458002511';
-  static const String _testBannerIdIOS =
-      'ca-app-pub-3940256099942544/2934735716';
-
-  // ============================================================
-  // 🔥 GERÇEK ID'LER - AdMob'dan alınan ID'ler
-  // ============================================================
-
-  // Gerçek App ID
-  static const String _realAppIdAndroid =
+  static const String testAppId = 'ca-app-pub-3940256099942544~3347511713';
+  static const String productionAppId =
       'ca-app-pub-3820038977003119~9164182684';
 
-  // Gerçek Banner Ad Unit ID
-  static const String _realBannerIdAndroid =
-      'ca-app-pub-3820038977003119/5632131784';
-
-  // iOS için (gelecekte kullanılabilir)
-  static const String _realAppIdIOS = 'ca-app-pub-3820038977003119~9164182684';
-  static const String _realBannerIdIOS =
-      'ca-app-pub-3820038977003119/5632131784';
-
-  // ============================================================
-  // 🔥 BÜYÜK BANNER ID'LERİ (Ayarlar vs.)
-  // ============================================================
-  
-  static const String _testLargeBannerIdAndroid = 'ca-app-pub-3940256099942544/6300978111'; // Standart test banner ID kullanılabilir
-  static const String _testLargeBannerIdIOS = 'ca-app-pub-3940256099942544/2934735716';
-
-  static const String _realLargeBannerIdAndroid = 'ca-app-pub-3820038977003119/7568534212';
-  static const String _realLargeBannerIdIOS = 'ca-app-pub-3820038977003119/7568534212';
-
-  // ============================================================
-  // 🎁 REWARDED AD ID'LERİ (Tema kilidi açmak için)
-  // ============================================================
-
-  // Test rewarded ad IDs
-  static const String _testRewardedIdAndroid =
+  static const String _testAdaptiveBannerId =
+      'ca-app-pub-3940256099942544/9214589741';
+  static const String _testMediumRectangleId =
+      'ca-app-pub-3940256099942544/6300978111';
+  static const String _testRewardedId =
       'ca-app-pub-3940256099942544/5224354917';
-  static const String _testRewardedIdIOS =
-      'ca-app-pub-3940256099942544/1712485313';
-
-  // Gerçek Rewarded Ad Unit ID
-  static const String _realRewardedIdAndroid =
-      'ca-app-pub-3820038977003119/5113967474';
-  static const String _realRewardedIdIOS =
-      'ca-app-pub-3820038977003119/5113967474';
-
-  // ============================================================
-  // 🎬 INTERSTITIAL AD ID'LERİ (Pomodoro sonrası)
-  // ============================================================
-
-  // Test interstitial ad IDs
-  static const String _testInterstitialIdAndroid =
+  static const String _testInterstitialId =
       'ca-app-pub-3940256099942544/1033173712';
-  static const String _testInterstitialIdIOS =
-      'ca-app-pub-3940256099942544/4411468910';
 
-  // Gerçek Interstitial Ad Unit ID
-  static const String _realInterstitialIdAndroid =
+  static const String _productionAdaptiveBannerId =
+      'ca-app-pub-3820038977003119/5632131784';
+  static const String _productionMediumRectangleId =
+      'ca-app-pub-3820038977003119/7568534212';
+  static const String _productionRewardedId =
+      'ca-app-pub-3820038977003119/5113967474';
+  static const String _productionInterstitialId =
       'ca-app-pub-3820038977003119/5476945465';
-  static const String _realInterstitialIdIOS =
-      'ca-app-pub-3820038977003119/5476945465';
 
-  // ============================================================
-  // GETTER METODLARI
-  // ============================================================
+  static bool get isTestMode => kDebugMode;
 
-  /// Banner reklam ID'sini döndürür.
-  /// Test moduna göre uygun ID'yi seçer.
-  static String get bannerAdUnitId {
-    if (Platform.isAndroid) {
-      return isTestMode ? _testBannerIdAndroid : _realBannerIdAndroid;
-    } else if (Platform.isIOS) {
-      return isTestMode ? _testBannerIdIOS : _realBannerIdIOS;
-    } else {
-      throw UnsupportedError('Bu platform desteklenmiyor');
-    }
-  }
+  static String bannerAdUnitIdFor({required bool isDebug}) =>
+      isDebug ? _testAdaptiveBannerId : _productionAdaptiveBannerId;
 
-  /// Büyük Banner reklam ID'sini döndürür.
-  static String get largeBannerAdUnitId {
-    if (Platform.isAndroid) {
-      return isTestMode ? _testLargeBannerIdAndroid : _realLargeBannerIdAndroid;
-    } else if (Platform.isIOS) {
-      return isTestMode ? _testLargeBannerIdIOS : _realLargeBannerIdIOS;
-    } else {
-      throw UnsupportedError('Bu platform desteklenmiyor');
-    }
-  }
+  static String largeBannerAdUnitIdFor({required bool isDebug}) =>
+      isDebug ? _testMediumRectangleId : _productionMediumRectangleId;
 
-  /// Rewarded reklam ID'sini döndürür.
-  static String get rewardedAdUnitId {
-    if (Platform.isAndroid) {
-      return isTestMode ? _testRewardedIdAndroid : _realRewardedIdAndroid;
-    } else if (Platform.isIOS) {
-      return isTestMode ? _testRewardedIdIOS : _realRewardedIdIOS;
-    } else {
-      throw UnsupportedError('Bu platform desteklenmiyor');
-    }
-  }
+  static String rewardedAdUnitIdFor({required bool isDebug}) =>
+      isDebug ? _testRewardedId : _productionRewardedId;
 
-  /// Interstitial reklam ID'sini döndürür.
-  static String get interstitialAdUnitId {
-    if (Platform.isAndroid) {
-      return isTestMode
-          ? _testInterstitialIdAndroid
-          : _realInterstitialIdAndroid;
-    } else if (Platform.isIOS) {
-      return isTestMode ? _testInterstitialIdIOS : _realInterstitialIdIOS;
-    } else {
-      throw UnsupportedError('Bu platform desteklenmiyor');
-    }
-  }
+  static String interstitialAdUnitIdFor({required bool isDebug}) =>
+      isDebug ? _testInterstitialId : _productionInterstitialId;
 
-  /// App ID'yi döndürür (bilgi amaçlı).
-  static String get appId {
-    if (Platform.isAndroid) {
-      return isTestMode ? _testAppIdAndroid : _realAppIdAndroid;
-    } else if (Platform.isIOS) {
-      return isTestMode ? _testAppIdIOS : _realAppIdIOS;
-    } else {
-      throw UnsupportedError('Bu platform desteklenmiyor');
-    }
-  }
+  static String appIdFor({required bool isDebug}) =>
+      isDebug ? testAppId : productionAppId;
+
+  static String get bannerAdUnitId => bannerAdUnitIdFor(isDebug: isTestMode);
+  static String get largeBannerAdUnitId =>
+      largeBannerAdUnitIdFor(isDebug: isTestMode);
+  static String get rewardedAdUnitId =>
+      rewardedAdUnitIdFor(isDebug: isTestMode);
+  static String get interstitialAdUnitId =>
+      interstitialAdUnitIdFor(isDebug: isTestMode);
+  static String get appId => appIdFor(isDebug: isTestMode);
 }

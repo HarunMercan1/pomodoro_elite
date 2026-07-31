@@ -4,7 +4,6 @@ import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'providers/timer_provider.dart';
 import 'providers/settings_provider.dart';
 import 'providers/stats_provider.dart';
@@ -15,6 +14,8 @@ import 'providers/purchase_provider.dart';
 import 'screens/splash_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/constants/supabase_constants.dart';
+import 'services/ad_consent_service.dart';
+import 'services/guest_stats_migration_service.dart';
 
 // main artık hafifledi, bekleme yapmıyor
 void main() async {
@@ -41,8 +42,6 @@ void main() async {
   tz.setLocalLocation(tz.getLocation('Europe/Istanbul'));
 
   // 🔥 AdMob SDK'yı başlat
-  await MobileAds.instance.initialize();
-
   runApp(
     EasyLocalization(
       supportedLocales: const [
@@ -78,16 +77,38 @@ void main() async {
         providers: [
           ChangeNotifierProvider(create: (_) => TimerProvider()),
           ChangeNotifierProvider(create: (_) => SettingsProvider()),
-          ChangeNotifierProvider(create: (_) => StatsProvider()),
-          ChangeNotifierProvider(create: (_) => AuthProvider()),
-          ChangeNotifierProvider(create: (_) => PurchaseProvider()),
+          Provider(create: (_) => GuestStatsMigrationService()),
           ChangeNotifierProvider(
-              create: (_) => ThemeProvider()), // 🎨 Tema yöneticisi
-          ChangeNotifierProxyProvider<PurchaseProvider, AdManager>(
+            create: (context) => StatsProvider(
+              guestStatsMigrationService:
+                  context.read<GuestStatsMigrationService>(),
+            ),
+          ),
+          ChangeNotifierProvider(
+            create: (context) => AuthProvider(
+              guestStatsMigrationService:
+                  context.read<GuestStatsMigrationService>(),
+            ),
+          ),
+          ChangeNotifierProvider(create: (_) => PurchaseProvider()),
+          ChangeNotifierProvider(create: (_) => AdConsentService()),
+          ChangeNotifierProxyProvider<PurchaseProvider, ThemeProvider>(
+            create: (_) => ThemeProvider(),
+            update: (_, purchaseProvider, themeProvider) {
+              return (themeProvider ?? ThemeProvider())
+                ..updatePremiumStatus(
+                  isPremium: purchaseProvider.isPremium,
+                  isLoading: purchaseProvider.isLoading,
+                );
+            },
+          ), // 🎨 Tema yöneticisi
+          ChangeNotifierProxyProvider2<PurchaseProvider, AdConsentService,
+              AdManager>(
             create: (_) => AdManager(),
-            update: (_, purchaseProvider, adManager) {
+            update: (_, purchaseProvider, consentService, adManager) {
               return (adManager ?? AdManager())
-                ..updatePremiumStatus(purchaseProvider.isPremium);
+                ..updatePremiumStatus(purchaseProvider.isPremium)
+                ..updateAdServingAllowed(consentService.adsReady);
             },
           ), // 🔥 Reklam yöneticisi
         ],

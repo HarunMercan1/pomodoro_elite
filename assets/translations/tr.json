@@ -25,6 +25,7 @@
   "background_music": "ODAKLANMA MÜZİĞİ",
   "enable_music": "Arka Plan Müziği",
   "notification_sound": "BİLDİRİM SESİ",
+  "notification_channel_description": "Sayaç arka planda tamamlandığında gösterilen bildirimler",
   "music_lock_msg": "Müzik değiştirmek için sayacı durdurun.",
   "stats_title": "İstatistikler",
   "total_focus": "Toplam Odaklanma",
@@ -38,6 +39,10 @@
   "minutes_label": "Dakika",
   "daily_streak": "Günlük Seri",
   "day_label": "Gün",
+  "sound_alarm": "Klasik Alarm",
+  "sound_digital": "Dijital",
+  "sound_bell3": "Ding Dong",
+  "sound_bell8": "Kristal Zil",
   "sound_zil1": "Zil 1",
   "sound_zil2": "Zil 2",
   "sound_zil3": "Zil 3",
@@ -238,8 +243,10 @@
   "ok_btn": "Tamam",
   "premium_subtitle": "Reklamları kaldır, temaları aç",
   "star_supporter": "Yıldız Destekçi",
-  "super_star_supporter": "Süper Yıldız Destekçi",
+  "super_supporter": "Süper Destekçi",
+  "mega_supporter": "Mega Destekçi",
   "login_required": "Üye Girişi Gerekli",
   "premium_login_required_desc": "Premium satın almak veya özelliklerini kullanmak için lütfen hesabınıza giriş yapın.",
-  "unlock_premium": "Premium'u Aç"
+  "unlock_premium": "Premium'u Aç",
+  "privacy_options": "Gizlilik seçenekleri"
 }

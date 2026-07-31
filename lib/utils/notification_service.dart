@@ -1,131 +1,108 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 
-class NotificationService {
+abstract interface class TimerNotificationGateway {
+  Future<bool> scheduleTimerEndNotification({
+    required int seconds,
+    required String title,
+    required String body,
+  });
+
+  Future<void> cancelScheduledNotification();
+}
+
+class NotificationService implements TimerNotificationGateway {
   static final NotificationService _instance = NotificationService._internal();
   factory NotificationService() => _instance;
   NotificationService._internal();
 
-  final FlutterLocalNotificationsPlugin _notificationsPlugin = FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin _notificationsPlugin =
+      FlutterLocalNotificationsPlugin();
 
-  /// Zamanlanmış bildirimler için sabit ID (aynı anda sadece 1 tane olabilir)
   static const int _scheduledNotificationId = 99;
 
   Future<void> init() async {
-    // Başlatma ayarları (Burası standart kalabilir)
-    const AndroidInitializationSettings androidSettings =
-    AndroidInitializationSettings('@mipmap/launcher_icon');
-
-    const DarwinInitializationSettings iosSettings = DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
+    const androidSettings = AndroidInitializationSettings(
+      '@mipmap/launcher_icon',
     );
-
-    const InitializationSettings initSettings = InitializationSettings(
-      android: androidSettings,
-      iOS: iosSettings,
-    );
+    const initSettings = InitializationSettings(android: androidSettings);
 
     await _notificationsPlugin.initialize(initSettings);
-
     await _notificationsPlugin
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
         ?.requestNotificationsPermission();
   }
 
-  Future<void> showNotification({
-    required String title,
-    required String body,
-  }) async {
-    const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
-      'pomodoro_elite_channel_v4', //
-      'Pomodoro Elite Bildirimleri',
-      channelDescription: 'Sayaç bitince gelen bildirimler',
-      importance: Importance.max,
-      priority: Priority.high,
-      ticker: 'ticker',
-      icon: 'notification_check',
-      largeIcon: DrawableResourceAndroidBitmap('notification_check'),
-      color: Color(0xFF4CAF50),
-      playSound: true,
-      enableVibration: true,
-    );
-
-    const DarwinNotificationDetails iosDetails = DarwinNotificationDetails(
-      presentSound: true,
-    );
-
-    const NotificationDetails details = NotificationDetails(
-      android: androidDetails,
-      iOS: iosDetails,
-    );
-
-    await _notificationsPlugin.show(
-      0,
-      title,
-      body,
-      details,
-    );
-  }
-
-  /// Timer başladığında çağrılır — bitiş anı için bildirim planlar.
-  /// Uygulama arka planda olsa veya tamamen kapatılsa bile bildirim gelir.
-  Future<void> scheduleTimerEndNotification({
+  @override
+  Future<bool> scheduleTimerEndNotification({
     required int seconds,
     required String title,
     required String body,
   }) async {
-    // Önce eski zamanlanmış bildirimi iptal et
+    if (seconds <= 0) return false;
+
     await cancelScheduledNotification();
 
-    final scheduledTime = tz.TZDateTime.now(tz.local).add(Duration(seconds: seconds));
+    final scheduledTime = tz.TZDateTime.now(
+      tz.local,
+    ).add(Duration(seconds: seconds));
 
-    const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+    final androidDetails = AndroidNotificationDetails(
       'pomodoro_elite_timer_channel',
-      'Pomodoro Timer Bildirimleri',
-      channelDescription: 'Sayaç arka planda bittiğinde gelen bildirimler',
+      'Pomodoro Elite',
+      channelDescription: 'notification_channel_description'.tr(),
       importance: Importance.max,
       priority: Priority.high,
       ticker: 'timer_done',
       icon: 'notification_check',
-      largeIcon: DrawableResourceAndroidBitmap('notification_check'),
-      color: Color(0xFF4CAF50),
+      largeIcon: const DrawableResourceAndroidBitmap('notification_check'),
+      color: const Color(0xFF4CAF50),
       playSound: true,
       enableVibration: true,
     );
-
-    const DarwinNotificationDetails iosDetails = DarwinNotificationDetails(
-      presentSound: true,
-    );
-
-    const NotificationDetails details = NotificationDetails(
-      android: androidDetails,
-      iOS: iosDetails,
-    );
+    final details = NotificationDetails(android: androidDetails);
 
     try {
+      final androidPlugin =
+          _notificationsPlugin.resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>();
+      final canScheduleExactly =
+          await androidPlugin?.canScheduleExactNotifications() ?? false;
+
       await _notificationsPlugin.zonedSchedule(
         _scheduledNotificationId,
         title,
         body,
         scheduledTime,
         details,
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        androidScheduleMode: canScheduleExactly
+            ? AndroidScheduleMode.exactAllowWhileIdle
+            : AndroidScheduleMode.inexactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
         matchDateTimeComponents: null,
       );
-      debugPrint("📅 Bildirim planlandı: $seconds sn sonra ($scheduledTime)");
-    } catch (e) {
-      debugPrint("❌ Zamanlanmış bildirim hatası: $e");
+      debugPrint('Bildirim planlandı: $seconds sn sonra ($scheduledTime)');
+      return true;
+    } catch (error, stackTrace) {
+      debugPrint('Zamanlanmış bildirim hatası: $error\n$stackTrace');
+      return false;
     }
   }
 
-  /// Zamanlanmış bildirimi iptal eder (timer durdurulduğunda/sıfırlandığında).
+  @override
   Future<void> cancelScheduledNotification() async {
-    await _notificationsPlugin.cancel(_scheduledNotificationId);
-    debugPrint("🚫 Zamanlanmış bildirim iptal edildi");
+    try {
+      await _notificationsPlugin.cancel(_scheduledNotificationId);
+      if (kDebugMode) {
+        debugPrint('Zamanlanmış timer bildirimi iptal edildi');
+      }
+    } catch (error, stackTrace) {
+      debugPrint('Timer bildirimi iptal edilemedi: $error\n$stackTrace');
+    }
   }
 }

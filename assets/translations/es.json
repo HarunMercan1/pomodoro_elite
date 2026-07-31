@@ -25,6 +25,7 @@
   "background_music": "MÚSICA DE CONCENTRACIÓN",
   "enable_music": "Música de Fondo",
   "notification_sound": "SONIDO DE NOTIFICACIÓN",
+  "notification_channel_description": "Notificaciones cuando el temporizador termina en segundo plano",
   "music_lock_msg": "Detén el temporizador para cambiar la música.",
   "stats_title": "Estadísticas",
   "total_focus": "Concentración Total",
@@ -174,6 +175,7 @@
   "theme_elite": "Elite",
   "theme_applied": "¡aplicado!",
   "theme_unlocked": "¡desbloqueado!",
+  "theme_unlocked_72h": "¡desbloqueado durante 72 horas!",
   "unlock_theme_msg": "Mira un video corto u obtén Premium para desbloquear este tema.",
   "watch_ad": "Ver Anuncio",
   "recommended_sound": "Recomendado",
@@ -215,7 +217,7 @@
   "log_out_title": "¿Cerrar sesión?",
   "exit_guest_mode_title": "¿Salir del modo invitado?",
   "log_out_confirm": "¿Estás seguro de que quieres cerrar sesión?",
-  "focus_grow_achieve": "Focus. Grow. Achieve.",
+  "focus_grow_achieve": "Concéntrate. Crece. Triunfa.",
   "sign_in_error": "Error al iniciar sesión. Inténtalo de nuevo.",
   "premium_active": "💎 Eres un Usuario Premium",
   "get_premium": "💎 Hazte Premium",
@@ -241,8 +243,10 @@
   "ok_btn": "De acuerdo",
   "premium_subtitle": "Eliminar anuncios, desbloquear temas",
   "star_supporter": "Patrocinador Estrella",
-  "super_star_supporter": "Patrocinador Súper Estrella",
+  "super_supporter": "Súper Patrocinador",
+  "mega_supporter": "Mega Patrocinador",
   "login_required": "Inicio de Sesión Requerido",
   "premium_login_required_desc": "Inicie sesión en su cuenta para comprar o usar las funciones Premium.",
-  "unlock_premium": "Desbloquear Premium"
+  "unlock_premium": "Desbloquear Premium",
+  "privacy_options": "Opciones de privacidad"
 }

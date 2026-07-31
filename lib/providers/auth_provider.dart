@@ -3,9 +3,20 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../core/constants/supabase_constants.dart';
+import '../services/guest_stats_migration_service.dart';
 
 class AuthProvider extends ChangeNotifier {
-  final SupabaseClient _supabase = Supabase.instance.client;
+  AuthProvider({
+    GuestStatsMigrationService? guestStatsMigrationService,
+    SupabaseClient? supabaseClient,
+  })  : _supabase = supabaseClient ?? Supabase.instance.client,
+        _guestStatsMigrationService =
+            guestStatsMigrationService ?? GuestStatsMigrationService() {
+    _initializeAuth();
+  }
+
+  final SupabaseClient _supabase;
+  final GuestStatsMigrationService _guestStatsMigrationService;
   User? _user;
   bool _isGuest = false;
   bool _isLoading = true;
@@ -15,12 +26,9 @@ class AuthProvider extends ChangeNotifier {
   bool get isGuest => _isGuest;
   bool get isLoading => _isLoading;
   bool get isAuthenticated => _user != null || _isGuest;
-  String get displayName => _user?.userMetadata?['full_name'] ?? _user?.email ?? 'Guest';
+  String get displayName =>
+      _user?.userMetadata?['full_name'] ?? _user?.email ?? 'Guest';
   String? get avatarUrl => _user?.userMetadata?['avatar_url'];
-
-  AuthProvider() {
-    _initializeAuth();
-  }
 
   Future<void> _initializeAuth() async {
     final prefs = await SharedPreferences.getInstance();
@@ -73,13 +81,21 @@ class AuthProvider extends ChangeNotifier {
   // 🔥 GOOGLE SIGN IN
   Future<void> signInWithGoogle() async {
     await _ensureGoogleInitialized();
-    
+
+    if (_isGuest) {
+      // Supabase oturumu açılmadan önce misafir verisinin değişmez bir
+      // snapshot'ını al. Auth event'i geldiğinde StatsProvider bu kuyruğu
+      // atomik biçimde yeni hesaba aktarır.
+      await _guestStatsMigrationService.prepareGuestSnapshot();
+    }
+
     try {
       await _performGoogleSignIn();
     } catch (e) {
       // Stale session durumunda: signOut yapıp tekrar dene
       final errorStr = e.toString().toLowerCase();
-      if (errorStr.contains('canceled') || errorStr.contains('sign_in_failed')) {
+      if (errorStr.contains('canceled') ||
+          errorStr.contains('sign_in_failed')) {
         try {
           await GoogleSignIn.instance.signOut();
         } catch (_) {}
