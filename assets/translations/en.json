@@ -239,5 +239,8 @@
   "restore_success": "Your purchases have been successfully restored and credited to your account.",
   "not_found_title": "Not Found",
   "restore_not_found": "No past Premium purchase records found for this account.",
-  "ok_btn": "Ok"
+  "ok_btn": "Ok",
+  "premium_subtitle": "Remove ads, unlock themes",
+  "star_supporter": "Star Supporter",
+  "super_star_supporter": "Super Star Supporter"
 }

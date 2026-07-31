@@ -238,5 +238,8 @@
   "restore_success": "आपकी खरीदारी सफलतापूर्वक बहाल कर दी गई है और आपके खाते में जमा कर दी गई है।",
   "not_found_title": "नहीं मिला",
   "restore_not_found": "इस खाते के लिए कोई पिछला प्रीमियम खरीद रिकॉर्ड नहीं मिला।",
-  "ok_btn": "ठीक है"
+  "ok_btn": "ठीक है",
+  "premium_subtitle": "Remove ads, unlock themes",
+  "star_supporter": "Star Supporter",
+  "super_star_supporter": "Super Star Supporter"
 }

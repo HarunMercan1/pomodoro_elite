@@ -238,5 +238,8 @@
   "restore_success": "Sus compras han sido restauradas y acreditadas exitosamente en su cuenta.",
   "not_found_title": "Extraviado",
   "restore_not_found": "No se encontraron registros de compras Premium anteriores para esta cuenta.",
-  "ok_btn": "De acuerdo"
+  "ok_btn": "De acuerdo",
+  "premium_subtitle": "Eliminar anuncios, desbloquear temas",
+  "star_supporter": "Patrocinador Estrella",
+  "super_star_supporter": "Patrocinador Súper Estrella"
 }

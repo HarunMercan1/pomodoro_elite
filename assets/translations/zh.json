@@ -238,5 +238,8 @@
   "restore_success": "您的购买已成功恢复并记入您的帐户。",
   "not_found_title": "未找到",
   "restore_not_found": "找不到该帐户过去的 Premium 购买记录。",
-  "ok_btn": "好的"
+  "ok_btn": "好的",
+  "premium_subtitle": "Remove ads, unlock themes",
+  "star_supporter": "Star Supporter",
+  "super_star_supporter": "Super Star Supporter"
 }

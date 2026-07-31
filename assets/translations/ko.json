@@ -238,5 +238,8 @@
   "restore_success": "귀하의 구매가 성공적으로 복원되었으며 귀하의 계정에 적립되었습니다.",
   "not_found_title": "찾을 수 없음",
   "restore_not_found": "이 계정에 대한 과거 프리미엄 구매 기록이 없습니다.",
-  "ok_btn": "좋아요"
+  "ok_btn": "좋아요",
+  "premium_subtitle": "Remove ads, unlock themes",
+  "star_supporter": "Star Supporter",
+  "super_star_supporter": "Super Star Supporter"
 }

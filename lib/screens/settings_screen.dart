@@ -227,52 +227,79 @@ class _SettingsScreenState extends State<SettingsScreen>
                             ),
 
                             // PREMIUM BUTONU
-                            Card(
-                              color: context.watch<PurchaseProvider>().isPremium 
-                                  ? Colors.amber.withOpacity(0.1) 
-                                  : Colors.amber.withOpacity(0.8),
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
+                            Container(
+                              decoration: BoxDecoration(
+                                gradient: context.watch<PurchaseProvider>().isPremium 
+                                    ? const LinearGradient(
+                                        colors: [Color(0xFF475569), Color(0xFF0F172A)], // Platinum/Slate
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                      )
+                                    : const LinearGradient(
+                                        colors: [Color(0xFF38BDF8), Color(0xFF3B82F6)], // Diamond Cyan/Blue
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                      ),
                                 borderRadius: BorderRadius.circular(16),
-                                side: const BorderSide(color: Colors.amber, width: 1),
+                                border: Border.all(
+                                  color: context.watch<PurchaseProvider>().isPremium 
+                                      ? const Color(0xFF38BDF8).withOpacity(0.5)
+                                      : Colors.transparent,
+                                  width: 1,
+                                ),
+                                boxShadow: context.watch<PurchaseProvider>().isPremium
+                                    ? []
+                                    : [
+                                        BoxShadow(
+                                          color: const Color(0xFF38BDF8).withOpacity(0.4),
+                                          blurRadius: 12,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                      ],
                               ),
-                              child: ListTile(
-                                contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: isTablet ? 8 : 0),
-                                leading: Icon(
-                                  Icons.workspace_premium_rounded,
-                                  color: context.watch<PurchaseProvider>().isPremium ? Colors.amber : Colors.black87,
-                                  size: iconSize,
-                                ),
-                                title: Text(
-                                  context.watch<PurchaseProvider>().isPremium 
-                                      ? '👑 Premium Aktif'
-                                      : '👑 Premium\'a Geç',
-                                  style: AppFonts.poppins(
-                                    context: context,
-                                    color: context.watch<PurchaseProvider>().isPremium ? Colors.amber : Colors.black87,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: titleSize,
-                                  ),
-                                ),
-                                subtitle: context.watch<PurchaseProvider>().isPremium 
-                                  ? null 
-                                  : Text(
-                                      'Reklamları kaldır, temaları aç',
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(16),
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => const PremiumScreen()),
+                                    );
+                                  },
+                                  child: ListTile(
+                                    contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: isTablet ? 8 : 0),
+                                    leading: Icon(
+                                      Icons.diamond_rounded,
+                                      color: Colors.white,
+                                      size: iconSize,
+                                    ),
+                                    title: Text(
+                                      context.watch<PurchaseProvider>().isPremium 
+                                          ? 'premium_active'.tr().replaceAll(RegExp(r'👑\s*'), '')
+                                          : 'get_premium'.tr().replaceAll(RegExp(r'👑\s*'), ''),
                                       style: AppFonts.poppins(
                                         context: context,
-                                        fontSize: subtitleSize,
-                                        color: Colors.black87.withOpacity(0.7),
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: titleSize,
                                       ),
                                     ),
-                                trailing: Icon(Icons.arrow_forward_ios_rounded,
-                                    size: trailingIconSize, 
-                                    color: context.watch<PurchaseProvider>().isPremium ? Colors.amber : Colors.black87),
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => const PremiumScreen()),
-                                  );
-                                },
+                                    subtitle: context.watch<PurchaseProvider>().isPremium 
+                                      ? null 
+                                      : Text(
+                                          'premium_subtitle'.tr(),
+                                          style: AppFonts.poppins(
+                                            context: context,
+                                            fontSize: subtitleSize,
+                                            color: Colors.white.withOpacity(0.9),
+                                          ),
+                                        ),
+                                    trailing: Icon(Icons.arrow_forward_ios_rounded,
+                                        size: trailingIconSize, 
+                                        color: Colors.white),
+                                  ),
+                                ),
                               ),
                             ),
                             const SizedBox(height: 20),

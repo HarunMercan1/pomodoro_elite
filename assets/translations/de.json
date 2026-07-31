@@ -238,5 +238,8 @@
   "restore_success": "Ihre Einkäufe wurden erfolgreich wiederhergestellt und Ihrem Konto gutgeschrieben.",
   "not_found_title": "Nicht gefunden",
   "restore_not_found": "Für dieses Konto wurden keine Datensätze zu früheren Premium-Käufen gefunden.",
-  "ok_btn": "OK"
+  "ok_btn": "OK",
+  "premium_subtitle": "Werbung entfernen, Themen freischalten",
+  "star_supporter": "Sterne-Unterstützer",
+  "super_star_supporter": "Super-Sterne-Unterstützer"
 }

@@ -238,5 +238,8 @@
   "restore_success": "Ваші покупки успішно відновлено та зараховано на ваш рахунок.",
   "not_found_title": "Не знайдено",
   "restore_not_found": "Для цього облікового запису не знайдено попередніх записів про покупки Premium.",
-  "ok_btn": "Гаразд"
+  "ok_btn": "Гаразд",
+  "premium_subtitle": "Remove ads, unlock themes",
+  "star_supporter": "Star Supporter",
+  "super_star_supporter": "Super Star Supporter"
 }

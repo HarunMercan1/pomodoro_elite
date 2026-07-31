@@ -238,5 +238,8 @@
   "restore_success": "I tuoi acquisti sono stati ripristinati e accreditati con successo sul tuo account.",
   "not_found_title": "Non trovato",
   "restore_not_found": "Nessun record di acquisti Premium precedenti trovato per questo account.",
-  "ok_btn": "OK"
+  "ok_btn": "OK",
+  "premium_subtitle": "Remove ads, unlock themes",
+  "star_supporter": "Star Supporter",
+  "super_star_supporter": "Super Star Supporter"
 }

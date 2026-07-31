@@ -238,5 +238,8 @@
   "restore_success": "Pembelian Anda telah berhasil dipulihkan dan dikreditkan ke akun Anda.",
   "not_found_title": "Tidak Ditemukan",
   "restore_not_found": "Tidak ditemukan catatan pembelian Premium sebelumnya untuk akun ini.",
-  "ok_btn": "Oke"
+  "ok_btn": "Oke",
+  "premium_subtitle": "Remove ads, unlock themes",
+  "star_supporter": "Star Supporter",
+  "super_star_supporter": "Super Star Supporter"
 }

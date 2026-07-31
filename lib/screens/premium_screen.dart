@@ -250,6 +250,13 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       // Play Store'dan gelen başlığın yanındaki parantez içini sil (Örn: "Yıldız Destekçi (Pomodoro Elite...)" -> "Yıldız Destekçi")
                       final cleanTitle = package.storeProduct.title.replaceAll(RegExp(r'\s*\(.*\)'), '');
                       
+                      String displayTitle = cleanTitle;
+                      if (cleanTitle.toLowerCase().contains("süper yıldız") || package.identifier.toLowerCase().contains("super")) {
+                        displayTitle = 'super_star_supporter'.tr();
+                      } else if (cleanTitle.toLowerCase().contains("yıldız") || package.identifier.toLowerCase().contains("star") || package.identifier.toLowerCase().contains("tip_1")) {
+                        displayTitle = 'star_supporter'.tr();
+                      }
+                      
                       // Paket sırasına göre renk tonlaması (Bronz, Gümüş, Altın / Elmas efekti)
                       final List<List<Color>> cardGradients = [
                         [const Color(0xFF818CF8), const Color(0xFF4F46E5)], // Indigo gradient
@@ -316,7 +323,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            cleanTitle,
+                                            displayTitle,
                                             style: AppFonts.poppins(
                                               context: context,
                                               fontSize: 16,

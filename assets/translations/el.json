@@ -238,5 +238,8 @@
   "restore_success": "Οι αγορές σας αποκαταστάθηκαν με επιτυχία και πιστώθηκαν στον λογαριασμό σας.",
   "not_found_title": "Δεν βρέθηκε",
   "restore_not_found": "Δεν βρέθηκαν προηγούμενες εγγραφές αγορών Premium για αυτόν τον λογαριασμό.",
-  "ok_btn": "Εντάξει"
+  "ok_btn": "Εντάξει",
+  "premium_subtitle": "Remove ads, unlock themes",
+  "star_supporter": "Star Supporter",
+  "super_star_supporter": "Super Star Supporter"
 }

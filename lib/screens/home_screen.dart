@@ -186,7 +186,7 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.bar_chart_rounded),
-          tooltip: "İstatistikler",
+          tooltip: 'stats_title'.tr(),
           onPressed: () {
             Navigator.push(
               context,

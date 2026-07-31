@@ -238,5 +238,8 @@
   "restore_success": "Twoje zakupy zostały pomyślnie przywrócone i zaksięgowane na Twoim koncie.",
   "not_found_title": "Nie znaleziono",
   "restore_not_found": "Nie znaleziono żadnych zapisów dotyczących wcześniejszych zakupów Premium dla tego konta.",
-  "ok_btn": "OK"
+  "ok_btn": "OK",
+  "premium_subtitle": "Remove ads, unlock themes",
+  "star_supporter": "Star Supporter",
+  "super_star_supporter": "Super Star Supporter"
 }

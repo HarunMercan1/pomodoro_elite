@@ -238,5 +238,8 @@
   "restore_success": "Uw aankopen zijn succesvol hersteld en bijgeschreven op uw account.",
   "not_found_title": "Niet gevonden",
   "restore_not_found": "Er zijn geen eerdere Premium-aankoopgegevens gevonden voor dit account.",
-  "ok_btn": "OK"
+  "ok_btn": "OK",
+  "premium_subtitle": "Remove ads, unlock themes",
+  "star_supporter": "Star Supporter",
+  "super_star_supporter": "Super Star Supporter"
 }

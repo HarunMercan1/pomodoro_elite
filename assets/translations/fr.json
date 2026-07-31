@@ -238,5 +238,8 @@
   "restore_success": "Vos achats ont été restaurés avec succès et crédités sur votre compte.",
   "not_found_title": "Introuvable",
   "restore_not_found": "Aucun enregistrement d'achat Premium antérieur trouvé pour ce compte.",
-  "ok_btn": "D'accord"
+  "ok_btn": "D'accord",
+  "premium_subtitle": "Supprimer les pubs, débloquer les thèmes",
+  "star_supporter": "Supporter Étoile",
+  "super_star_supporter": "Supporter Super Étoile"
 }

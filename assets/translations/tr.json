@@ -235,5 +235,8 @@
   "restore_success": "Satın almalarınız başarıyla geri yüklendi ve hesabınıza tanımlandı.",
   "not_found_title": "Bulunamadı",
   "restore_not_found": "Bu hesaba ait geçmiş bir Premium satın alma kaydı bulunamadı.",
-  "ok_btn": "Tamam"
+  "ok_btn": "Tamam",
+  "premium_subtitle": "Reklamları kaldır, temaları aç",
+  "star_supporter": "Yıldız Destekçi",
+  "super_star_supporter": "Süper Yıldız Destekçi"
 }

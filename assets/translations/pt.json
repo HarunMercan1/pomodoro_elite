@@ -238,5 +238,8 @@
   "restore_success": "Suas compras foram restauradas com sucesso e creditadas em sua conta.",
   "not_found_title": "Não encontrado",
   "restore_not_found": "Nenhum registro de compra Premium anterior encontrado para esta conta.",
-  "ok_btn": "OK"
+  "ok_btn": "OK",
+  "premium_subtitle": "Remova anúncios, desbloqueie temas",
+  "star_supporter": "Apoiador Estrela",
+  "super_star_supporter": "Apoiador Super Estrela"
 }

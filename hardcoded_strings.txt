@@ -1,0 +1,75 @@
+ad_manager.dart:51: 🔄 Settings Banner yükleniyor... (width: $width)
+ad_manager.dart:66: ✅ Settings Banner yüklendi
+ad_manager.dart:71: ❌ Settings Banner yüklenemedi: ${error.message}
+ad_manager.dart:87: 🔄 Duration Banner yükleniyor... (width: $width)
+ad_manager.dart:98: ✅ Duration Banner yüklendi
+ad_manager.dart:103: ❌ Duration Banner yüklenemedi: ${error.message}
+ad_manager.dart:135: 🔄 Sound Banner yükleniyor... (width: $width)
+ad_manager.dart:146: ✅ Sound Banner yüklendi
+ad_manager.dart:151: ❌ Sound Banner yüklenemedi: ${error.message}
+ad_manager.dart:181: 🔄 Rewarded Ad yükleniyor...
+ad_manager.dart:188: ✅ Rewarded Ad yüklendi
+ad_manager.dart:194: ❌ Rewarded Ad yüklenemedi: ${error.message}
+ad_manager.dart:209: ⚠️ Rewarded Ad hazır değil, yükleniyor...
+ad_manager.dart:216: 📺 Rewarded Ad gösterildi
+ad_manager.dart:219: 👋 Rewarded Ad kapatıldı
+ad_manager.dart:228: ❌ Rewarded Ad gösterilemedi: ${error.message}
+ad_manager.dart:239: 🎁 Ödül kazanıldı: ${reward.amount} ${reward.type}
+ad_manager.dart:260: 🔄 Interstitial Ad yükleniyor...
+ad_manager.dart:267: ✅ Interstitial Ad yüklendi
+ad_manager.dart:273: ❌ Interstitial Ad yüklenemedi: ${error.message}
+ad_manager.dart:288: 🍅 Pomodoro sayısı: $_pomodorosSinceLastAd
+ad_manager.dart:302: ⚠️ Interstitial Ad hazır değil
+ad_manager.dart:309: 📺 Interstitial Ad gösterildi
+ad_manager.dart:312: 👋 Interstitial Ad kapatıldı
+ad_manager.dart:320: ❌ Interstitial Ad gösterilemedi: ${error.message}
+settings_provider.dart:57: , // rain1.mp3 artık 
+settings_provider.dart:58: , // rain2.mp3 artık 
+settings_provider.dart:114: ❌ Zil Hatası: $e
+settings_provider.dart:153: ⬇️ Müzik İndiriliyor: $url
+settings_provider.dart:161: ✅ Müzik İndirildi: ${file.path}
+settings_provider.dart:163: ❌ İndirme Başarısız: ${response.statusCode}
+settings_provider.dart:166: ❌ İndirme Hatası: $e
+settings_provider.dart:185: ⚠️ Müzik bulunamadı, indirilmesi gerek: $soundPath
+settings_provider.dart:204: ❌ Müzik Çalma Hatası: $e
+stats_provider.dart:80: Supabase veri çekme hatası: $e
+stats_provider.dart:233: e veri kaydetme hatası: $e
+stats_provider.dart:272: Supabase silme hatası: $e
+theme_provider.dart:186: Güven, Sade
+theme_provider.dart:310: Kristal Mavi, Sarı Tulum
+theme_provider.dart:438: Doğa, Huzur
+theme_provider.dart:566: Lüks, Başarı
+theme_provider.dart:690: Buz, Ferahlık
+theme_provider.dart:756: Yüksek Enerji
+theme_provider.dart:991: ❌ Tema kilidi açık değil: $themeId
+theme_provider.dart:998: 🎨 Tema seçildi: $themeId
+theme_provider.dart:1009: 🔓 $themeId teması $_unlockDurationHours saat açıldı. Bitiş: $expiry
+timer_provider.dart:53: ⏸️ Uygulama arka plana geçti, sayaç çalışıyor.
+timer_provider.dart:64: ⏳ Arkaplanda geçen süre: $timePassed sn, Kalan: $_remainingSeconds sn
+timer_provider.dart:98: 🔄 Timer.periodic yeniden başlatılıyor...
+timer_provider.dart:164: ❌ Alarm Hatası: $e
+timer_provider.dart:251: ⚠️ Müzik dosyası bulunamadı: ${settings.backgroundMusic}
+timer_provider.dart:254: ❌ Müzik Çalma Hatası: $e
+duration_settings_screen.dart:39: DurationSettingsScreen Dispose Hatası: $e
+duration_settings_screen.dart:368: 10 - 180 arası
+home_screen.dart:189: İstatistikler
+language_selection_screen.dart:12: Türkçe
+language_selection_screen.dart:16: Français
+settings_screen.dart:33: Türkçe
+settings_screen.dart:43: Français
+settings_screen.dart:108: SettingsScreen Dispose Hatası: $e
+sound_settings_screen.dart:37: SoundSettingsScreen Dispose Hatası: $e
+splash_screen.dart:54: ❌ Bildirim hatası: $e
+splash_screen.dart:60: ❌ Wakelock hatası: $e
+splash_screen.dart:67: ❌ Bekleme hatası: $e
+notification_service.dart:45: Sayaç bitince gelen bildirimler
+notification_service.dart:88: Sayaç arka planda bittiğinde gelen bildirimler
+notification_service.dart:120: 📅 Bildirim planlandı: $seconds sn sonra ($scheduledTime)
+notification_service.dart:122: ❌ Zamanlanmış bildirim hatası: $e
+notification_service.dart:129: 🚫 Zamanlanmış bildirim iptal edildi
+review_helper.dart:41: ❌ Review Helper hatası: $e
+review_helper.dart:82: ✅ In-App Review kullanılabilir, gösteriliyor...
+review_helper.dart:94: ✅ Review popup gösterildi
+review_helper.dart:97: ⚠️ In-App Review kullanılamıyor (cihaz desteklemiyor veya kota doldu)
+review_helper.dart:110: , // iOS için gerekli, Android
+review_helper.dart:115: ❌ Review isteği başarısız: $e

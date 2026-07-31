@@ -238,5 +238,8 @@
   "restore_success": "購入は正常に復元され、アカウントに入金されました。",
   "not_found_title": "見つかりません",
   "restore_not_found": "このアカウントには過去のプレミアム購入記録が見つかりません。",
-  "ok_btn": "わかりました"
+  "ok_btn": "わかりました",
+  "premium_subtitle": "Remove ads, unlock themes",
+  "star_supporter": "Star Supporter",
+  "super_star_supporter": "Super Star Supporter"
 }

@@ -238,5 +238,8 @@
   "restore_success": "การซื้อของคุณได้รับการคืนค่าและโอนเข้าบัญชีของคุณเรียบร้อยแล้ว",
   "not_found_title": "ไม่พบ",
   "restore_not_found": "ไม่พบบันทึกการซื้อระดับพรีเมียมในอดีตสำหรับบัญชีนี้",
-  "ok_btn": "ตกลง"
+  "ok_btn": "ตกลง",
+  "premium_subtitle": "Remove ads, unlock themes",
+  "star_supporter": "Star Supporter",
+  "super_star_supporter": "Super Star Supporter"
 }

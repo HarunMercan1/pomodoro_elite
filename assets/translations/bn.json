@@ -238,5 +238,8 @@
   "restore_success": "আপনার কেনাকাটা সফলভাবে পুনরুদ্ধার করা হয়েছে এবং আপনার অ্যাকাউন্টে জমা করা হয়েছে।",
   "not_found_title": "পাওয়া যায়নি",
   "restore_not_found": "এই অ্যাকাউন্টের জন্য কোনো অতীতের প্রিমিয়াম ক্রয়ের রেকর্ড পাওয়া যায়নি।",
-  "ok_btn": "ঠিক আছে"
+  "ok_btn": "ঠিক আছে",
+  "premium_subtitle": "Remove ads, unlock themes",
+  "star_supporter": "Star Supporter",
+  "super_star_supporter": "Super Star Supporter"
 }

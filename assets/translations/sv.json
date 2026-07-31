@@ -238,5 +238,8 @@
   "restore_success": "Dina köp har återställts och krediterats till ditt konto.",
   "not_found_title": "Hittade inte",
   "restore_not_found": "Inga tidigare Premium-köpposter hittades för detta konto.",
-  "ok_btn": "Ok"
+  "ok_btn": "Ok",
+  "premium_subtitle": "Remove ads, unlock themes",
+  "star_supporter": "Star Supporter",
+  "super_star_supporter": "Super Star Supporter"
 }
