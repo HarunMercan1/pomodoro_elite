@@ -214,7 +214,7 @@
   "log_out_confirm": "Çıkış yapmak istediğinize emin misiniz?",
   "focus_grow_achieve": "Odaklan. Büyü. Başar.",
   "sign_in_error": "Giriş başarısız. Lütfen tekrar deneyin.",
-  "premium_active": "💎 Premium Aktif",
+  "premium_active": "💎 Premium Kullanıcısınız",
   "get_premium": "💎 Premium'a Geç",
   "premium_thanks": "Desteğiniz için teşekkürler! Tüm özellikler açık.",
   "premium_desc": "Pomodoro Elite deneyimini sınırlarına taşıyın.",
@@ -222,7 +222,7 @@
   "premium_feature_ads": "Sonsuza kadar reklamsız deneyim",
   "premium_feature_themes": "Tüm özel temaların kilidini aç",
   "premium_feature_support": "Geliştiriciye doğrudan destek ol",
-  "get_unlimited_premium": "Sınırsız Premium Al",
+  "get_unlimited_premium": "Premium Al",
   "packages_loading": "Paketler yükleniyor... İnternet bağlantınızı kontrol edin.",
   "restore_purchases_btn": "Satın Almaları Geri Yükle",
   "support_developer": "Geliştiriciye Destek Ol ❤️",
@@ -240,5 +240,6 @@
   "star_supporter": "Yıldız Destekçi",
   "super_star_supporter": "Süper Yıldız Destekçi",
   "login_required": "Üye Girişi Gerekli",
-  "premium_login_required_desc": "Premium satın almak veya özelliklerini kullanmak için lütfen hesabınıza giriş yapın."
+  "premium_login_required_desc": "Premium satın almak veya özelliklerini kullanmak için lütfen hesabınıza giriş yapın.",
+  "unlock_premium": "Premium'u Aç"
 }

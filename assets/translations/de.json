@@ -217,7 +217,7 @@
   "log_out_confirm": "Sind Sie sicher, dass Sie sich abmelden wollen?",
   "focus_grow_achieve": "Focus. Grow. Achieve.",
   "sign_in_error": "Anmeldung fehlgeschlagen. Bitte versuchen Sie es erneut.",
-  "premium_active": "💎 Premium Aktiv",
+  "premium_active": "💎 Sie sind ein Premium-Benutzer",
   "get_premium": "💎 Gehen Sie Premium",
   "premium_thanks": "Vielen Dank für Ihre Unterstützung! Alle Funktionen sind offen.",
   "premium_desc": "Bringen Sie das Pomodoro Elite-Erlebnis an seine Grenzen.",
@@ -225,7 +225,7 @@
   "premium_feature_ads": "Werbefreies Erlebnis für immer",
   "premium_feature_themes": "Schalte alle exklusiven Themen frei",
   "premium_feature_support": "Unterstützen Sie den Entwickler direkt",
-  "get_unlimited_premium": "Holen Sie sich unbegrenztes Premium",
+  "get_unlimited_premium": "Premium Holen",
   "packages_loading": "Pakete werden installiert... Überprüfen Sie Ihre Internetverbindung.",
   "restore_purchases_btn": "Einkäufe wiederherstellen",
   "support_developer": "Unterstützen Sie den Entwickler ❤️",
@@ -243,5 +243,6 @@
   "star_supporter": "Sterne-Unterstützer",
   "super_star_supporter": "Super-Sterne-Unterstützer",
   "login_required": "Anmeldung Erforderlich",
-  "premium_login_required_desc": "Bitte melden Sie sich an, um Premium-Funktionen zu kaufen oder zu nutzen."
+  "premium_login_required_desc": "Bitte melden Sie sich an, um Premium-Funktionen zu kaufen oder zu nutzen.",
+  "unlock_premium": "Premium Freischalten"
 }

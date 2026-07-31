@@ -217,7 +217,7 @@
   "log_out_confirm": "คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบ?",
   "focus_grow_achieve": "Focus. Grow. Achieve.",
   "sign_in_error": "เข้าสู่ระบบไม่สำเร็จ กรุณาลองใหม่อีกครั้ง",
-  "premium_active": "💎 แอคทีฟระดับพรีเมียม",
+  "premium_active": "💎 คุณคือผู้ใช้พรีเมียม",
   "get_premium": "💎 ไปแบบพรีเมียม",
   "premium_thanks": "ขอบคุณสำหรับการสนับสนุนของคุณ! คุณสมบัติทั้งหมดเปิดอยู่",
   "premium_desc": "สัมผัสประสบการณ์ Pomodoro Elite ให้ถึงขีดจำกัด",
@@ -225,7 +225,7 @@
   "premium_feature_ads": "ประสบการณ์ไร้โฆษณาตลอดไป",
   "premium_feature_themes": "ปลดล็อกธีมพิเศษทั้งหมด",
   "premium_feature_support": "สนับสนุนผู้พัฒนาโดยตรง",
-  "get_unlimited_premium": "รับพรีเมี่ยมไม่จำกัด",
+  "get_unlimited_premium": "รับพรีเมียม",
   "packages_loading": "กำลังติดตั้งแพ็คเกจ... ตรวจสอบการเชื่อมต่ออินเทอร์เน็ตของคุณ",
   "restore_purchases_btn": "คืนค่าการซื้อ",
   "support_developer": "สนับสนุนนักพัฒนา❤️",
@@ -243,5 +243,6 @@
   "star_supporter": "Star Supporter",
   "super_star_supporter": "Super Star Supporter",
   "login_required": "จำเป็นต้องเข้าสู่ระบบ",
-  "premium_login_required_desc": "โปรดเข้าสู่ระบบบัญชีของคุณเพื่อซื้อหรือใช้คุณสมบัติพรีเมียม"
+  "premium_login_required_desc": "โปรดเข้าสู่ระบบบัญชีของคุณเพื่อซื้อหรือใช้คุณสมบัติพรีเมียม",
+  "unlock_premium": "ปลดล็อกพรีเมียม"
 }

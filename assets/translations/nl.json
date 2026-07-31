@@ -217,7 +217,7 @@
   "log_out_confirm": "Weet u zeker dat u wilt uitloggen?",
   "focus_grow_achieve": "Focus. Grow. Achieve.",
   "sign_in_error": "Aanmelden mislukt. Probeer het opnieuw.",
-  "premium_active": "💎 Premium Actief",
+  "premium_active": "💎 U bent een Premium Gebruiker",
   "get_premium": "💎 Ga voor Premium",
   "premium_thanks": "Bedankt voor uw steun! Alle functies zijn geopend.",
   "premium_desc": "Breng de Pomodoro Elite-ervaring tot het uiterste.",
@@ -225,7 +225,7 @@
   "premium_feature_ads": "Voor altijd een advertentievrije ervaring",
   "premium_feature_themes": "Ontgrendel alle exclusieve thema's",
   "premium_feature_support": "Ondersteun de ontwikkelaar rechtstreeks",
-  "get_unlimited_premium": "Ontvang onbeperkte premie",
+  "get_unlimited_premium": "Krijg Premium",
   "packages_loading": "Pakketten installeren... Controleer uw internetverbinding.",
   "restore_purchases_btn": "Aankopen herstellen",
   "support_developer": "Steun de ontwikkelaar ❤️",
@@ -243,5 +243,6 @@
   "star_supporter": "Star Supporter",
   "super_star_supporter": "Super Star Supporter",
   "login_required": "Inloggen Vereist",
-  "premium_login_required_desc": "Log in op uw account om Premium-functies te kopen of te gebruiken."
+  "premium_login_required_desc": "Log in op uw account om Premium-functies te kopen of te gebruiken.",
+  "unlock_premium": "Premium Ontgrendelen"
 }

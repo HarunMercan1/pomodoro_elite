@@ -217,7 +217,7 @@
   "log_out_confirm": "Är du säker på att du vill logga ut?",
   "focus_grow_achieve": "Focus. Grow. Achieve.",
   "sign_in_error": "Inloggningen misslyckades. Försök igen.",
-  "premium_active": "💎 Premium Active",
+  "premium_active": "💎 Du är en Premium-användare",
   "get_premium": "💎 Gå Premium",
   "premium_thanks": "Tack för ditt stöd! Alla funktioner är öppna.",
   "premium_desc": "Ta Pomodoro Elite-upplevelsen till dess gränser.",
@@ -225,7 +225,7 @@
   "premium_feature_ads": "Annonsfri upplevelse för alltid",
   "premium_feature_themes": "Lås upp alla exklusiva teman",
   "premium_feature_support": "Stöd utvecklaren direkt",
-  "get_unlimited_premium": "Få obegränsad premium",
+  "get_unlimited_premium": "Skaffa Premium",
   "packages_loading": "Installerar paket... Kontrollera din internetanslutning.",
   "restore_purchases_btn": "Återställ inköp",
   "support_developer": "Stöd utvecklaren ❤️",
@@ -243,5 +243,6 @@
   "star_supporter": "Star Supporter",
   "super_star_supporter": "Super Star Supporter",
   "login_required": "Inloggning Krävs",
-  "premium_login_required_desc": "Logga in på ditt konto för att köpa eller använda Premium-funktioner."
+  "premium_login_required_desc": "Logga in på ditt konto för att köpa eller använda Premium-funktioner.",
+  "unlock_premium": "Lås upp Premium"
 }

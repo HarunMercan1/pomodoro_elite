@@ -217,7 +217,7 @@
   "log_out_confirm": "您确定要退出登录吗？",
   "focus_grow_achieve": "Focus. Grow. Achieve.",
   "sign_in_error": "登录失败，请重试。",
-  "premium_active": "💎 高级活性",
+  "premium_active": "💎 您是高级用户",
   "get_premium": "💎 升级至高级版",
   "premium_thanks": "感谢您的支持！所有功能均开放。",
   "premium_desc": "将番茄钟精英体验发挥到极致。",
@@ -225,7 +225,7 @@
   "premium_feature_ads": "永远无广告体验",
   "premium_feature_themes": "解锁所有独家主题",
   "premium_feature_support": "直接支持开发商",
-  "get_unlimited_premium": "获得无限保费",
+  "get_unlimited_premium": "获取高级版",
   "packages_loading": "正在安装软件包...检查您的互联网连接。",
   "restore_purchases_btn": "恢复购买",
   "support_developer": "支持开发者❤️",
@@ -243,5 +243,6 @@
   "star_supporter": "Star Supporter",
   "super_star_supporter": "Super Star Supporter",
   "login_required": "需要登录",
-  "premium_login_required_desc": "请登录您的帐户以购买或使用高级功能。"
+  "premium_login_required_desc": "请登录您的帐户以购买或使用高级功能。",
+  "unlock_premium": "解锁高级版"
 }

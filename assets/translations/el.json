@@ -217,7 +217,7 @@
   "log_out_confirm": "Είστε σίγουροι ότι θέλετε να αποσυνδεθείτε;",
   "focus_grow_achieve": "Focus. Grow. Achieve.",
   "sign_in_error": "Η σύνδεση απέτυχε. Δοκιμάστε ξανά.",
-  "premium_active": "💎 Premium Active",
+  "premium_active": "💎 Είστε Χρήστης Premium",
   "get_premium": "💎 Go Premium",
   "premium_thanks": "Ευχαριστώ για την υποστήριξή σας! Όλες οι λειτουργίες είναι ανοιχτές.",
   "premium_desc": "Φέρτε την εμπειρία Pomodoro Elite στα όριά της.",
@@ -225,7 +225,7 @@
   "premium_feature_ads": "Εμπειρία χωρίς διαφημίσεις για πάντα",
   "premium_feature_themes": "Ξεκλειδώστε όλα τα αποκλειστικά θέματα",
   "premium_feature_support": "Υποστηρίξτε τον προγραμματιστή απευθείας",
-  "get_unlimited_premium": "Αποκτήστε απεριόριστο Premium",
+  "get_unlimited_premium": "Αποκτήστε Premium",
   "packages_loading": "Εγκατάσταση πακέτων... Ελέγξτε τη σύνδεσή σας στο διαδίκτυο.",
   "restore_purchases_btn": "Επαναφορά αγορών",
   "support_developer": "Υποστηρίξτε τον προγραμματιστή ❤️",
@@ -243,5 +243,6 @@
   "star_supporter": "Star Supporter",
   "super_star_supporter": "Super Star Supporter",
   "login_required": "Απαιτείται Σύνδεση",
-  "premium_login_required_desc": "Συνδεθείτε στον λογαριασμό σας για να αγοράσετε ή να χρησιμοποιήσετε λειτουργίες Premium."
+  "premium_login_required_desc": "Συνδεθείτε στον λογαριασμό σας για να αγοράσετε ή να χρησιμοποιήσετε λειτουργίες Premium.",
+  "unlock_premium": "Ξεκλείδωμα Premium"
 }

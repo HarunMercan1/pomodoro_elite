@@ -217,7 +217,7 @@
   "log_out_confirm": "کیا آپ واقعی لاگ آؤٹ کرنا چاہتے ہیں؟",
   "focus_grow_achieve": "Focus. Grow. Achieve.",
   "sign_in_error": "سائن ان ناکام۔ براہ کرم دوبارہ کوشش کریں۔",
-  "premium_active": "💎 پریمیم ایکٹو",
+  "premium_active": "💎 آپ ایک پریمیم صارف ہیں",
   "get_premium": "💎 Go Premium",
   "premium_thanks": "آپ کی حمایت کے لئے شکریہ! تمام خصوصیات کھلی ہیں۔",
   "premium_desc": "پومودورو ایلیٹ کے تجربے کو اس کی حدود تک لے جائیں۔",
@@ -225,7 +225,7 @@
   "premium_feature_ads": "ہمیشہ کے لیے اشتہار سے پاک تجربہ",
   "premium_feature_themes": "تمام خصوصی تھیمز کو غیر مقفل کریں۔",
   "premium_feature_support": "ڈویلپر کو براہ راست سپورٹ کریں۔",
-  "get_unlimited_premium": "لامحدود پریمیم حاصل کریں۔",
+  "get_unlimited_premium": "پریمیم حاصل کریں",
   "packages_loading": "پیکجز انسٹال ہو رہے ہیں... اپنا انٹرنیٹ کنکشن چیک کریں۔",
   "restore_purchases_btn": "خریداریوں کو بحال کریں۔",
   "support_developer": "ڈویلپر کو سپورٹ کریں ❤️",
@@ -243,5 +243,6 @@
   "star_supporter": "Star Supporter",
   "super_star_supporter": "Super Star Supporter",
   "login_required": "لاگ ان درکار ہے",
-  "premium_login_required_desc": "پریمیم خصوصیات خریدنے یا استعمال کرنے کے لیے براہ کرم اپنے اکاؤنٹ میں لاگ ان کریں۔"
+  "premium_login_required_desc": "پریمیم خصوصیات خریدنے یا استعمال کرنے کے لیے براہ کرم اپنے اکاؤنٹ میں لاگ ان کریں۔",
+  "unlock_premium": "پریمیم انلاک کریں"
 }

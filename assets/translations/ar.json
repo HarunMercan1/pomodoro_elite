@@ -217,7 +217,7 @@
   "log_out_confirm": "هل أنت متأكد أنك تريد تسجيل الخروج؟",
   "focus_grow_achieve": "Focus. Grow. Achieve.",
   "sign_in_error": "فشل تسجيل الدخول. يرجى المحاولة مرة أخرى.",
-  "premium_active": "💎 بريميوم أكتيف",
+  "premium_active": "💎 أنت مستخدم مميز",
   "get_premium": "💎 انتقل إلى الإصدار المميز",
   "premium_thanks": "شكرا لدعمكم! جميع الميزات مفتوحة.",
   "premium_desc": "خذ تجربة بومودورو إيليت إلى أقصى حدودها.",
@@ -225,7 +225,7 @@
   "premium_feature_ads": "تجربة خالية من الإعلانات إلى الأبد",
   "premium_feature_themes": "فتح جميع المواضيع الحصرية",
   "premium_feature_support": "دعم المطور مباشرة",
-  "get_unlimited_premium": "احصل على قسط غير محدود",
+  "get_unlimited_premium": "احصل على بريميوم",
   "packages_loading": "جارٍ تثبيت الحزم... تحقق من اتصالك بالإنترنت.",
   "restore_purchases_btn": "استعادة المشتريات",
   "support_developer": "دعم المطور ❤️",
@@ -243,5 +243,6 @@
   "star_supporter": "Star Supporter",
   "super_star_supporter": "Super Star Supporter",
   "login_required": "تسجيل الدخول مطلوب",
-  "premium_login_required_desc": "يرجى تسجيل الدخول إلى حسابك لشراء أو استخدام ميزات Premium."
+  "premium_login_required_desc": "يرجى تسجيل الدخول إلى حسابك لشراء أو استخدام ميزات Premium.",
+  "unlock_premium": "فتح بريميوم"
 }

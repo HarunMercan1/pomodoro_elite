@@ -217,7 +217,7 @@
   "log_out_confirm": "Вы уверены, что хотите выйти?",
   "focus_grow_achieve": "Focus. Grow. Achieve.",
   "sign_in_error": "Ошибка входа. Попробуйте снова.",
-  "premium_active": "💎 Премиум Актив",
+  "premium_active": "💎 Вы - Premium пользователь",
   "get_premium": "💎 Перейти Премиум",
   "premium_thanks": "Спасибо за вашу поддержку! Все функции открыты.",
   "premium_desc": "Доведите опыт Pomodoro Elite до предела.",
@@ -225,7 +225,7 @@
   "premium_feature_ads": "Опыт без рекламы навсегда",
   "premium_feature_themes": "Разблокируйте все эксклюзивные темы",
   "premium_feature_support": "Поддержите разработчика напрямую",
-  "get_unlimited_premium": "Получите неограниченный премиум",
+  "get_unlimited_premium": "Получить Premium",
   "packages_loading": "Установка пакетов... Проверьте подключение к Интернету.",
   "restore_purchases_btn": "Восстановить покупки",
   "support_developer": "Поддержите разработчика ❤️",
@@ -243,5 +243,6 @@
   "star_supporter": "Звездный спонсор",
   "super_star_supporter": "Супер Звездный спонсор",
   "login_required": "Требуется вход",
-  "premium_login_required_desc": "Пожалуйста, войдите в свою учетную запись, чтобы приобрести или использовать функции Premium."
+  "premium_login_required_desc": "Пожалуйста, войдите в свою учетную запись, чтобы приобрести или использовать функции Premium.",
+  "unlock_premium": "Разблокировать Premium"
 }

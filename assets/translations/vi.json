@@ -217,7 +217,7 @@
   "log_out_confirm": "Bạn có chắc chắn muốn đăng xuất không?",
   "focus_grow_achieve": "Focus. Grow. Achieve.",
   "sign_in_error": "Đăng nhập thất bại. Vui lòng thử lại.",
-  "premium_active": "💎 Hoạt động cao cấp",
+  "premium_active": "💎 Bạn là Người dùng Premium",
   "get_premium": "💎 Lên bản cao cấp",
   "premium_thanks": "Cảm ơn sự hỗ trợ của bạn! Tất cả các tính năng đều mở.",
   "premium_desc": "Đưa trải nghiệm Pomodoro Elite đến giới hạn của nó.",
@@ -225,7 +225,7 @@
   "premium_feature_ads": "Trải nghiệm không có quảng cáo mãi mãi",
   "premium_feature_themes": "Mở khóa tất cả các chủ đề độc quyền",
   "premium_feature_support": "Hỗ trợ trực tiếp nhà phát triển",
-  "get_unlimited_premium": "Nhận phí bảo hiểm không giới hạn",
+  "get_unlimited_premium": "Nhận Premium",
   "packages_loading": "Đang cài đặt gói... Kiểm tra kết nối internet của bạn.",
   "restore_purchases_btn": "Khôi phục mua hàng",
   "support_developer": "Hỗ trợ nhà phát triển ❤️",
@@ -243,5 +243,6 @@
   "star_supporter": "Star Supporter",
   "super_star_supporter": "Super Star Supporter",
   "login_required": "Yêu cầu Đăng nhập",
-  "premium_login_required_desc": "Vui lòng đăng nhập vào tài khoản của bạn để mua hoặc sử dụng các tính năng Premium."
+  "premium_login_required_desc": "Vui lòng đăng nhập vào tài khoản của bạn để mua hoặc sử dụng các tính năng Premium.",
+  "unlock_premium": "Mở khóa Premium"
 }

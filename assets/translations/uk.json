@@ -217,7 +217,7 @@
   "log_out_confirm": "Ви впевнені, що хочете вийти?",
   "focus_grow_achieve": "Focus. Grow. Achieve.",
   "sign_in_error": "Помилка входу. Спробуйте ще раз.",
-  "premium_active": "💎 Premium Active",
+  "premium_active": "💎 Ви - Premium користувач",
   "get_premium": "💎 Переходьте на Premium",
   "premium_thanks": "Дякуємо за підтримку! Усі функції відкриті.",
   "premium_desc": "Доведіть досвід Pomodoro Elite до своїх меж.",
@@ -225,7 +225,7 @@
   "premium_feature_ads": "Назавжди без реклами",
   "premium_feature_themes": "Розблокуйте всі ексклюзивні теми",
   "premium_feature_support": "Підтримуйте безпосередньо розробника",
-  "get_unlimited_premium": "Отримайте необмежений преміум",
+  "get_unlimited_premium": "Отримати Premium",
   "packages_loading": "Встановлення пакетів... Перевірте підключення до Інтернету.",
   "restore_purchases_btn": "Відновити покупки",
   "support_developer": "Підтримайте розробника ❤️",
@@ -243,5 +243,6 @@
   "star_supporter": "Star Supporter",
   "super_star_supporter": "Super Star Supporter",
   "login_required": "Потрібен Вхід",
-  "premium_login_required_desc": "Увійдіть у свій обліковий запис, щоб придбати або використовувати функції Premium."
+  "premium_login_required_desc": "Увійдіть у свій обліковий запис, щоб придбати або використовувати функції Premium.",
+  "unlock_premium": "Розблокувати Premium"
 }

@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../core/constants/revenuecat_constants.dart';
@@ -92,6 +93,16 @@ class PurchaseProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
       return true;
+    } on PlatformException catch (e) {
+      var errorCode = PurchasesErrorHelper.getErrorCode(e);
+      if (errorCode == PurchasesErrorCode.productAlreadyPurchasedError) {
+        debugPrint("Product already purchased, attempting to restore...");
+        return await restorePurchases();
+      }
+      debugPrint("Purchase Package Error: $e");
+      _isLoading = false;
+      notifyListeners();
+      return false;
     } catch (e) {
       debugPrint("Purchase Package Error: $e");
       _isLoading = false;

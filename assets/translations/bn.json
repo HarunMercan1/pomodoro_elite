@@ -217,7 +217,7 @@
   "log_out_confirm": "আপনি কি নিশ্চিত যে লগ আউট করতে চান?",
   "focus_grow_achieve": "Focus. Grow. Achieve.",
   "sign_in_error": "সাইন ইন ব্যর্থ হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।",
-  "premium_active": "💎 প্রিমিয়াম সক্রিয়",
+  "premium_active": "💎 আপনি একজন প্রিমিয়াম ব্যবহারকারী",
   "get_premium": "💎 প্রিমিয়ামে যান",
   "premium_thanks": "আপনার সমর্থনের জন্য ধন্যবাদ! সমস্ত বৈশিষ্ট্য খোলা আছে.",
   "premium_desc": "পোমোডোরো এলিট অভিজ্ঞতাকে এর সীমাতে নিয়ে যান।",
@@ -225,7 +225,7 @@
   "premium_feature_ads": "চিরকালের জন্য বিজ্ঞাপন-মুক্ত অভিজ্ঞতা",
   "premium_feature_themes": "সমস্ত একচেটিয়া থিম আনলক করুন",
   "premium_feature_support": "বিকাশকারীকে সরাসরি সমর্থন করুন",
-  "get_unlimited_premium": "আনলিমিটেড প্রিমিয়াম পান",
+  "get_unlimited_premium": "প্রিমিয়াম পান",
   "packages_loading": "প্যাকেজ ইনস্টল করা হচ্ছে... আপনার ইন্টারনেট সংযোগ পরীক্ষা করুন৷",
   "restore_purchases_btn": "কেনাকাটা পুনরুদ্ধার করুন",
   "support_developer": "বিকাশকারীকে সমর্থন করুন ❤️",
@@ -243,5 +243,6 @@
   "star_supporter": "Star Supporter",
   "super_star_supporter": "Super Star Supporter",
   "login_required": "লগইন প্রয়োজন",
-  "premium_login_required_desc": "প্রিমিয়াম বৈশিষ্ট্যগুলি কিনতে বা ব্যবহার করতে অনুগ্রহ করে আপনার অ্যাকাউন্টে লগ ইন করুন।"
+  "premium_login_required_desc": "প্রিমিয়াম বৈশিষ্ট্যগুলি কিনতে বা ব্যবহার করতে অনুগ্রহ করে আপনার অ্যাকাউন্টে লগ ইন করুন।",
+  "unlock_premium": "প্রিমিয়াম আনলক করুন"
 }

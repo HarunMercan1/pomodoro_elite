@@ -217,7 +217,7 @@
   "log_out_confirm": "ログアウトしてもよろしいですか？",
   "focus_grow_achieve": "Focus. Grow. Achieve.",
   "sign_in_error": "サインインに失敗しました。もう一度お試しください。",
-  "premium_active": "💎 プレミアムアクティブ",
+  "premium_active": "💎 プレミアムユーザーです",
   "get_premium": "💎 プレミアムに行く",
   "premium_thanks": "ご支援ありがとうございます!すべての機能がオープンです。",
   "premium_desc": "ポモドーロ エリートのエクスペリエンスを限界まで高めましょう。",
@@ -225,7 +225,7 @@
   "premium_feature_ads": "永遠に広告なしのエクスペリエンス",
   "premium_feature_themes": "すべての限定テーマをアンロックする",
   "premium_feature_support": "開発者を直接サポートする",
-  "get_unlimited_premium": "無制限のプレミアムを入手",
+  "get_unlimited_premium": "プレミアムを取得",
   "packages_loading": "パッケージをインストールしています... インターネット接続を確認してください。",
   "restore_purchases_btn": "購入を復元する",
   "support_developer": "開発者をサポートしてください❤️",
@@ -243,5 +243,6 @@
   "star_supporter": "Star Supporter",
   "super_star_supporter": "Super Star Supporter",
   "login_required": "ログインが必要です",
-  "premium_login_required_desc": "プレミアム機能を購入または使用するには、アカウントにログインしてください。"
+  "premium_login_required_desc": "プレミアム機能を購入または使用するには、アカウントにログインしてください。",
+  "unlock_premium": "プレミアムのロック解除"
 }

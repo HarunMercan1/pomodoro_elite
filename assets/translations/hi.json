@@ -217,7 +217,7 @@
   "log_out_confirm": "क्या आप वाकई लॉग आउट करना चाहते हैं?",
   "focus_grow_achieve": "Focus. Grow. Achieve.",
   "sign_in_error": "साइन इन विफल। कृपया पुनः प्रयास करें।",
-  "premium_active": "💎 प्रीमियम सक्रिय",
+  "premium_active": "💎 आप एक प्रीमियम उपयोगकर्ता हैं",
   "get_premium": "💎गो प्रीमियम",
   "premium_thanks": "आपके समर्थन के लिए धन्यवाद! सभी सुविधाएं खुली हैं.",
   "premium_desc": "पोमोडोरो एलीट अनुभव को उसकी सीमा तक ले जाएं।",
@@ -225,7 +225,7 @@
   "premium_feature_ads": "हमेशा के लिए विज्ञापन-मुक्त अनुभव",
   "premium_feature_themes": "सभी विशिष्ट थीम अनलॉक करें",
   "premium_feature_support": "सीधे डेवलपर का समर्थन करें",
-  "get_unlimited_premium": "असीमित प्रीमियम प्राप्त करें",
+  "get_unlimited_premium": "प्रीमियम प्राप्त करें",
   "packages_loading": "पैकेज स्थापित कर रहा है... अपना इंटरनेट कनेक्शन जांचें।",
   "restore_purchases_btn": "खरीदारी वापस लौटाएं",
   "support_developer": "डेवलपर का समर्थन करें ❤️",
@@ -243,5 +243,6 @@
   "star_supporter": "Star Supporter",
   "super_star_supporter": "Super Star Supporter",
   "login_required": "लॉगिन आवश्यक",
-  "premium_login_required_desc": "प्रीमियम सुविधाएँ खरीदने या उपयोग करने के लिए कृपया अपने खाते में लॉग इन करें।"
+  "premium_login_required_desc": "प्रीमियम सुविधाएँ खरीदने या उपयोग करने के लिए कृपया अपने खाते में लॉग इन करें।",
+  "unlock_premium": "प्रीमियम अनलॉक करें"
 }
