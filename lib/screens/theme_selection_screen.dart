@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import '../providers/theme_provider.dart';
 import '../providers/ad_manager.dart';
 import '../providers/purchase_provider.dart';
+import '../providers/auth_provider.dart';
 import '../utils/app_fonts.dart';
 import 'premium_screen.dart';
 
@@ -190,7 +191,24 @@ class _ThemeSelectionScreenState extends State<ThemeSelectionScreen> {
               ElevatedButton.icon(
                 onPressed: () {
                   Navigator.pop(ctx);
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => const PremiumScreen()));
+                  final isGuest = context.read<AuthProvider>().isGuest;
+                  if (isGuest) {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: Text('login_required'.tr()),
+                        content: Text('premium_login_required_desc'.tr()),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text('ok_btn'.tr()),
+                          ),
+                        ],
+                      ),
+                    );
+                  } else {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const PremiumScreen()));
+                  }
                 },
                 icon: const Icon(Icons.workspace_premium, color: Colors.white),
                 label: Text('unlock_premium'.tr(), style: const TextStyle(fontWeight: FontWeight.bold)),
