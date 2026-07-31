@@ -248,5 +248,19 @@
   "login_required": "Inloggen Vereist",
   "premium_login_required_desc": "Log in op uw account om Premium-functies te kopen of te gebruiken.",
   "unlock_premium": "Premium Ontgrendelen",
-  "privacy_options": "Privacyopties"
+  "privacy_options": "Privacyopties",
+  "guest_connect_google_title": "Opslaan met Google",
+  "guest_connect_google_desc": "Koppel je account en bescherm je voortgang",
+  "purchase_restored_title": "Aankoop hersteld",
+  "purchase_restored_after_owned": "Google Play heeft je aankoop gevonden. Premium-toegang is hersteld.",
+  "purchase_cancelled_title": "Aankoop geannuleerd",
+  "purchase_pending_title": "Betaling in behandeling",
+  "purchase_pending_desc": "Je betaling wacht op bevestiging. Premium wordt automatisch geactiveerd na goedkeuring door Google Play.",
+  "play_account_sync_title": "Controleer je Play-account",
+  "play_account_sync_desc": "Aankopen horen bij het Google-account dat in de Play Store is geselecteerd, niet bij het aanmeldaccount van de app. Controleer je account en probeer opnieuw nadat een recente terugbetaling is gesynchroniseerd.",
+  "purchase_account_conflict_title": "Aankoop gekoppeld aan ander account",
+  "purchase_account_conflict_desc": "Deze Play-aankoop is gekoppeld aan een ander Pomodoro Elite-account. Meld je aan bij het oorspronkelijke app-account en herstel aankopen.",
+  "store_unavailable_title": "Store niet beschikbaar",
+  "store_unavailable_desc": "Google Play is niet bereikbaar. Controleer je verbinding en probeer opnieuw.",
+  "purchase_failed_desc": "De aankoop kon niet worden voltooid. Probeer het zo opnieuw."
 }

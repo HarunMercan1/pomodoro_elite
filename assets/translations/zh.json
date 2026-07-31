@@ -248,5 +248,19 @@
   "login_required": "需要登录",
   "premium_login_required_desc": "请登录您的帐户以购买或使用高级功能。",
   "unlock_premium": "解锁高级版",
-  "privacy_options": "隐私选项"
+  "privacy_options": "隐私选项",
+  "guest_connect_google_title": "使用 Google 保存数据",
+  "guest_connect_google_desc": "关联账号，安全保护你的进度",
+  "purchase_restored_title": "购买已恢复",
+  "purchase_restored_after_owned": "Google Play 已找到你的购买记录，Premium 权限已恢复。",
+  "purchase_cancelled_title": "购买已取消",
+  "purchase_pending_title": "付款待确认",
+  "purchase_pending_desc": "付款正在等待确认。Google Play 批准后将自动解锁 Premium。",
+  "play_account_sync_title": "检查 Play 账号",
+  "play_account_sync_desc": "购买归属于 Play 商店中选择的 Google 账号，而不是应用登录账号。请检查 Play 账号，并在近期退款同步完成后重试。",
+  "purchase_account_conflict_title": "购买已关联其他账号",
+  "purchase_account_conflict_desc": "此 Play 购买已关联其他 Pomodoro Elite 账号。请登录原应用账号并恢复购买。",
+  "store_unavailable_title": "商店不可用",
+  "store_unavailable_desc": "无法连接 Google Play。请检查网络后重试。",
+  "purchase_failed_desc": "无法完成购买，请稍后重试。"
 }

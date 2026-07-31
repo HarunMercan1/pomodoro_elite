@@ -248,5 +248,19 @@
   "login_required": "Yêu cầu Đăng nhập",
   "premium_login_required_desc": "Vui lòng đăng nhập vào tài khoản của bạn để mua hoặc sử dụng các tính năng Premium.",
   "unlock_premium": "Mở khóa Premium",
-  "privacy_options": "Tùy chọn quyền riêng tư"
+  "privacy_options": "Tùy chọn quyền riêng tư",
+  "guest_connect_google_title": "Lưu dữ liệu với Google",
+  "guest_connect_google_desc": "Liên kết tài khoản và bảo vệ tiến trình",
+  "purchase_restored_title": "Đã khôi phục giao dịch",
+  "purchase_restored_after_owned": "Google Play đã tìm thấy giao dịch. Quyền Premium đã được khôi phục.",
+  "purchase_cancelled_title": "Đã hủy giao dịch",
+  "purchase_pending_title": "Thanh toán đang chờ",
+  "purchase_pending_desc": "Khoản thanh toán đang chờ xác nhận. Premium sẽ tự động mở sau khi Google Play phê duyệt.",
+  "play_account_sync_title": "Kiểm tra tài khoản Play",
+  "play_account_sync_desc": "Giao dịch thuộc về tài khoản Google đang chọn trong Play Store, không phải tài khoản đăng nhập ứng dụng. Hãy kiểm tra tài khoản và thử lại sau khi khoản hoàn tiền gần đây đồng bộ xong.",
+  "purchase_account_conflict_title": "Giao dịch liên kết với tài khoản khác",
+  "purchase_account_conflict_desc": "Giao dịch Play này liên kết với một tài khoản Pomodoro Elite khác. Hãy đăng nhập tài khoản ứng dụng ban đầu và khôi phục giao dịch.",
+  "store_unavailable_title": "Cửa hàng không khả dụng",
+  "store_unavailable_desc": "Không thể kết nối Google Play. Hãy kiểm tra mạng và thử lại.",
+  "purchase_failed_desc": "Không thể hoàn tất giao dịch. Vui lòng thử lại sau ít phút."
 }

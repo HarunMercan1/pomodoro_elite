@@ -7,6 +7,17 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../services/revenuecat_gateway.dart';
 
+enum PurchaseOutcome {
+  purchased,
+  restored,
+  cancelled,
+  pending,
+  alreadyOwnedButInactive,
+  ownedByAnotherAppAccount,
+  storeUnavailable,
+  failed,
+}
+
 class PurchaseProvider extends ChangeNotifier {
   final RevenueCatGateway _revenueCat;
 
@@ -172,9 +183,11 @@ class PurchaseProvider extends ChangeNotifier {
     await _fetchOfferingsInternal();
   }
 
-  Future<bool> purchasePackage(Package package) async {
+  Future<PurchaseOutcome> purchasePackage(Package package) async {
     await _initialization;
-    if (!_isConfigured || _isDisposed || _isPurchaseInProgress) return false;
+    if (!_isConfigured || _isDisposed || _isPurchaseInProgress) {
+      return PurchaseOutcome.failed;
+    }
 
     _isPurchaseInProgress = true;
     _notifyListeners();
@@ -183,24 +196,81 @@ class PurchaseProvider extends ChangeNotifier {
       final customerState = await _revenueCat.purchasePackage(package);
       _applyCustomerState(customerState);
       _lastError = null;
-      return true;
+      return PurchaseOutcome.purchased;
     } on PlatformException catch (error, stackTrace) {
       final errorCode = PurchasesErrorHelper.getErrorCode(error);
       if (errorCode == PurchasesErrorCode.productAlreadyPurchasedError) {
-        debugPrint('Product already purchased; restoring purchases.');
-        return _restorePurchasesInternal();
+        debugPrint(
+          'Google Play reports ITEM_ALREADY_OWNED; refreshing purchases.',
+        );
+        return _recoverAlreadyOwnedPurchase();
+      }
+      if (errorCode == PurchasesErrorCode.purchaseCancelledError) {
+        _lastError = null;
+        return PurchaseOutcome.cancelled;
+      }
+      if (errorCode == PurchasesErrorCode.paymentPendingError) {
+        _lastError = null;
+        return PurchaseOutcome.pending;
+      }
+      if (errorCode == PurchasesErrorCode.receiptAlreadyInUseError ||
+          errorCode == PurchasesErrorCode.receiptInUseByOtherSubscriberError) {
+        _lastError = 'RevenueCat receipt belongs to another app account.';
+        debugPrint('$_lastError\n$stackTrace');
+        return PurchaseOutcome.ownedByAnotherAppAccount;
+      }
+      if (errorCode == PurchasesErrorCode.networkError ||
+          errorCode == PurchasesErrorCode.offlineConnectionError ||
+          errorCode == PurchasesErrorCode.storeProblemError) {
+        _lastError = 'RevenueCat store connection error: $error';
+        debugPrint('$_lastError\n$stackTrace');
+        return PurchaseOutcome.storeUnavailable;
       }
 
       _lastError = 'RevenueCat purchase error: $error';
       debugPrint('$_lastError\n$stackTrace');
-      return false;
+      return PurchaseOutcome.failed;
     } catch (error, stackTrace) {
       _lastError = 'RevenueCat purchase error: $error';
       debugPrint('$_lastError\n$stackTrace');
-      return false;
+      return PurchaseOutcome.failed;
     } finally {
       _isPurchaseInProgress = false;
       _notifyListeners();
+    }
+  }
+
+  Future<PurchaseOutcome> _recoverAlreadyOwnedPurchase() async {
+    try {
+      // restorePurchases is the RevenueCat-recommended response to
+      // ITEM_ALREADY_OWNED. If a refund/re-purchase happened recently, force a
+      // second uncached Play/RevenueCat sync before deciding that access is
+      // still inactive.
+      var customerState = await _revenueCat.restorePurchases();
+      if (!customerState.isPremium) {
+        customerState = await _revenueCat.resyncPurchases();
+      }
+
+      _applyCustomerState(customerState);
+      _lastError = null;
+      return customerState.isPremium
+          ? PurchaseOutcome.restored
+          : PurchaseOutcome.alreadyOwnedButInactive;
+    } catch (error, stackTrace) {
+      if (error is PlatformException) {
+        final errorCode = PurchasesErrorHelper.getErrorCode(error);
+        if (errorCode == PurchasesErrorCode.receiptAlreadyInUseError ||
+            errorCode ==
+                PurchasesErrorCode.receiptInUseByOtherSubscriberError) {
+          _lastError = 'RevenueCat receipt belongs to another app account.';
+          debugPrint('$_lastError\n$stackTrace');
+          return PurchaseOutcome.ownedByAnotherAppAccount;
+        }
+      }
+
+      _lastError = 'RevenueCat already-owned recovery error: $error';
+      debugPrint('$_lastError\n$stackTrace');
+      return PurchaseOutcome.alreadyOwnedButInactive;
     }
   }
 

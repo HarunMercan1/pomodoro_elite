@@ -248,5 +248,19 @@
   "login_required": "จำเป็นต้องเข้าสู่ระบบ",
   "premium_login_required_desc": "โปรดเข้าสู่ระบบบัญชีของคุณเพื่อซื้อหรือใช้คุณสมบัติพรีเมียม",
   "unlock_premium": "ปลดล็อกพรีเมียม",
-  "privacy_options": "ตัวเลือกความเป็นส่วนตัว"
+  "privacy_options": "ตัวเลือกความเป็นส่วนตัว",
+  "guest_connect_google_title": "บันทึกข้อมูลด้วย Google",
+  "guest_connect_google_desc": "เชื่อมโยงบัญชีและปกป้องความคืบหน้าของคุณ",
+  "purchase_restored_title": "กู้คืนการซื้อแล้ว",
+  "purchase_restored_after_owned": "Google Play พบรายการซื้อของคุณและกู้คืนสิทธิ์ Premium แล้ว",
+  "purchase_cancelled_title": "ยกเลิกการซื้อแล้ว",
+  "purchase_pending_title": "กำลังรอการชำระเงิน",
+  "purchase_pending_desc": "การชำระเงินกำลังรอยืนยัน Premium จะเปิดอัตโนมัติเมื่อ Google Play อนุมัติ",
+  "play_account_sync_title": "ตรวจสอบบัญชี Play",
+  "play_account_sync_desc": "การซื้อผูกกับบัญชี Google ที่เลือกใน Play Store ไม่ใช่บัญชีที่ใช้เข้าสู่แอป โปรดตรวจสอบบัญชีและลองใหม่หลังการคืนเงินล่าสุดซิงค์เสร็จ",
+  "purchase_account_conflict_title": "การซื้อผูกกับบัญชีอื่น",
+  "purchase_account_conflict_desc": "การซื้อผ่าน Play นี้ผูกกับบัญชี Pomodoro Elite อื่น โปรดเข้าสู่บัญชีแอปเดิมและกู้คืนการซื้อ",
+  "store_unavailable_title": "ไม่สามารถใช้ร้านค้าได้",
+  "store_unavailable_desc": "ไม่สามารถเชื่อมต่อ Google Play โปรดตรวจสอบอินเทอร์เน็ตแล้วลองใหม่",
+  "purchase_failed_desc": "ไม่สามารถดำเนินการซื้อให้เสร็จ โปรดลองใหม่อีกครั้งในภายหลัง"
 }

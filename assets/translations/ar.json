@@ -248,5 +248,19 @@
   "login_required": "تسجيل الدخول مطلوب",
   "premium_login_required_desc": "يرجى تسجيل الدخول إلى حسابك لشراء أو استخدام ميزات Premium.",
   "unlock_premium": "فتح بريميوم",
-  "privacy_options": "خيارات الخصوصية"
+  "privacy_options": "خيارات الخصوصية",
+  "guest_connect_google_title": "حفظ البيانات عبر Google",
+  "guest_connect_google_desc": "اربط حسابك واحمِ تقدمك بأمان",
+  "purchase_restored_title": "تمت استعادة الشراء",
+  "purchase_restored_after_owned": "عثر Google Play على عملية الشراء وتمت استعادة Premium.",
+  "purchase_cancelled_title": "تم إلغاء الشراء",
+  "purchase_pending_title": "الدفع قيد الانتظار",
+  "purchase_pending_desc": "دفعتك بانتظار التأكيد. سيتم تفعيل Premium تلقائياً بعد موافقة Google Play.",
+  "play_account_sync_title": "تحقق من حساب Play",
+  "play_account_sync_desc": "ترتبط المشتريات بحساب Google المحدد في متجر Play وليس بحساب تسجيل الدخول إلى التطبيق. تحقق من حساب Play وأعد المحاولة بعد مزامنة أي استرداد حديث.",
+  "purchase_account_conflict_title": "الشراء مرتبط بحساب آخر",
+  "purchase_account_conflict_desc": "عملية الشراء هذه مرتبطة بحساب Pomodoro Elite آخر. سجّل الدخول إلى حساب التطبيق الأصلي واستعد مشترياتك.",
+  "store_unavailable_title": "المتجر غير متاح",
+  "store_unavailable_desc": "تعذر الوصول إلى Google Play. تحقق من اتصالك وحاول مجدداً.",
+  "purchase_failed_desc": "تعذر إكمال عملية الشراء. حاول مرة أخرى بعد قليل."
 }

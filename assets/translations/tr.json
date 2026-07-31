@@ -248,5 +248,19 @@
   "login_required": "Üye Girişi Gerekli",
   "premium_login_required_desc": "Premium satın almak veya özelliklerini kullanmak için lütfen hesabınıza giriş yapın.",
   "unlock_premium": "Premium'u Aç",
-  "privacy_options": "Gizlilik seçenekleri"
+  "privacy_options": "Gizlilik seçenekleri",
+  "guest_connect_google_title": "Verilerini Google ile Kaydet",
+  "guest_connect_google_desc": "Hesabını bağla, ilerlemeni güvenle koru",
+  "purchase_restored_title": "Satın Alma Geri Yüklendi",
+  "purchase_restored_after_owned": "Google Play satın almanızı buldu. Premium erişiminiz geri yüklendi.",
+  "purchase_cancelled_title": "Satın Alma İptal Edildi",
+  "purchase_pending_title": "Ödeme Beklemede",
+  "purchase_pending_desc": "Ödemeniz onay bekliyor. Google Play onayladığında Premium otomatik olarak açılacak.",
+  "play_account_sync_title": "Play Store Hesabını Kontrol Et",
+  "play_account_sync_desc": "Satın almalar uygulamadaki giriş hesabına değil, Play Store'da seçili Google hesabına bağlıdır. Play Store hesabını kontrol edin; yakın zamanda iade yaptıysanız senkronizasyon tamamlanınca tekrar deneyin.",
+  "purchase_account_conflict_title": "Satın Alma Başka Hesaba Bağlı",
+  "purchase_account_conflict_desc": "Bu Play satın alması başka bir Pomodoro Elite hesabına bağlı. Satın alırken kullandığınız uygulama hesabına girip satın almaları geri yükleyin.",
+  "store_unavailable_title": "Mağazaya Ulaşılamıyor",
+  "store_unavailable_desc": "Google Play'e ulaşılamadı. Bağlantınızı kontrol edip tekrar deneyin.",
+  "purchase_failed_desc": "Satın alma tamamlanamadı. Lütfen kısa süre sonra tekrar deneyin."
 }

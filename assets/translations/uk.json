@@ -248,5 +248,19 @@
   "login_required": "Потрібен Вхід",
   "premium_login_required_desc": "Увійдіть у свій обліковий запис, щоб придбати або використовувати функції Premium.",
   "unlock_premium": "Розблокувати Premium",
-  "privacy_options": "Налаштування конфіденційності"
+  "privacy_options": "Налаштування конфіденційності",
+  "guest_connect_google_title": "Зберегти через Google",
+  "guest_connect_google_desc": "Прив’яжіть обліковий запис і захистіть прогрес",
+  "purchase_restored_title": "Покупку відновлено",
+  "purchase_restored_after_owned": "Google Play знайшов вашу покупку. Доступ Premium відновлено.",
+  "purchase_cancelled_title": "Покупку скасовано",
+  "purchase_pending_title": "Платіж очікує",
+  "purchase_pending_desc": "Платіж очікує підтвердження. Premium увімкнеться автоматично після схвалення Google Play.",
+  "play_account_sync_title": "Перевірте обліковий запис Play",
+  "play_account_sync_desc": "Покупки належать обліковому запису Google, вибраному в Play Маркеті, а не обліковому запису входу в застосунок. Перевірте його й повторіть після синхронізації нещодавнього повернення.",
+  "purchase_account_conflict_title": "Покупку пов’язано з іншим обліковим записом",
+  "purchase_account_conflict_desc": "Цю покупку Play пов’язано з іншим обліковим записом Pomodoro Elite. Увійдіть у початковий обліковий запис застосунку та відновіть покупки.",
+  "store_unavailable_title": "Магазин недоступний",
+  "store_unavailable_desc": "Не вдалося зв’язатися з Google Play. Перевірте з’єднання та повторіть спробу.",
+  "purchase_failed_desc": "Не вдалося завершити покупку. Спробуйте ще раз трохи пізніше."
 }

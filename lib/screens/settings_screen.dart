@@ -46,6 +46,130 @@ class _SettingsScreenState extends State<SettingsScreen>
     }
   }
 
+  Future<void> _showPremiumLoginRequired() async {
+    final shouldConnect = await showDialog<bool>(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.72),
+      builder: (dialogContext) {
+        final theme = dialogContext.read<ThemeProvider>();
+        final textColor = theme.settingsTextColor;
+        final surfaceColor =
+            theme.currentTheme.settingsCardColor ?? const Color(0xFF121A2A);
+
+        return Dialog(
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 420),
+            padding: const EdgeInsets.fromLTRB(22, 24, 22, 20),
+            decoration: BoxDecoration(
+              color: surfaceColor,
+              borderRadius: BorderRadius.circular(28),
+              border: Border.all(
+                color: const Color(0xFF38BDF8).withValues(alpha: 0.38),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF2563EB).withValues(alpha: 0.24),
+                  blurRadius: 36,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 76,
+                  height: 76,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [Color(0xFF67E8F9), Color(0xFF2563EB)],
+                    ),
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF38BDF8).withValues(alpha: 0.34),
+                        blurRadius: 24,
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.cloud_upload_rounded,
+                    color: Colors.white,
+                    size: 38,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'login_required'.tr(),
+                  textAlign: TextAlign.center,
+                  style: AppFonts.poppins(
+                    context: dialogContext,
+                    color: textColor,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 9),
+                Text(
+                  'premium_login_required_desc'.tr(),
+                  textAlign: TextAlign.center,
+                  style: AppFonts.poppins(
+                    context: dialogContext,
+                    color: textColor.withValues(alpha: 0.68),
+                    fontSize: 14,
+                    height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 22),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: () => Navigator.pop(dialogContext, true),
+                    icon: const Icon(Icons.link_rounded),
+                    label: Text('guest_connect_google_title'.tr()),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: const Color(0xFF2563EB),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      textStyle: AppFonts.poppins(
+                        context: dialogContext,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 7),
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext, false),
+                  child: Text(
+                    'cancel'.tr(),
+                    style: AppFonts.poppins(
+                      context: dialogContext,
+                      color: textColor.withValues(alpha: 0.62),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    if (shouldConnect == true && mounted) {
+      await _connectGuestWithGoogle();
+    }
+  }
+
   String _getLanguageName(String code) {
     switch (code) {
       case 'tr':
@@ -329,14 +453,40 @@ class _SettingsScreenState extends State<SettingsScreen>
                                           ),
                                           const SizedBox(width: 14),
                                           Expanded(
-                                            child: Text(
-                                              'continue_with_google'.tr(),
-                                              style: AppFonts.poppins(
-                                                context: context,
-                                                color: Colors.white,
-                                                fontSize: titleSize,
-                                                fontWeight: FontWeight.w700,
-                                              ),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  'guest_connect_google_title'
+                                                      .tr(),
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: AppFonts.poppins(
+                                                    context: context,
+                                                    color: Colors.white,
+                                                    fontSize: titleSize,
+                                                    fontWeight: FontWeight.w700,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 2),
+                                                Text(
+                                                  'guest_connect_google_desc'
+                                                      .tr(),
+                                                  maxLines: 2,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: AppFonts.poppins(
+                                                    context: context,
+                                                    color: Colors.white
+                                                        .withValues(
+                                                            alpha: 0.78),
+                                                    fontSize: subtitleSize,
+                                                    height: 1.25,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
                                           const Icon(
@@ -358,9 +508,11 @@ class _SettingsScreenState extends State<SettingsScreen>
                                   context.watch<PurchaseProvider>().isPremium
                                       ? const LinearGradient(
                                           colors: [
-                                            Color(0xFF475569),
-                                            Color(0xFF0F172A)
-                                          ], // Platinum/Slate
+                                            Color(0xFF64748B),
+                                            Color(0xFF2563EB),
+                                            Color(0xFF0891B2),
+                                          ],
+                                          stops: [0.0, 0.52, 1.0],
                                           begin: Alignment.topLeft,
                                           end: Alignment.bottomRight,
                                         )
@@ -383,7 +535,20 @@ class _SettingsScreenState extends State<SettingsScreen>
                               ),
                               boxShadow:
                                   context.watch<PurchaseProvider>().isPremium
-                                      ? []
+                                      ? [
+                                          BoxShadow(
+                                            color: const Color(0xFF38BDF8)
+                                                .withValues(alpha: 0.34),
+                                            blurRadius: 20,
+                                            offset: const Offset(0, 8),
+                                          ),
+                                          BoxShadow(
+                                            color: const Color(0xFFE2E8F0)
+                                                .withValues(alpha: 0.12),
+                                            blurRadius: 8,
+                                            offset: const Offset(-3, -2),
+                                          ),
+                                        ]
                                       : [
                                           BoxShadow(
                                             color: const Color(0xFF38BDF8)
@@ -401,21 +566,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                                   final isGuest =
                                       context.read<AuthProvider>().isGuest;
                                   if (isGuest) {
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) => AlertDialog(
-                                        title: Text('login_required'.tr()),
-                                        content: Text(
-                                            'premium_login_required_desc'.tr()),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () =>
-                                                Navigator.pop(context),
-                                            child: Text('ok_btn'.tr()),
-                                          ),
-                                        ],
-                                      ),
-                                    );
+                                    _showPremiumLoginRequired();
                                   } else {
                                     Navigator.push(
                                       context,

@@ -248,5 +248,19 @@
   "login_required": "Accesso Richiesto",
   "premium_login_required_desc": "Accedi al tuo account per acquistare o utilizzare le funzionalità Premium.",
   "unlock_premium": "Sblocca Premium",
-  "privacy_options": "Opzioni sulla privacy"
+  "privacy_options": "Opzioni sulla privacy",
+  "guest_connect_google_title": "Salva con Google",
+  "guest_connect_google_desc": "Collega l’account e proteggi i tuoi progressi",
+  "purchase_restored_title": "Acquisto ripristinato",
+  "purchase_restored_after_owned": "Google Play ha trovato il tuo acquisto. L’accesso Premium è stato ripristinato.",
+  "purchase_cancelled_title": "Acquisto annullato",
+  "purchase_pending_title": "Pagamento in attesa",
+  "purchase_pending_desc": "Il pagamento è in attesa di conferma. Premium si attiverà automaticamente dopo l’approvazione di Google Play.",
+  "play_account_sync_title": "Controlla l’account Play",
+  "play_account_sync_desc": "Gli acquisti appartengono all’account Google selezionato nel Play Store, non all’account usato nell’app. Controlla l’account e riprova dopo la sincronizzazione di un rimborso recente.",
+  "purchase_account_conflict_title": "Acquisto collegato a un altro account",
+  "purchase_account_conflict_desc": "Questo acquisto Play è collegato a un altro account Pomodoro Elite. Accedi all’account originale e ripristina gli acquisti.",
+  "store_unavailable_title": "Store non disponibile",
+  "store_unavailable_desc": "Google Play non è raggiungibile. Controlla la connessione e riprova.",
+  "purchase_failed_desc": "Impossibile completare l’acquisto. Riprova tra poco."
 }

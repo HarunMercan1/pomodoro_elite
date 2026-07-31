@@ -248,5 +248,19 @@
   "login_required": "Inloggning Krävs",
   "premium_login_required_desc": "Logga in på ditt konto för att köpa eller använda Premium-funktioner.",
   "unlock_premium": "Lås upp Premium",
-  "privacy_options": "Sekretessalternativ"
+  "privacy_options": "Sekretessalternativ",
+  "guest_connect_google_title": "Spara med Google",
+  "guest_connect_google_desc": "Länka kontot och skydda dina framsteg",
+  "purchase_restored_title": "Köp återställt",
+  "purchase_restored_after_owned": "Google Play hittade ditt köp. Premium-åtkomsten har återställts.",
+  "purchase_cancelled_title": "Köp avbrutet",
+  "purchase_pending_title": "Betalning väntar",
+  "purchase_pending_desc": "Din betalning väntar på bekräftelse. Premium aktiveras automatiskt när Google Play godkänner den.",
+  "play_account_sync_title": "Kontrollera ditt Play-konto",
+  "play_account_sync_desc": "Köp tillhör Google-kontot som valts i Play Butik, inte appens inloggningskonto. Kontrollera kontot och försök igen när en nylig återbetalning har synkroniserats.",
+  "purchase_account_conflict_title": "Köp länkat till annat konto",
+  "purchase_account_conflict_desc": "Det här Play-köpet är länkat till ett annat Pomodoro Elite-konto. Logga in på det ursprungliga appkontot och återställ köpen.",
+  "store_unavailable_title": "Butiken är inte tillgänglig",
+  "store_unavailable_desc": "Google Play kunde inte nås. Kontrollera anslutningen och försök igen.",
+  "purchase_failed_desc": "Köpet kunde inte slutföras. Försök igen om en stund."
 }

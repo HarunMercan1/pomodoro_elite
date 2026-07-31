@@ -248,5 +248,19 @@
   "login_required": "Diperlukan Login",
   "premium_login_required_desc": "Silakan masuk ke akun Anda untuk membeli atau menggunakan fitur Premium.",
   "unlock_premium": "Buka Premium",
-  "privacy_options": "Opsi privasi"
+  "privacy_options": "Opsi privasi",
+  "guest_connect_google_title": "Simpan dengan Google",
+  "guest_connect_google_desc": "Tautkan akun dan lindungi progres Anda",
+  "purchase_restored_title": "Pembelian dipulihkan",
+  "purchase_restored_after_owned": "Google Play menemukan pembelian Anda. Akses Premium telah dipulihkan.",
+  "purchase_cancelled_title": "Pembelian dibatalkan",
+  "purchase_pending_title": "Pembayaran tertunda",
+  "purchase_pending_desc": "Pembayaran Anda menunggu konfirmasi. Premium akan aktif otomatis setelah disetujui Google Play.",
+  "play_account_sync_title": "Periksa akun Play",
+  "play_account_sync_desc": "Pembelian terikat ke akun Google yang dipilih di Play Store, bukan akun untuk masuk ke aplikasi. Periksa akun Play dan coba lagi setelah pengembalian dana terbaru selesai disinkronkan.",
+  "purchase_account_conflict_title": "Pembelian terhubung ke akun lain",
+  "purchase_account_conflict_desc": "Pembelian Play ini terhubung ke akun Pomodoro Elite lain. Masuk ke akun aplikasi asli dan pulihkan pembelian.",
+  "store_unavailable_title": "Toko tidak tersedia",
+  "store_unavailable_desc": "Google Play tidak dapat dihubungi. Periksa koneksi lalu coba lagi.",
+  "purchase_failed_desc": "Pembelian tidak dapat diselesaikan. Coba lagi sebentar lagi."
 }

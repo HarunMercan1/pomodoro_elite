@@ -248,5 +248,19 @@
   "login_required": "Login Required",
   "premium_login_required_desc": "Please log in to your account to purchase or use Premium features.",
   "unlock_premium": "Unlock Premium",
-  "privacy_options": "Privacy options"
+  "privacy_options": "Privacy options",
+  "guest_connect_google_title": "Save with Google",
+  "guest_connect_google_desc": "Link your account and protect your progress",
+  "purchase_restored_title": "Purchase Restored",
+  "purchase_restored_after_owned": "Google Play found your purchase. Premium access has been restored.",
+  "purchase_cancelled_title": "Purchase Cancelled",
+  "purchase_pending_title": "Payment Pending",
+  "purchase_pending_desc": "Your payment is awaiting confirmation. Premium will unlock automatically once Google Play approves it.",
+  "play_account_sync_title": "Check Your Play Account",
+  "play_account_sync_desc": "Purchases belong to the Google account selected in Play Store, not the account used to sign in to the app. Check your Play Store account and try again after a recent refund has finished syncing.",
+  "purchase_account_conflict_title": "Purchase Linked to Another Account",
+  "purchase_account_conflict_desc": "This Play purchase is linked to another Pomodoro Elite account. Sign in to the original app account and restore purchases.",
+  "store_unavailable_title": "Store Unavailable",
+  "store_unavailable_desc": "Google Play could not be reached. Check your connection and try again.",
+  "purchase_failed_desc": "The purchase could not be completed. Please try again shortly."
 }

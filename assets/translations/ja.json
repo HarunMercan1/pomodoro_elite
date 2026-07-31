@@ -248,5 +248,19 @@
   "login_required": "ログインが必要です",
   "premium_login_required_desc": "プレミアム機能を購入または使用するには、アカウントにログインしてください。",
   "unlock_premium": "プレミアムのロック解除",
-  "privacy_options": "プライバシー オプション"
+  "privacy_options": "プライバシー オプション",
+  "guest_connect_google_title": "Google でデータを保存",
+  "guest_connect_google_desc": "アカウントを連携して進捗を安全に保護",
+  "purchase_restored_title": "購入を復元しました",
+  "purchase_restored_after_owned": "Google Play で購入が確認され、Premium が復元されました。",
+  "purchase_cancelled_title": "購入をキャンセルしました",
+  "purchase_pending_title": "支払い確認中",
+  "purchase_pending_desc": "支払いの確認を待っています。Google Play の承認後、Premium は自動的に有効になります。",
+  "play_account_sync_title": "Play アカウントを確認",
+  "play_account_sync_desc": "購入はアプリのログインではなく、Play ストアで選択中の Google アカウントに紐づきます。アカウントを確認し、最近の払い戻しの同期後に再試行してください。",
+  "purchase_account_conflict_title": "別のアカウントに紐づく購入です",
+  "purchase_account_conflict_desc": "この購入は別の Pomodoro Elite アカウントに紐づいています。元のアプリ用アカウントでログインして購入を復元してください。",
+  "store_unavailable_title": "ストアに接続できません",
+  "store_unavailable_desc": "Google Play に接続できませんでした。通信状態を確認して再試行してください。",
+  "purchase_failed_desc": "購入を完了できませんでした。しばらくしてから再試行してください。"
 }

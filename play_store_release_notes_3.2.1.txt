@@ -1,0 +1,176 @@
+<en-US>
+🚀 Pomodoro Elite 3.2.1 is here!
+✨ A completely redesigned, modern statistics experience
+☁️ Sign in with Google as a guest without losing local progress
+⏱️ More reliable timers in the background and duplicate notification fixes
+💎 Premium, theme access, and in-app purchase improvements
+🌍 Localization, privacy consent, stability, and performance refinements
+</en-US>
+<tr-TR>
+🚀 Pomodoro Elite 3.2.1 yayında!
+✨ Baştan tasarlanan modern istatistik deneyimi
+☁️ Yerel ilerlemeyi kaybetmeden misafir hesaptan Google ile giriş
+⏱️ Arka planda daha güvenilir sayaçlar ve yinelenen bildirim düzeltmeleri
+💎 Premium, tema erişimi ve uygulama içi satın alma iyileştirmeleri
+🌍 Yerelleştirme, gizlilik izni, kararlılık ve performans geliştirmeleri
+</tr-TR>
+<de-DE>
+🚀 Pomodoro Elite 3.2.1 ist da!
+✨ Eine komplett neu gestaltete, moderne Statistikansicht
+☁️ Als Gast mit Google anmelden, ohne lokale Fortschritte zu verlieren
+⏱️ Zuverlässigere Timer im Hintergrund und keine doppelten Benachrichtigungen
+💎 Verbesserungen für Premium, Themes und In-App-Käufe
+🌍 Optimierungen bei Übersetzungen, Datenschutz, Stabilität und Leistung
+</de-DE>
+<es-ES>
+🚀 ¡Pomodoro Elite 3.2.1 ya está aquí!
+✨ Una experiencia de estadísticas moderna y totalmente renovada
+☁️ Inicia sesión con Google como invitado sin perder tu progreso local
+⏱️ Temporizadores más fiables en segundo plano y corrección de notificaciones duplicadas
+💎 Mejoras en Premium, temas y compras dentro de la app
+🌍 Mejoras de traducción, privacidad, estabilidad y rendimiento
+</es-ES>
+<fr-FR>
+🚀 Pomodoro Elite 3.2.1 est disponible !
+✨ Un écran de statistiques moderne entièrement repensé
+☁️ Connectez-vous avec Google en tant qu’invité sans perdre votre progression locale
+⏱️ Minuteurs plus fiables en arrière-plan et correction des notifications en double
+💎 Améliorations de Premium, des thèmes et des achats intégrés
+🌍 Optimisations des traductions, de la confidentialité, de la stabilité et des performances
+</fr-FR>
+<it-IT>
+🚀 Pomodoro Elite 3.2.1 è arrivato!
+✨ Una schermata delle statistiche moderna e completamente rinnovata
+☁️ Accedi con Google come ospite senza perdere i progressi locali
+⏱️ Timer più affidabili in background e correzione delle notifiche duplicate
+💎 Miglioramenti a Premium, temi e acquisti in-app
+🌍 Ottimizzazioni per traduzioni, privacy, stabilità e prestazioni
+</it-IT>
+<pt-BR>
+🚀 O Pomodoro Elite 3.2.1 chegou!
+✨ Uma experiência de estatísticas moderna e totalmente reformulada
+☁️ Entre com o Google como convidado sem perder seu progresso local
+⏱️ Temporizadores mais confiáveis em segundo plano e correção de notificações duplicadas
+💎 Melhorias no Premium, temas e compras no app
+🌍 Melhorias de tradução, privacidade, estabilidade e desempenho
+</pt-BR>
+<ru-RU>
+🚀 Встречайте Pomodoro Elite 3.2.1!
+✨ Полностью обновлённый современный экран статистики
+☁️ Вход через Google из гостевого режима без потери локального прогресса
+⏱️ Более надёжная работа таймера в фоне и устранение повторных уведомлений
+💎 Улучшения Premium, тем и покупок в приложении
+🌍 Улучшения локализации, конфиденциальности, стабильности и производительности
+</ru-RU>
+<ja-JP>
+🚀 Pomodoro Elite 3.2.1 が登場！
+✨ 統計画面をモダンなデザインに全面刷新
+☁️ ゲストのローカル進捗を失わずに Google でログイン
+⏱️ バックグラウンドタイマーの信頼性向上と重複通知の修正
+💎 Premium、テーマ、アプリ内購入を改善
+🌍 翻訳、プライバシー同意、安定性、パフォーマンスを改善
+</ja-JP>
+<ko-KR>
+🚀 Pomodoro Elite 3.2.1 출시!
+✨ 통계 화면을 현대적인 디자인으로 전면 개편
+☁️ 게스트의 로컬 진행 상황을 잃지 않고 Google로 로그인
+⏱️ 백그라운드 타이머 안정성 향상 및 중복 알림 수정
+💎 Premium, 테마 이용 및 인앱 결제 개선
+🌍 번역, 개인정보 동의, 안정성 및 성능 개선
+</ko-KR>
+<zh-CN>
+🚀 Pomodoro Elite 3.2.1 已上线！
+✨ 全新设计的现代化统计体验
+☁️ 访客可使用 Google 登录，且不会丢失本地进度
+⏱️ 提升后台计时器可靠性并修复重复通知
+💎 改进 Premium、主题访问和应用内购买
+🌍 优化本地化、隐私同意、稳定性和性能
+</zh-CN>
+<ar>
+🚀 وصل Pomodoro Elite 3.2.1!
+✨ تجربة إحصائيات عصرية أعيد تصميمها بالكامل
+☁️ سجّل الدخول عبر Google كضيف دون فقدان تقدمك المحلي
+⏱️ مؤقتات أكثر موثوقية في الخلفية وإصلاح الإشعارات المكررة
+💎 تحسينات على Premium والسمات وعمليات الشراء داخل التطبيق
+🌍 تحسينات الترجمة والموافقة على الخصوصية والثبات والأداء
+</ar>
+<hi-IN>
+🚀 Pomodoro Elite 3.2.1 आ गया है!
+✨ पूरी तरह नया और आधुनिक सांख्यिकी अनुभव
+☁️ स्थानीय प्रगति खोए बिना अतिथि खाते से Google साइन-इन
+⏱️ बैकग्राउंड में अधिक भरोसेमंद टाइमर और डुप्लिकेट नोटिफिकेशन का सुधार
+💎 Premium, थीम एक्सेस और इन-ऐप खरीदारी में सुधार
+🌍 अनुवाद, गोपनीयता सहमति, स्थिरता और प्रदर्शन में सुधार
+</hi-IN>
+<id>
+🚀 Pomodoro Elite 3.2.1 telah hadir!
+✨ Tampilan statistik modern yang didesain ulang sepenuhnya
+☁️ Masuk dengan Google sebagai tamu tanpa kehilangan progres lokal
+⏱️ Timer latar belakang lebih andal dan perbaikan notifikasi ganda
+💎 Peningkatan Premium, akses tema, dan pembelian dalam aplikasi
+🌍 Penyempurnaan terjemahan, persetujuan privasi, stabilitas, dan performa
+</id>
+<nl-NL>
+🚀 Pomodoro Elite 3.2.1 is er!
+✨ Een volledig vernieuwde, moderne statistiekervaring
+☁️ Log als gast in met Google zonder lokale voortgang te verliezen
+⏱️ Betrouwbaardere timers op de achtergrond en geen dubbele meldingen meer
+💎 Verbeteringen voor Premium, thema’s en in-app-aankopen
+🌍 Verbeteringen aan vertalingen, privacytoestemming, stabiliteit en prestaties
+</nl-NL>
+<pl-PL>
+🚀 Pomodoro Elite 3.2.1 już dostępne!
+✨ Całkowicie przeprojektowany, nowoczesny ekran statystyk
+☁️ Logowanie przez Google jako gość bez utraty lokalnych postępów
+⏱️ Bardziej niezawodne działanie timera w tle i poprawka podwójnych powiadomień
+💎 Ulepszenia Premium, motywów i zakupów w aplikacji
+🌍 Ulepszenia tłumaczeń, prywatności, stabilności i wydajności
+</pl-PL>
+<sv-SE>
+🚀 Pomodoro Elite 3.2.1 är här!
+✨ En helt omdesignad och modern statistikupplevelse
+☁️ Logga in med Google som gäst utan att förlora lokala framsteg
+⏱️ Pålitligare timer i bakgrunden och åtgärdade dubbla aviseringar
+💎 Förbättringar av Premium, teman och köp i appen
+🌍 Förbättringar av översättningar, integritetssamtycke, stabilitet och prestanda
+</sv-SE>
+<uk>
+🚀 Pomodoro Elite 3.2.1 уже доступний!
+✨ Повністю оновлений сучасний екран статистики
+☁️ Вхід через Google у гостьовому режимі без втрати локального прогресу
+⏱️ Надійніша робота таймера у фоні та виправлення повторних сповіщень
+💎 Покращення Premium, тем і покупок у застосунку
+🌍 Покращення перекладів, згоди на конфіденційність, стабільності та швидкодії
+</uk>
+<vi>
+🚀 Pomodoro Elite 3.2.1 đã ra mắt!
+✨ Trải nghiệm thống kê hiện đại được thiết kế lại hoàn toàn
+☁️ Đăng nhập Google từ chế độ khách mà không mất tiến trình cục bộ
+⏱️ Bộ hẹn giờ nền đáng tin cậy hơn và sửa lỗi thông báo trùng lặp
+💎 Cải tiến Premium, quyền truy cập giao diện và mua hàng trong ứng dụng
+🌍 Cải thiện bản dịch, đồng ý quyền riêng tư, độ ổn định và hiệu suất
+</vi>
+<th>
+🚀 Pomodoro Elite 3.2.1 มาแล้ว!
+✨ หน้าสถิติรูปแบบใหม่ที่ทันสมัยและออกแบบใหม่ทั้งหมด
+☁️ ลงชื่อเข้าใช้ Google จากโหมดผู้เยี่ยมชมโดยไม่สูญเสียความคืบหน้าในเครื่อง
+⏱️ ตัวจับเวลาเบื้องหลังเชื่อถือได้มากขึ้นและแก้ไขการแจ้งเตือนซ้ำ
+💎 ปรับปรุง Premium ธีม และการซื้อในแอป
+🌍 ปรับปรุงการแปล ความยินยอมด้านความเป็นส่วนตัว ความเสถียร และประสิทธิภาพ
+</th>
+<el-GR>
+🚀 Το Pomodoro Elite 3.2.1 κυκλοφόρησε!
+✨ Πλήρως ανανεωμένη και σύγχρονη εμπειρία στατιστικών
+☁️ Σύνδεση επισκέπτη μέσω Google χωρίς απώλεια της τοπικής προόδου
+⏱️ Πιο αξιόπιστο χρονόμετρο στο παρασκήνιο και διόρθωση διπλών ειδοποιήσεων
+💎 Βελτιώσεις σε Premium, θέματα και αγορές εντός εφαρμογής
+🌍 Βελτιώσεις σε μεταφράσεις, απόρρητο, σταθερότητα και απόδοση
+</el-GR>
+<ur>
+🚀 Pomodoro Elite 3.2.1 آ گیا ہے!
+✨ مکمل طور پر نیا اور جدید شماریات کا تجربہ
+☁️ مقامی پیش رفت کھوئے بغیر مہمان اکاؤنٹ سے Google سائن اِن
+⏱️ پس منظر میں زیادہ قابلِ اعتماد ٹائمر اور دہرے نوٹیفکیشن کی اصلاح
+💎 Premium، تھیم رسائی اور اِن ایپ خریداری میں بہتری
+🌍 ترجمہ، رازداری کی رضامندی، استحکام اور کارکردگی میں بہتری
+</ur>

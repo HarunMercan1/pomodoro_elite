@@ -18,7 +18,6 @@ class PremiumScreen extends StatefulWidget {
 class _PremiumScreenState extends State<PremiumScreen> {
   static const _diamond = Color(0xFF38BDF8);
   static const _sapphire = Color(0xFF2563EB);
-  static const _platinum = Color(0xFFCBD5E1);
 
   @override
   Widget build(BuildContext context) {
@@ -232,16 +231,67 @@ class _PremiumScreenState extends State<PremiumScreen> {
   }
 
   Future<void> _purchase(BuildContext context, Package package) async {
-    final success =
+    final outcome =
         await context.read<PurchaseProvider>().purchasePackage(package);
     if (!context.mounted) return;
 
+    final presentation = switch (outcome) {
+      PurchaseOutcome.purchased => (
+          'thanks_title',
+          'purchase_success',
+          Icons.check_circle_rounded,
+          const Color(0xFF22C55E),
+        ),
+      PurchaseOutcome.restored => (
+          'purchase_restored_title',
+          'purchase_restored_after_owned',
+          Icons.verified_rounded,
+          const Color(0xFF22C55E),
+        ),
+      PurchaseOutcome.cancelled => (
+          'purchase_cancelled_title',
+          'purchase_cancelled',
+          Icons.close_rounded,
+          const Color(0xFF94A3B8),
+        ),
+      PurchaseOutcome.pending => (
+          'purchase_pending_title',
+          'purchase_pending_desc',
+          Icons.hourglass_top_rounded,
+          const Color(0xFFF59E0B),
+        ),
+      PurchaseOutcome.alreadyOwnedButInactive => (
+          'play_account_sync_title',
+          'play_account_sync_desc',
+          Icons.sync_problem_rounded,
+          const Color(0xFFF59E0B),
+        ),
+      PurchaseOutcome.ownedByAnotherAppAccount => (
+          'purchase_account_conflict_title',
+          'purchase_account_conflict_desc',
+          Icons.manage_accounts_rounded,
+          const Color(0xFFF59E0B),
+        ),
+      PurchaseOutcome.storeUnavailable => (
+          'store_unavailable_title',
+          'store_unavailable_desc',
+          Icons.cloud_off_rounded,
+          const Color(0xFFF59E0B),
+        ),
+      PurchaseOutcome.failed => (
+          'transaction_failed',
+          'purchase_failed_desc',
+          Icons.error_outline_rounded,
+          const Color(0xFFF43F5E),
+        ),
+    };
+
     _showResultDialog(
       context,
-      title: success ? 'thanks_title'.tr() : 'transaction_failed'.tr(),
-      message: success ? 'purchase_success'.tr() : 'purchase_cancelled'.tr(),
-      icon: success ? Icons.check_circle_rounded : Icons.error_outline_rounded,
-      color: success ? const Color(0xFF22C55E) : const Color(0xFFF43F5E),
+      title: presentation.$1.tr(),
+      message: presentation.$2.tr(),
+      icon: presentation.$3,
+      color: presentation.$4,
     );
   }
 
@@ -374,16 +424,26 @@ class _PremiumHero extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF334155), Color(0xFF111827), Color(0xFF0F172A)],
+          colors: [
+            Color(0xFF64748B),
+            Color(0xFF1D4ED8),
+            Color(0xFF082F49),
+          ],
+          stops: [0.0, 0.46, 1.0],
         ),
         borderRadius: BorderRadius.circular(28),
         border:
-            Border.all(color: const Color(0xFF94A3B8).withValues(alpha: 0.24)),
+            Border.all(color: const Color(0xFFE2E8F0).withValues(alpha: 0.46)),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF38BDF8).withValues(alpha: 0.15),
-            blurRadius: 28,
-            offset: const Offset(0, 14),
+            color: const Color(0xFF38BDF8).withValues(alpha: 0.28),
+            blurRadius: 34,
+            offset: const Offset(0, 16),
+          ),
+          BoxShadow(
+            color: const Color(0xFFE2E8F0).withValues(alpha: 0.10),
+            blurRadius: 12,
+            offset: const Offset(-5, -4),
           ),
         ],
       ),
@@ -480,7 +540,7 @@ class _FeaturePill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.065),
+        color: Colors.white.withValues(alpha: 0.11),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
       ),
@@ -875,8 +935,8 @@ class _TierVisual {
         SupportTier.star => const _TierVisual(
             translationKey: 'star_supporter',
             icon: Icons.star_rounded,
-            colors: [_PremiumScreenState._platinum, Color(0xFF64748B)],
-            priceColor: Color(0xFF94A3B8),
+            colors: [Color(0xFFFBBF24), Color(0xFFD97706)],
+            priceColor: Color(0xFFFBBF24),
           ),
         SupportTier.superStar => const _TierVisual(
             translationKey: 'super_supporter',

@@ -248,5 +248,19 @@
   "login_required": "লগইন প্রয়োজন",
   "premium_login_required_desc": "প্রিমিয়াম বৈশিষ্ট্যগুলি কিনতে বা ব্যবহার করতে অনুগ্রহ করে আপনার অ্যাকাউন্টে লগ ইন করুন।",
   "unlock_premium": "প্রিমিয়াম আনলক করুন",
-  "privacy_options": "গোপনীয়তার বিকল্প"
+  "privacy_options": "গোপনীয়তার বিকল্প",
+  "guest_connect_google_title": "Google দিয়ে ডেটা সংরক্ষণ করুন",
+  "guest_connect_google_desc": "অ্যাকাউন্ট যুক্ত করে অগ্রগতি নিরাপদ রাখুন",
+  "purchase_restored_title": "ক্রয় পুনরুদ্ধার হয়েছে",
+  "purchase_restored_after_owned": "Google Play আপনার ক্রয় খুঁজে পেয়েছে। Premium অ্যাক্সেস পুনরুদ্ধার হয়েছে।",
+  "purchase_cancelled_title": "ক্রয় বাতিল হয়েছে",
+  "purchase_pending_title": "পেমেন্ট অপেক্ষমাণ",
+  "purchase_pending_desc": "আপনার পেমেন্ট নিশ্চিতকরণের অপেক্ষায় আছে। Google Play অনুমোদন করলে Premium স্বয়ংক্রিয়ভাবে চালু হবে।",
+  "play_account_sync_title": "Play অ্যাকাউন্ট পরীক্ষা করুন",
+  "play_account_sync_desc": "ক্রয় অ্যাপের লগইন অ্যাকাউন্টে নয়, Play Store-এ নির্বাচিত Google অ্যাকাউন্টে যুক্ত থাকে। অ্যাকাউন্ট পরীক্ষা করে সাম্প্রতিক রিফান্ড সিঙ্ক হওয়ার পর আবার চেষ্টা করুন।",
+  "purchase_account_conflict_title": "ক্রয় অন্য অ্যাকাউন্টে যুক্ত",
+  "purchase_account_conflict_desc": "এই Play ক্রয় অন্য Pomodoro Elite অ্যাকাউন্টে যুক্ত। মূল অ্যাপ অ্যাকাউন্টে লগইন করে ক্রয় পুনরুদ্ধার করুন।",
+  "store_unavailable_title": "স্টোর অনুপলব্ধ",
+  "store_unavailable_desc": "Google Play-এ পৌঁছানো যায়নি। সংযোগ পরীক্ষা করে আবার চেষ্টা করুন।",
+  "purchase_failed_desc": "ক্রয় সম্পন্ন করা যায়নি। কিছুক্ষণ পরে আবার চেষ্টা করুন।"
 }

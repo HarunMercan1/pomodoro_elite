@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
@@ -136,6 +137,78 @@ void main() {
       expect(provider.isPremium, isFalse);
       expect(provider.lastError, contains('identity sync error'));
     });
+
+    test('recovers an already-owned purchase with a fresh store sync',
+        () async {
+      final gateway = _FakeRevenueCatGateway(
+        purchaseError: PlatformException(
+          code:
+              PurchasesErrorCode.productAlreadyPurchasedError.index.toString(),
+        ),
+        restoreState: const RevenueCatCustomerState(isPremium: false),
+        resyncState: const RevenueCatCustomerState(isPremium: true),
+      );
+      final provider = PurchaseProvider(
+        revenueCat: gateway,
+        currentUserId: () => 'user-a',
+        userIdChanges: authChanges.stream,
+      );
+      addTearDown(provider.dispose);
+
+      await provider.initialized;
+      final outcome = await provider.purchasePackage(_TestPackage());
+
+      expect(outcome, PurchaseOutcome.restored);
+      expect(provider.isPremium, isTrue);
+      expect(gateway.restoreCalls, 1);
+      expect(gateway.resyncCalls, 1);
+    });
+
+    test('reports the stale Play ownership state without granting Premium',
+        () async {
+      final gateway = _FakeRevenueCatGateway(
+        purchaseError: PlatformException(
+          code:
+              PurchasesErrorCode.productAlreadyPurchasedError.index.toString(),
+        ),
+        restoreState: const RevenueCatCustomerState(isPremium: false),
+        resyncState: const RevenueCatCustomerState(isPremium: false),
+      );
+      final provider = PurchaseProvider(
+        revenueCat: gateway,
+        currentUserId: () => 'user-a',
+        userIdChanges: authChanges.stream,
+      );
+      addTearDown(provider.dispose);
+
+      await provider.initialized;
+      final outcome = await provider.purchasePackage(_TestPackage());
+
+      expect(outcome, PurchaseOutcome.alreadyOwnedButInactive);
+      expect(provider.isPremium, isFalse);
+      expect(gateway.restoreCalls, 1);
+      expect(gateway.resyncCalls, 1);
+    });
+
+    test('distinguishes user cancellation from a purchase failure', () async {
+      final gateway = _FakeRevenueCatGateway(
+        purchaseError: PlatformException(
+          code: PurchasesErrorCode.purchaseCancelledError.index.toString(),
+        ),
+      );
+      final provider = PurchaseProvider(
+        revenueCat: gateway,
+        currentUserId: () => 'user-a',
+        userIdChanges: authChanges.stream,
+      );
+      addTearDown(provider.dispose);
+
+      await provider.initialized;
+      final outcome = await provider.purchasePackage(_TestPackage());
+
+      expect(outcome, PurchaseOutcome.cancelled);
+      expect(provider.lastError, isNull);
+    });
   });
 }
 
@@ -145,10 +218,16 @@ class _FakeRevenueCatGateway implements RevenueCatGateway {
   final Map<String, Future<RevenueCatCustomerState>> loginResults;
   final Map<String, Completer<void>> loginStarted;
   final Map<String, Object> loginErrors;
+  final Object? purchaseError;
+  final RevenueCatCustomerState? purchaseState;
+  final RevenueCatCustomerState? restoreState;
+  final RevenueCatCustomerState? resyncState;
 
   final List<String?> configuredUserIds = [];
   final List<String> loginCalls = [];
   int logoutCalls = 0;
+  int restoreCalls = 0;
+  int resyncCalls = 0;
 
   String? _currentUserId;
   RevenueCatCustomerStateListener? _listener;
@@ -159,6 +238,10 @@ class _FakeRevenueCatGateway implements RevenueCatGateway {
     this.loginResults = const {},
     this.loginStarted = const {},
     this.loginErrors = const {},
+    this.purchaseError,
+    this.purchaseState,
+    this.restoreState,
+    this.resyncState,
   });
 
   RevenueCatCustomerState get _currentState => RevenueCatCustomerState(
@@ -204,11 +287,22 @@ class _FakeRevenueCatGateway implements RevenueCatGateway {
 
   @override
   Future<RevenueCatCustomerState> purchasePackage(Package package) {
-    throw UnimplementedError();
+    final error = purchaseError;
+    if (error != null) throw error;
+    return Future.value(purchaseState ?? _currentState);
   }
 
   @override
-  Future<RevenueCatCustomerState> restorePurchases() async => _currentState;
+  Future<RevenueCatCustomerState> restorePurchases() async {
+    restoreCalls++;
+    return restoreState ?? _currentState;
+  }
+
+  @override
+  Future<RevenueCatCustomerState> resyncPurchases() async {
+    resyncCalls++;
+    return resyncState ?? _currentState;
+  }
 
   @override
   void addCustomerStateListener(RevenueCatCustomerStateListener listener) {
@@ -219,4 +313,9 @@ class _FakeRevenueCatGateway implements RevenueCatGateway {
   void removeCustomerStateListener(RevenueCatCustomerStateListener listener) {
     if (_listener == listener) _listener = null;
   }
+}
+
+class _TestPackage implements Package {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }

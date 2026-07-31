@@ -29,6 +29,11 @@ abstract interface class RevenueCatGateway {
 
   Future<RevenueCatCustomerState> restorePurchases();
 
+  /// Re-queries Google Play and then bypasses RevenueCat's local customer
+  /// cache. Used only after Play reports ITEM_ALREADY_OWNED so a recently
+  /// refunded or re-purchased lifetime product can settle correctly.
+  Future<RevenueCatCustomerState> resyncPurchases();
+
   void addCustomerStateListener(RevenueCatCustomerStateListener listener);
 
   void removeCustomerStateListener(RevenueCatCustomerStateListener listener);
@@ -81,6 +86,13 @@ class PurchasesRevenueCatGateway implements RevenueCatGateway {
   @override
   Future<RevenueCatCustomerState> restorePurchases() async {
     return _toCustomerState(await Purchases.restorePurchases());
+  }
+
+  @override
+  Future<RevenueCatCustomerState> resyncPurchases() async {
+    await Purchases.syncPurchases();
+    await Purchases.invalidateCustomerInfoCache();
+    return _toCustomerState(await Purchases.getCustomerInfo());
   }
 
   @override

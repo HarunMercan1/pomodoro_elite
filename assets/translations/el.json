@@ -248,5 +248,19 @@
   "login_required": "Απαιτείται Σύνδεση",
   "premium_login_required_desc": "Συνδεθείτε στον λογαριασμό σας για να αγοράσετε ή να χρησιμοποιήσετε λειτουργίες Premium.",
   "unlock_premium": "Ξεκλείδωμα Premium",
-  "privacy_options": "Επιλογές απορρήτου"
+  "privacy_options": "Επιλογές απορρήτου",
+  "guest_connect_google_title": "Αποθήκευση με Google",
+  "guest_connect_google_desc": "Συνδέστε τον λογαριασμό και προστατέψτε την πρόοδό σας",
+  "purchase_restored_title": "Η αγορά αποκαταστάθηκε",
+  "purchase_restored_after_owned": "Το Google Play βρήκε την αγορά σας. Η πρόσβαση Premium αποκαταστάθηκε.",
+  "purchase_cancelled_title": "Η αγορά ακυρώθηκε",
+  "purchase_pending_title": "Πληρωμή σε αναμονή",
+  "purchase_pending_desc": "Η πληρωμή περιμένει επιβεβαίωση. Το Premium θα ενεργοποιηθεί αυτόματα μετά την έγκριση του Google Play.",
+  "play_account_sync_title": "Ελέγξτε τον λογαριασμό Play",
+  "play_account_sync_desc": "Οι αγορές ανήκουν στον λογαριασμό Google που έχει επιλεγεί στο Play Store, όχι στον λογαριασμό σύνδεσης της εφαρμογής. Ελέγξτε τον και δοκιμάστε ξανά μετά τον συγχρονισμό πρόσφατης επιστροφής.",
+  "purchase_account_conflict_title": "Η αγορά συνδέεται με άλλο λογαριασμό",
+  "purchase_account_conflict_desc": "Αυτή η αγορά Play συνδέεται με άλλο λογαριασμό Pomodoro Elite. Συνδεθείτε στον αρχικό λογαριασμό εφαρμογής και επαναφέρετε τις αγορές.",
+  "store_unavailable_title": "Το κατάστημα δεν είναι διαθέσιμο",
+  "store_unavailable_desc": "Δεν ήταν δυνατή η σύνδεση με το Google Play. Ελέγξτε τη σύνδεση και δοκιμάστε ξανά.",
+  "purchase_failed_desc": "Η αγορά δεν ολοκληρώθηκε. Δοκιμάστε ξανά σε λίγο."
 }

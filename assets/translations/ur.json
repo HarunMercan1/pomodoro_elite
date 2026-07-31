@@ -248,5 +248,19 @@
   "login_required": "لاگ ان درکار ہے",
   "premium_login_required_desc": "پریمیم خصوصیات خریدنے یا استعمال کرنے کے لیے براہ کرم اپنے اکاؤنٹ میں لاگ ان کریں۔",
   "unlock_premium": "پریمیم انلاک کریں",
-  "privacy_options": "رازداری کے اختیارات"
+  "privacy_options": "رازداری کے اختیارات",
+  "guest_connect_google_title": "Google کے ساتھ ڈیٹا محفوظ کریں",
+  "guest_connect_google_desc": "اکاؤنٹ منسلک کریں اور اپنی پیش رفت محفوظ رکھیں",
+  "purchase_restored_title": "خریداری بحال ہوگئی",
+  "purchase_restored_after_owned": "Google Play کو آپ کی خریداری مل گئی۔ Premium رسائی بحال کردی گئی ہے۔",
+  "purchase_cancelled_title": "خریداری منسوخ ہوگئی",
+  "purchase_pending_title": "ادائیگی زیرِ التوا ہے",
+  "purchase_pending_desc": "آپ کی ادائیگی تصدیق کی منتظر ہے۔ Google Play کی منظوری کے بعد Premium خودکار طور پر کھل جائے گا۔",
+  "play_account_sync_title": "Play اکاؤنٹ چیک کریں",
+  "play_account_sync_desc": "خریداری ایپ کے لاگ اِن اکاؤنٹ کے بجائے Play Store میں منتخب Google اکاؤنٹ سے منسلک ہوتی ہے۔ اکاؤنٹ چیک کریں اور حالیہ رقم واپسی کی مطابقت پذیری کے بعد دوبارہ کوشش کریں۔",
+  "purchase_account_conflict_title": "خریداری دوسرے اکاؤنٹ سے منسلک ہے",
+  "purchase_account_conflict_desc": "یہ Play خریداری دوسرے Pomodoro Elite اکاؤنٹ سے منسلک ہے۔ اصل ایپ اکاؤنٹ میں لاگ اِن ہوکر خریداری بحال کریں۔",
+  "store_unavailable_title": "اسٹور دستیاب نہیں",
+  "store_unavailable_desc": "Google Play تک رسائی نہیں ہوسکی۔ کنکشن چیک کرکے دوبارہ کوشش کریں۔",
+  "purchase_failed_desc": "خریداری مکمل نہیں ہوسکی۔ کچھ دیر بعد دوبارہ کوشش کریں۔"
 }

@@ -248,5 +248,19 @@
   "login_required": "Требуется вход",
   "premium_login_required_desc": "Пожалуйста, войдите в свою учетную запись, чтобы приобрести или использовать функции Premium.",
   "unlock_premium": "Разблокировать Premium",
-  "privacy_options": "Настройки конфиденциальности"
+  "privacy_options": "Настройки конфиденциальности",
+  "guest_connect_google_title": "Сохранить через Google",
+  "guest_connect_google_desc": "Привяжите аккаунт и защитите свой прогресс",
+  "purchase_restored_title": "Покупка восстановлена",
+  "purchase_restored_after_owned": "Google Play нашёл вашу покупку. Доступ Premium восстановлен.",
+  "purchase_cancelled_title": "Покупка отменена",
+  "purchase_pending_title": "Платёж ожидает подтверждения",
+  "purchase_pending_desc": "Платёж ожидает подтверждения. Premium включится автоматически после одобрения Google Play.",
+  "play_account_sync_title": "Проверьте аккаунт Play",
+  "play_account_sync_desc": "Покупки относятся к аккаунту Google, выбранному в Play Маркете, а не к аккаунту входа в приложение. Проверьте аккаунт и повторите попытку после синхронизации недавнего возврата.",
+  "purchase_account_conflict_title": "Покупка связана с другим аккаунтом",
+  "purchase_account_conflict_desc": "Эта покупка Play связана с другим аккаунтом Pomodoro Elite. Войдите в исходный аккаунт приложения и восстановите покупки.",
+  "store_unavailable_title": "Магазин недоступен",
+  "store_unavailable_desc": "Не удалось подключиться к Google Play. Проверьте соединение и повторите попытку.",
+  "purchase_failed_desc": "Не удалось завершить покупку. Повторите попытку немного позже."
 }
