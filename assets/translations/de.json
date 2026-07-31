@@ -241,5 +241,7 @@
   "ok_btn": "OK",
   "premium_subtitle": "Werbung entfernen, Themen freischalten",
   "star_supporter": "Sterne-Unterstützer",
-  "super_star_supporter": "Super-Sterne-Unterstützer"
+  "super_star_supporter": "Super-Sterne-Unterstützer",
+  "login_required": "Anmeldung Erforderlich",
+  "premium_login_required_desc": "Bitte melden Sie sich an, um Premium-Funktionen zu kaufen oder zu nutzen."
 }

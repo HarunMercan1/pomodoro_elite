@@ -241,5 +241,7 @@
   "ok_btn": "OK",
   "premium_subtitle": "Remova anúncios, desbloqueie temas",
   "star_supporter": "Apoiador Estrela",
-  "super_star_supporter": "Apoiador Super Estrela"
+  "super_star_supporter": "Apoiador Super Estrela",
+  "login_required": "Login Necessário",
+  "premium_login_required_desc": "Faça login na sua conta para comprar ou usar os recursos Premium."
 }

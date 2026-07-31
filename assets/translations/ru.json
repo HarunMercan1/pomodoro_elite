@@ -241,5 +241,7 @@
   "ok_btn": "Хорошо",
   "premium_subtitle": "Удалить рекламу, разблокировать темы",
   "star_supporter": "Звездный спонсор",
-  "super_star_supporter": "Супер Звездный спонсор"
+  "super_star_supporter": "Супер Звездный спонсор",
+  "login_required": "Требуется вход",
+  "premium_login_required_desc": "Пожалуйста, войдите в свою учетную запись, чтобы приобрести или использовать функции Premium."
 }

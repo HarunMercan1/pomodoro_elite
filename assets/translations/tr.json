@@ -238,5 +238,7 @@
   "ok_btn": "Tamam",
   "premium_subtitle": "Reklamları kaldır, temaları aç",
   "star_supporter": "Yıldız Destekçi",
-  "super_star_supporter": "Süper Yıldız Destekçi"
+  "super_star_supporter": "Süper Yıldız Destekçi",
+  "login_required": "Üye Girişi Gerekli",
+  "premium_login_required_desc": "Premium satın almak veya özelliklerini kullanmak için lütfen hesabınıza giriş yapın."
 }

@@ -262,10 +262,27 @@ class _SettingsScreenState extends State<SettingsScreen>
                                 child: InkWell(
                                   borderRadius: BorderRadius.circular(16),
                                   onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(builder: (context) => const PremiumScreen()),
-                                    );
+                                    final isGuest = context.read<AuthProvider>().isGuest;
+                                    if (isGuest) {
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) => AlertDialog(
+                                          title: Text('login_required'.tr()),
+                                          content: Text('premium_login_required_desc'.tr()),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () => Navigator.pop(context),
+                                              child: Text('ok'.tr()),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    } else {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => const PremiumScreen()),
+                                      );
+                                    }
                                   },
                                   child: ListTile(
                                     contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: isTablet ? 8 : 0),

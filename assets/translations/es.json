@@ -241,5 +241,7 @@
   "ok_btn": "De acuerdo",
   "premium_subtitle": "Eliminar anuncios, desbloquear temas",
   "star_supporter": "Patrocinador Estrella",
-  "super_star_supporter": "Patrocinador Súper Estrella"
+  "super_star_supporter": "Patrocinador Súper Estrella",
+  "login_required": "Inicio de Sesión Requerido",
+  "premium_login_required_desc": "Inicie sesión en su cuenta para comprar o usar las funciones Premium."
 }

@@ -241,5 +241,7 @@
   "ok_btn": "D'accord",
   "premium_subtitle": "Supprimer les pubs, débloquer les thèmes",
   "star_supporter": "Supporter Étoile",
-  "super_star_supporter": "Supporter Super Étoile"
+  "super_star_supporter": "Supporter Super Étoile",
+  "login_required": "Connexion Requise",
+  "premium_login_required_desc": "Veuillez vous connecter pour acheter ou utiliser les fonctionnalités Premium."
 }
