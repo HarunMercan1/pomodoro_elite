@@ -242,6 +242,6 @@
   "premium_subtitle": "Remove ads, unlock themes",
   "star_supporter": "Star Supporter",
   "super_star_supporter": "Super Star Supporter",
-  "login_required": "Login Required",
-  "premium_login_required_desc": "Please log in to your account to purchase or use Premium features."
+  "login_required": "需要登录",
+  "premium_login_required_desc": "请登录您的帐户以购买或使用高级功能。"
 }

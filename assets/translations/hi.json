@@ -242,6 +242,6 @@
   "premium_subtitle": "Remove ads, unlock themes",
   "star_supporter": "Star Supporter",
   "super_star_supporter": "Super Star Supporter",
-  "login_required": "Login Required",
-  "premium_login_required_desc": "Please log in to your account to purchase or use Premium features."
+  "login_required": "लॉगिन आवश्यक",
+  "premium_login_required_desc": "प्रीमियम सुविधाएँ खरीदने या उपयोग करने के लिए कृपया अपने खाते में लॉग इन करें।"
 }
