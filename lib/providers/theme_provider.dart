@@ -780,16 +780,16 @@ class AppThemes {
         menuButtonTextColor: Color(0xFFE6F6FF),
       ),
       focus: ThemeStateColors(
-        bgColor: Color(0xFF0B3C5D),
-        gradientColors: [Color(0xFF0B3C5D), Color(0xFF0A6A9B)],
-        accentColor: Color(0xFFBAE6FD),
-        textColor: Color(0xFFFFFFFF),
-        mainButtonColor: Color(0xFFFFFFFF),
-        mainButtonTextColor: Color(0xFF084C73),
-        menuButtonColor: Color(0xFF075985),
-        menuButtonTextColor: Color(0xFFFFFFFF),
+        bgColor: Color(0xFFDFF4FF),
+        gradientColors: [Color(0xFFDFF4FF), Color(0xFFA9DDF4)],
+        accentColor: Color(0xFF075985),
+        textColor: Color(0xFF0B2942),
+        mainButtonColor: Color(0xFF0B3A5A),
+        mainButtonTextColor: Color(0xFFFFFFFF),
+        menuButtonColor: Color(0xFFF7FCFF),
+        menuButtonTextColor: Color(0xFF0B2942),
       ),
-      // ❄️ BREAK: Focus ile aynı
+      // Nordic Snow odak ve mola sırasında aynı açık buz paletini kullanır.
       breakState: ThemeStateColors(
         bgColor: Color(0xFFDFF4FF),
         gradientColors: [Color(0xFFDFF4FF), Color(0xFFA9DDF4)],

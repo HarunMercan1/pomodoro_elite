@@ -173,13 +173,7 @@ class _ThemeSelectionScreenState extends State<ThemeSelectionScreen> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              LayoutBuilder(
-                builder: (context, constraints) => _ThemeStatePreview(
-                  theme: theme,
-                  width: constraints.maxWidth,
-                  height: 72,
-                ),
-              ),
+              Center(child: _ThemeStatePreview(theme: theme, size: 78)),
               const SizedBox(height: 18),
               Text(
                 'unlock_theme_msg'.tr(),
@@ -386,7 +380,7 @@ class _ThemeCard extends StatelessWidget {
             ),
             child: Row(
               children: [
-                _ThemeStatePreview(theme: theme, width: 60, height: 60),
+                _ThemeStatePreview(theme: theme, size: 62),
                 const SizedBox(width: 14),
                 Expanded(
                   child: Column(
@@ -431,58 +425,129 @@ class _ThemeCard extends StatelessWidget {
 
 class _ThemeStatePreview extends StatelessWidget {
   final AppTheme theme;
-  final double width;
-  final double height;
+  final double size;
 
   const _ThemeStatePreview({
     required this.theme,
-    required this.width,
-    required this.height,
+    required this.size,
   });
 
   @override
   Widget build(BuildContext context) {
-    final states = [theme.idle, theme.focus, theme.breakState];
+    final idle = _previewBackground(theme.idle);
+    final focus = _previewBackground(theme.focus);
+    final rest = _previewBackground(theme.breakState);
+    final center = Color.lerp(focus, rest, 0.5) ?? focus;
+    final iconColor = ThemeContrast.ensure(
+      foreground: theme.focus.textColor,
+      background: center,
+      minimumRatio: 4.5,
+    );
 
-    return Container(
-      width: width,
-      height: height,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: _foregroundFor(theme.idle.bgColor).withValues(alpha: 0.18),
+    return SizedBox(
+      width: size,
+      height: size,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: SweepGradient(
+            colors: [
+              idle,
+              theme.idle.accentColor,
+              focus,
+              theme.focus.accentColor,
+              rest,
+              theme.breakState.accentColor,
+              idle,
+            ],
+          ),
+          border: Border.all(
+            color: iconColor.withValues(alpha: 0.28),
+            width: 1.2,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: theme.idle.accentColor.withValues(alpha: 0.30),
+              blurRadius: 16,
+              spreadRadius: -2,
+            ),
+          ],
         ),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Row(
-        children: [
-          for (final state in states)
-            Expanded(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: state.bgColor,
-                  gradient: state.gradient,
+        child: Padding(
+          padding: const EdgeInsets.all(4),
+          child: ClipOval(
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: RadialGradient(
+                      center: const Alignment(-0.35, -0.4),
+                      radius: 1.05,
+                      colors: [
+                        Colors.white.withValues(alpha: 0.34),
+                        center.withValues(alpha: 0.76),
+                        idle,
+                      ],
+                    ),
+                  ),
                 ),
-                child: Center(
+                Positioned(
+                  top: -12,
+                  right: -9,
                   child: Container(
-                    width: 7,
-                    height: 7,
+                    width: size * 0.56,
+                    height: size * 0.56,
                     decoration: BoxDecoration(
-                      color: ThemeContrast.ensure(
-                        foreground: state.accentColor,
-                        background: _previewBackground(state),
-                      ),
                       shape: BoxShape.circle,
-                      border: Border.all(
-                        color: _foregroundFor(state.accentColor)
-                            .withValues(alpha: 0.24),
+                      gradient: RadialGradient(
+                        colors: [
+                          theme.focus.accentColor.withValues(alpha: 0.72),
+                          theme.focus.accentColor.withValues(alpha: 0),
+                        ],
                       ),
                     ),
                   ),
                 ),
-              ),
+                Positioned(
+                  left: -10,
+                  bottom: -15,
+                  child: Container(
+                    width: size * 0.62,
+                    height: size * 0.62,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          theme.breakState.accentColor.withValues(alpha: 0.64),
+                          theme.breakState.accentColor.withValues(alpha: 0),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Center(
+                  child: Container(
+                    width: size * 0.47,
+                    height: size * 0.47,
+                    decoration: BoxDecoration(
+                      color: center.withValues(alpha: 0.52),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: iconColor.withValues(alpha: 0.24),
+                      ),
+                    ),
+                    child: Icon(
+                      Icons.auto_awesome_rounded,
+                      color: iconColor,
+                      size: size * 0.24,
+                    ),
+                  ),
+                ),
+              ],
             ),
-        ],
+          ),
+        ),
       ),
     );
   }

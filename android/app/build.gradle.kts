@@ -15,6 +15,10 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
+// Dahili test AAB'lerinde -PfastInternal=true ile R8 bekleme süresini atla.
+// Normal release derlemeleri küçültme ve gizlemeyi kullanmaya devam eder.
+val fastInternalBuild = providers.gradleProperty("fastInternal").orNull == "true"
+
 android {
     namespace = "com.mercansoftware.pomodoro_elite"
     compileSdk = 36
@@ -58,8 +62,8 @@ android {
             signingConfig = signingConfigs.getByName("release")
 
             // Kod küçültme ve gizleme (Opsiyonel ama önerilir)
-            isMinifyEnabled = true
-            isShrinkResources = true
+            isMinifyEnabled = !fastInternalBuild
+            isShrinkResources = !fastInternalBuild
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

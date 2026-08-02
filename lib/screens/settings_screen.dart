@@ -11,6 +11,8 @@ import '../providers/settings_provider.dart';
 import '../providers/theme_provider.dart';
 import '../services/ad_consent_service.dart';
 import '../utils/app_fonts.dart';
+import '../utils/live_page_route.dart';
+import '../utils/text_normalization.dart';
 import '../widgets/settings_components.dart';
 import 'duration_settings_screen.dart';
 import 'language_selection_screen.dart';
@@ -87,8 +89,7 @@ class _SettingsScreenState extends State<SettingsScreen>
     await WidgetsBinding.instance.endOfFrame;
     if (!mounted) return;
     await Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        allowSnapshotting: false,
+      livePageRoute<void>(
         builder: (_) => page,
       ),
     );
@@ -791,9 +792,11 @@ class _PremiumBanner extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        (isPremium ? 'premium_active' : 'get_premium')
-                            .tr()
-                            .replaceFirst(RegExp(r'^[💎👑]\s*'), ''),
+                        withoutLeadingPremiumEmoji(
+                          (isPremium ? 'premium_active' : 'get_premium').tr(),
+                        ),
+                        maxLines: 2,
+                        softWrap: true,
                         style: AppFonts.poppins(
                           context: context,
                           color: Colors.white,

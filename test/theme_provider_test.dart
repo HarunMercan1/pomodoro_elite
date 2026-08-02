@@ -79,6 +79,24 @@ void main() {
     );
   });
 
+  test('Nordic Snow uses its light break palette while focusing', () {
+    final theme = AppThemes.getById('nordic_snow');
+    expect(theme.focus.bgColor, theme.breakState.bgColor);
+    expect(theme.focus.gradientColors, theme.breakState.gradientColors);
+    expect(theme.focus.accentColor, theme.breakState.accentColor);
+    expect(theme.focus.textColor, theme.breakState.textColor);
+    expect(theme.focus.mainButtonColor, theme.breakState.mainButtonColor);
+    expect(
+      theme.focus.mainButtonTextColor,
+      theme.breakState.mainButtonTextColor,
+    );
+    expect(theme.focus.menuButtonColor, theme.breakState.menuButtonColor);
+    expect(
+      theme.focus.menuButtonTextColor,
+      theme.breakState.menuButtonTextColor,
+    );
+  });
+
   test('the first four approved palettes stay unchanged', () {
     const expectedSignatures = <String, String>{
       'elite': '-|#FF202020|#0FFFFFFF|-|'
@@ -216,7 +234,7 @@ void main() {
     }
   });
 
-  test('theme preview dots stay visible without changing theme constants', () {
+  test('theme preview accents stay visible without changing constants', () {
     for (final theme in AppThemes.all) {
       for (final state in [theme.idle, theme.focus, theme.breakState]) {
         final gradient = state.gradientColors;
@@ -231,7 +249,7 @@ void main() {
         expect(
           _contrastRatio(dot, background),
           greaterThanOrEqualTo(3),
-          reason: '${theme.id} preview dot is not visible',
+          reason: '${theme.id} preview accent is not visible',
         );
       }
     }

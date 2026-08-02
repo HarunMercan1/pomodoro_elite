@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'package:confetti/confetti.dart';
 import 'dart:math';
@@ -14,6 +15,7 @@ import '../screens/stats_screen.dart';
 import '../widgets/time_option_button.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../utils/app_fonts.dart';
+import '../utils/live_page_route.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -28,6 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
   TimerProvider? _listenedTimerProvider;
   AdManager? _adManager;
   VoidCallback? _timerListener;
+  int _surfaceGeneration = 0;
 
   @override
   void initState() {
@@ -57,7 +60,6 @@ class _HomeScreenState extends State<HomeScreen> {
       _adManager = adManager;
       _timerListener = _handleTimerChanged;
       timerProvider.addListener(_timerListener!);
-      _syncThemeState(timerProvider);
     });
   }
 
@@ -75,20 +77,9 @@ class _HomeScreenState extends State<HomeScreen> {
     return timerProvider.isRunning ? TimerState.focus : TimerState.idle;
   }
 
-  void _syncThemeState(TimerProvider timerProvider) {
-    context.read<ThemeProvider>().setTimerState(
-          _visualStateFor(timerProvider),
-        );
-  }
-
   void _handleTimerChanged() {
     final timerProvider = _listenedTimerProvider;
     if (!mounted || timerProvider == null) return;
-
-    // Tema ve sayaç görsel durumu aynı bildirim turunda ilerlesin. Bir
-    // microtask gecikmesi, kaplı bir route altındaki ana ekranda eski frame'in
-    // tutulmasına yol açabiliyordu.
-    _syncThemeState(timerProvider);
 
     if (timerProvider.remainingSeconds == 0 &&
         timerProvider.currentDuration != 0 &&
@@ -100,6 +91,23 @@ class _HomeScreenState extends State<HomeScreen> {
       _lastCompletedRounds = timerProvider.completedRounds;
       _adManager?.onPomodoroCompleted();
     }
+  }
+
+  /// Drops stale compositor layers without touching the provider-owned timer.
+  void _refreshHomeSurface() {
+    if (!mounted) return;
+    setState(() => _surfaceGeneration++);
+    SchedulerBinding.instance.scheduleForcedFrame();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.findRenderObject()?.markNeedsPaint();
+      SchedulerBinding.instance.scheduleForcedFrame();
+    });
+  }
+
+  void _runTimerInteraction(VoidCallback action) {
+    action();
+    _refreshHomeSurface();
   }
 
   @override
@@ -223,27 +231,21 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () async {
               await Navigator.push(
                 context,
-                MaterialPageRoute(
-                  // Ayarlar ekranı native reklam PlatformView'ları içerebilir.
-                  // Route snapshot'ı, geri dönüşte Flutter yüzeyinde eski bir
-                  // frame bırakabildiği için canlı kompozisyonu kullan.
-                  allowSnapshotting: false,
+                livePageRoute<void>(
                   builder: (context) => const SettingsScreen(),
                 ),
               );
               if (!context.mounted) return;
-
-              final timerProvider = context.read<TimerProvider>();
-              _syncThemeState(timerProvider);
-              setState(() {});
+              _refreshHomeSurface();
             },
           ),
         ],
       ),
-      // 🎨 AnimatedContainer ile yumuşak 500ms renk/gradient geçişi
-      body: AnimatedContainer(
-        duration: const Duration(milliseconds: 800),
-        curve: Curves.easeInOut,
+      // Tema değiştirildikten sonra yeni yüzey doğrudan canlı frame'i çizer.
+      body: Container(
+        key: ValueKey<String>(
+          'home-${themeProvider.currentThemeId}-$_surfaceGeneration',
+        ),
         decoration: BoxDecoration(
           color: bgGradient == null ? bgColor : null,
           gradient: bgGradient,
@@ -446,17 +448,20 @@ class _HomeScreenState extends State<HomeScreen> {
                             final provider = context.read<TimerProvider>();
                             final stats = context.read<StatsProvider>();
 
-                            if (provider.isAlarmPlaying) {
-                              provider.stopAlarm(
-                                workTime: settingsProvider.workTime,
-                                shortBreakTime: settingsProvider.shortBreakTime,
-                                longBreakTime: settingsProvider.longBreakTime,
-                              );
-                            } else if (provider.isRunning) {
-                              provider.stopTimer(reset: false);
-                            } else {
-                              provider.startTimer(settingsProvider, stats);
-                            }
+                            _runTimerInteraction(() {
+                              if (provider.isAlarmPlaying) {
+                                provider.stopAlarm(
+                                  workTime: settingsProvider.workTime,
+                                  shortBreakTime:
+                                      settingsProvider.shortBreakTime,
+                                  longBreakTime: settingsProvider.longBreakTime,
+                                );
+                              } else if (provider.isRunning) {
+                                provider.stopTimer(reset: false);
+                              } else {
+                                provider.startTimer(settingsProvider, stats);
+                              }
+                            });
                           },
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 300),
@@ -522,8 +527,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ? 1.0
                                 : 0.0,
                             child: GestureDetector(
-                              onTap: () =>
-                                  context.read<TimerProvider>().resetTimer(),
+                              onTap: () => _runTimerInteraction(
+                                () =>
+                                    context.read<TimerProvider>().resetTimer(),
+                              ),
                               child: Text(
                                 "reset".tr(),
                                 style: AppFonts.poppins(
@@ -594,7 +601,9 @@ class _HomeScreenState extends State<HomeScreen> {
       titleFontSize: titleSize,
       subTitleFontSize: subTitleSize,
       padding: padding,
-      onTap: () => context.read<TimerProvider>().setTime(time, mode),
+      onTap: () => _runTimerInteraction(
+        () => context.read<TimerProvider>().setTime(time, mode),
+      ),
     );
   }
 }
