@@ -40,17 +40,18 @@ class _PremiumScreenState extends State<PremiumScreen> {
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           color: textColor,
         ),
-        title: Text(
-          purchaseProvider.isPremium
-              ? 'premium_active'.tr()
-              : 'get_premium'.tr(),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: AppFonts.poppins(
-            context: context,
-            color: _diamond,
-            fontSize: 22,
-            fontWeight: FontWeight.w800,
+        title: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            purchaseProvider.isPremium
+                ? 'premium_active'.tr()
+                : 'get_premium'.tr(),
+            style: AppFonts.poppins(
+              context: context,
+              color: _diamond,
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
+            ),
           ),
         ),
       ),
@@ -508,20 +509,30 @@ class _PremiumHero extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 20),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: features.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-              childAspectRatio: 2.75,
-            ),
-            itemBuilder: (context, index) => _FeaturePill(
-              icon: features[index].$1,
-              label: features[index].$2,
-            ),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              // Natural-height pills let long translations wrap instead of
+              // truncating. Two columns stay compact on phones; only extremely
+              // narrow accessibility layouts fall back to a single column.
+              final columns = constraints.maxWidth >= 240 ? 2 : 1;
+              const spacing = 9.0;
+              final itemWidth =
+                  (constraints.maxWidth - spacing * (columns - 1)) / columns;
+              return Wrap(
+                spacing: spacing,
+                runSpacing: spacing,
+                children: [
+                  for (final feature in features)
+                    SizedBox(
+                      width: itemWidth,
+                      child: _FeaturePill(
+                        icon: feature.$1,
+                        label: feature.$2,
+                      ),
+                    ),
+                ],
+              );
+            },
           ),
         ],
       ),
@@ -538,6 +549,7 @@ class _FeaturePill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      constraints: const BoxConstraints(minHeight: 48),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.11),
@@ -559,14 +571,12 @@ class _FeaturePill extends StatelessWidget {
           Expanded(
             child: Text(
               label,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
               style: AppFonts.poppins(
                 context: context,
                 color: const Color(0xFFE2E8F0),
-                fontSize: 10.5,
+                fontSize: 11,
                 fontWeight: FontWeight.w600,
-                height: 1.2,
+                height: 1.25,
               ),
             ),
           ),
@@ -665,27 +675,34 @@ class _PremiumPurchaseCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 14),
                 Expanded(
-                  child: Text(
-                    'get_unlimited_premium'.tr(),
-                    style: AppFonts.poppins(
-                      context: context,
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                    ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'get_unlimited_premium'.tr(),
+                        style: AppFonts.poppins(
+                          context: context,
+                          color: Colors.white,
+                          fontSize: 15.5,
+                          height: 1.25,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        package!.storeProduct.priceString,
+                        style: AppFonts.poppins(
+                          context: context,
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  package!.storeProduct.priceString,
-                  style: AppFonts.poppins(
-                    context: context,
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-                const SizedBox(width: 4),
                 const Icon(Icons.arrow_forward_rounded,
                     color: Colors.white, size: 20),
               ],
@@ -829,38 +846,45 @@ class _SupportCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 14),
                   Expanded(
-                    child: Text(
-                      visual.translationKey.tr(),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppFonts.poppins(
-                        context: context,
-                        color: textColor,
-                        fontSize: 15.5,
-                        height: 1.2,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 13, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: visual.colors.first.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(
-                        color: visual.colors.first.withValues(alpha: 0.22),
-                      ),
-                    ),
-                    child: Text(
-                      offer.package.storeProduct.priceString,
-                      style: AppFonts.poppins(
-                        context: context,
-                        color: visual.priceColor,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w900,
-                      ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          visual.translationKey.tr(),
+                          style: AppFonts.poppins(
+                            context: context,
+                            color: textColor,
+                            fontSize: 15.5,
+                            height: 1.2,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 11,
+                            vertical: 7,
+                          ),
+                          decoration: BoxDecoration(
+                            color: visual.colors.first.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color:
+                                  visual.colors.first.withValues(alpha: 0.22),
+                            ),
+                          ),
+                          child: Text(
+                            offer.package.storeProduct.priceString,
+                            style: AppFonts.poppins(
+                              context: context,
+                              color: visual.priceColor,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],

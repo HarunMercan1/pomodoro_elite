@@ -25,6 +25,9 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   late ConfettiController _confettiController;
   int _lastCompletedRounds = 0;
+  TimerProvider? _listenedTimerProvider;
+  AdManager? _adManager;
+  VoidCallback? _timerListener;
 
   @override
   void initState() {
@@ -33,6 +36,8 @@ class _HomeScreenState extends State<HomeScreen> {
         ConfettiController(duration: const Duration(seconds: 2));
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
       final timerProvider = context.read<TimerProvider>();
       final settingsProvider = context.read<SettingsProvider>();
       final adManager = context.read<AdManager>();
@@ -48,46 +53,61 @@ class _HomeScreenState extends State<HomeScreen> {
       }
 
       _lastCompletedRounds = timerProvider.completedRounds;
-
-      timerProvider.addListener(() {
-        if (!mounted) return;
-
-        // 🎨 Timer durumunu tema sistemine bildir (Build dışında)
-        final isTimerRunning = timerProvider.isRunning;
-        final isPaused = (!isTimerRunning &&
-            !timerProvider.isAlarmPlaying &&
-            timerProvider.remainingSeconds > 0 &&
-            timerProvider.remainingSeconds <
-                timerProvider.currentDuration * 60);
-        final isAlarmPlaying = timerProvider.isAlarmPlaying;
-        final modeString = timerProvider.currentMode.toString().split('.').last;
-
-        Future.microtask(() {
-          if (!mounted) return;
-          context.read<ThemeProvider>().updateFromTimer(
-                isRunning: isTimerRunning,
-                isPaused: isPaused,
-                isAlarmPlaying: isAlarmPlaying,
-                mode: modeString,
-              );
-        });
-
-        if (timerProvider.remainingSeconds == 0 &&
-            timerProvider.currentDuration != 0 &&
-            _confettiController.state != ConfettiControllerState.playing) {
-          _confettiController.play();
-        }
-
-        if (timerProvider.completedRounds > _lastCompletedRounds) {
-          _lastCompletedRounds = timerProvider.completedRounds;
-          adManager.onPomodoroCompleted();
-        }
-      });
+      _listenedTimerProvider = timerProvider;
+      _adManager = adManager;
+      _timerListener = _handleTimerChanged;
+      timerProvider.addListener(_timerListener!);
+      _syncThemeState(timerProvider);
     });
+  }
+
+  TimerState _visualStateFor(TimerProvider timerProvider) {
+    if (timerProvider.isAlarmPlaying) return TimerState.finish;
+
+    final isPaused = !timerProvider.isRunning &&
+        timerProvider.remainingSeconds > 0 &&
+        timerProvider.remainingSeconds < timerProvider.currentDuration * 60;
+    if (isPaused) return TimerState.workPaused;
+
+    if (timerProvider.currentMode != TimerMode.work) {
+      return timerProvider.isRunning ? TimerState.pause : TimerState.idle;
+    }
+    return timerProvider.isRunning ? TimerState.focus : TimerState.idle;
+  }
+
+  void _syncThemeState(TimerProvider timerProvider) {
+    context.read<ThemeProvider>().setTimerState(
+          _visualStateFor(timerProvider),
+        );
+  }
+
+  void _handleTimerChanged() {
+    final timerProvider = _listenedTimerProvider;
+    if (!mounted || timerProvider == null) return;
+
+    // Tema ve sayaç görsel durumu aynı bildirim turunda ilerlesin. Bir
+    // microtask gecikmesi, kaplı bir route altındaki ana ekranda eski frame'in
+    // tutulmasına yol açabiliyordu.
+    _syncThemeState(timerProvider);
+
+    if (timerProvider.remainingSeconds == 0 &&
+        timerProvider.currentDuration != 0 &&
+        _confettiController.state != ConfettiControllerState.playing) {
+      _confettiController.play();
+    }
+
+    if (timerProvider.completedRounds > _lastCompletedRounds) {
+      _lastCompletedRounds = timerProvider.completedRounds;
+      _adManager?.onPomodoroCompleted();
+    }
   }
 
   @override
   void dispose() {
+    final timerListener = _timerListener;
+    if (timerListener != null) {
+      _listenedTimerProvider?.removeListener(timerListener);
+    }
     _confettiController.dispose();
     super.dispose();
   }
@@ -130,9 +150,11 @@ class _HomeScreenState extends State<HomeScreen> {
         remainingSeconds > 0 &&
         remainingSeconds < currentDuration * 60;
 
-
-    // 🎨 Dinamik tema renkleri (initState listener'da updateFromTimer zaten çağrılıyor)
-    final stateColors = themeProvider.stateColors;
+    // Görsel paleti doğrudan TimerProvider snapshot'ından türet. Böylece
+    // mod/başlat/duraklat değişikliği ikinci bir notifier turunu beklemez.
+    final stateColors = themeProvider.currentTheme.getStateColors(
+      _visualStateFor(timerProvider),
+    );
     final Color bgColor = stateColors.bgColor;
     final LinearGradient? bgGradient = stateColors.gradient;
     final Color textColor = stateColors.textColor;
@@ -198,11 +220,22 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
-            onPressed: () {
-              Navigator.push(
+            onPressed: () async {
+              await Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const SettingsScreen()),
+                MaterialPageRoute(
+                  // Ayarlar ekranı native reklam PlatformView'ları içerebilir.
+                  // Route snapshot'ı, geri dönüşte Flutter yüzeyinde eski bir
+                  // frame bırakabildiği için canlı kompozisyonu kullan.
+                  allowSnapshotting: false,
+                  builder: (context) => const SettingsScreen(),
+                ),
               );
+              if (!context.mounted) return;
+
+              final timerProvider = context.read<TimerProvider>();
+              _syncThemeState(timerProvider);
+              setState(() {});
             },
           ),
         ],
@@ -304,8 +337,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               Theme.of(context).primaryColor,
                             );
                           } else {
-                            localRingColor = themeProvider
-                                .stateColors.accentColor; // Tema rengi
+                            localRingColor = stateColors.accentColor;
                           }
 
                           // 🔥 Orijinal Track Rengi Mantığı
@@ -339,7 +371,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           : 18, // Tablette kalın çizgi
                                       // 🔥 Eğer aktif değilse (Idle), Gri Track (Eski usül)
                                       backgroundColor: isActiveState
-                                          ? Colors.white.withOpacity(0.2)
+                                          ? Colors.white.withValues(alpha: 0.2)
                                           : (isDark
                                               ? Colors.grey.shade800
                                               : const Color(0xFFF0F0F0)),

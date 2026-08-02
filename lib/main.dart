@@ -107,7 +107,10 @@ void main() async {
             create: (_) => AdManager(),
             update: (_, purchaseProvider, consentService, adManager) {
               return (adManager ?? AdManager())
-                ..updatePremiumStatus(purchaseProvider.isPremium)
+                ..updatePremiumStatus(
+                  isPremium: purchaseProvider.isPremium,
+                  isLoading: purchaseProvider.isLoading,
+                )
                 ..updateAdServingAllowed(consentService.adsReady);
             },
           ), // 🔥 Reklam yöneticisi

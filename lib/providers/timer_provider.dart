@@ -320,10 +320,14 @@ class TimerProvider with ChangeNotifier, WidgetsBindingObserver {
     } else {
       setTime(workTime, TimerMode.work);
     }
-    _notifyListeners();
   }
 
   void stopTimer({bool reset = true}) {
+    _stopActivePlayback();
+    _notifyListeners();
+  }
+
+  void _stopActivePlayback() {
     _countdown.pause();
     _timer?.cancel();
     _timer = null;
@@ -331,11 +335,10 @@ class TimerProvider with ChangeNotifier, WidgetsBindingObserver {
     _runSafely(_audio.stopAlarm(), 'Alarm stop');
     _runSafely(_audio.stopMusic(), 'Music stop');
     _isAlarmPlaying = false;
-    _notifyListeners();
   }
 
   void resetTimer() {
-    stopTimer();
+    _stopActivePlayback();
     _countdown.reset(_selectedTimeInMinutes * 60);
     _currentMotivation = 'ready';
     _isAlarmPlaying = false;
@@ -344,7 +347,7 @@ class TimerProvider with ChangeNotifier, WidgetsBindingObserver {
   }
 
   void setTime(int minutes, TimerMode mode) {
-    stopTimer();
+    _stopActivePlayback();
     _selectedTimeInMinutes = minutes;
     _countdown.reset(minutes * 60);
     _currentMode = mode;

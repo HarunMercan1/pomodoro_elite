@@ -182,6 +182,55 @@ void main() {
       expect(notifications.scheduleCalls, hasLength(1));
     });
   });
+
+  group('TimerProvider atomic UI notifications', () {
+    test('mode selection publishes only the completed state transition', () {
+      final provider = TimerProvider(
+        notifications: _FakeTimerNotifications(),
+        audio: _FakeTimerAudio(),
+        observeLifecycle: false,
+      );
+      addTearDown(provider.dispose);
+
+      final snapshots = <(TimerMode, int, int, bool)>[];
+      provider.addListener(() {
+        snapshots.add((
+          provider.currentMode,
+          provider.currentDuration,
+          provider.remainingSeconds,
+          provider.isRunning,
+        ));
+      });
+
+      provider.setTime(5, TimerMode.shortBreak);
+
+      expect(snapshots, [
+        (TimerMode.shortBreak, 5, 5 * 60, false),
+      ]);
+    });
+
+    test('reset publishes one coherent idle snapshot', () {
+      final provider = TimerProvider(
+        notifications: _FakeTimerNotifications(),
+        audio: _FakeTimerAudio(),
+        observeLifecycle: false,
+      );
+      addTearDown(provider.dispose);
+      provider.setTime(5, TimerMode.shortBreak);
+      provider.startCountdown(_configuration(<int>[]));
+
+      var notifications = 0;
+      provider.addListener(() => notifications++);
+
+      provider.resetTimer();
+
+      expect(notifications, 1);
+      expect(provider.currentMode, TimerMode.shortBreak);
+      expect(provider.remainingSeconds, 5 * 60);
+      expect(provider.isRunning, isFalse);
+      expect(provider.currentMotivation, 'ready');
+    });
+  });
 }
 
 TimerRunConfiguration _configuration(List<int> recordedMinutes) {

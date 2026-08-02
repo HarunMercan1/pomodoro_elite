@@ -1,23 +1,22 @@
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
-import '../providers/settings_provider.dart';
-// import '../providers/stats_provider.dart';
-import '../providers/ad_manager.dart';
-import 'duration_settings_screen.dart';
-import 'sound_settings_screen.dart';
-import 'theme_selection_screen.dart';
-import '../providers/theme_provider.dart';
-import '../providers/auth_provider.dart';
-import '../utils/app_fonts.dart';
+import 'package:flutter/material.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:provider/provider.dart';
 
-import 'package:pomodoro_elite/screens/language_selection_screen.dart';
-import 'package:pomodoro_elite/screens/premium_screen.dart';
+import '../providers/ad_manager.dart';
+import '../providers/auth_provider.dart';
 import '../providers/purchase_provider.dart';
+import '../providers/settings_provider.dart';
+import '../providers/theme_provider.dart';
 import '../services/ad_consent_service.dart';
+import '../utils/app_fonts.dart';
+import '../widgets/settings_components.dart';
+import 'duration_settings_screen.dart';
+import 'language_selection_screen.dart';
+import 'premium_screen.dart';
+import 'sound_settings_screen.dart';
+import 'theme_selection_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -29,6 +28,82 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen>
     with WidgetsBindingObserver {
   bool _isGuestConnectLoading = false;
+  bool _allowPop = false;
+  bool _isClosing = false;
+  late AdManager _adManager;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadBanner());
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _adManager = context.read<AdManager>();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      context.read<SettingsProvider>().stopPreview();
+    }
+  }
+
+  @override
+  void deactivate() {
+    context.read<SettingsProvider>().stopPreview();
+    super.deactivate();
+  }
+
+  @override
+  void dispose() {
+    try {
+      _adManager.disposeSettingsBanner();
+    } catch (error) {
+      debugPrint('Settings banner dispose failed: $error');
+    }
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  Future<void> _loadBanner() async {
+    if (!mounted) return;
+    final route = ModalRoute.of(context);
+    if (route != null && !route.isCurrent) return;
+    await _adManager.loadSettingsBanner(MediaQuery.sizeOf(context).width);
+  }
+
+  /// Native AdWidget views must not stay mounted below another route. Disposing
+  /// before every settings navigation also prevents theme changes on the next
+  /// page from moving the old platform view over Flutter's surface.
+  Future<void> _openSettingsPage(Widget page) async {
+    _adManager.disposeSettingsBanner();
+    // Let the Consumer remove AdWidget's native platform view before the next
+    // route starts its transition. Otherwise it can survive for one frame and
+    // intercept/repaint touches above the new route on some Android devices.
+    await WidgetsBinding.instance.endOfFrame;
+    if (!mounted) return;
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        allowSnapshotting: false,
+        builder: (_) => page,
+      ),
+    );
+    if (!mounted) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadBanner());
+  }
+
+  Future<void> _closeSettings() async {
+    if (_isClosing) return;
+    _isClosing = true;
+    _adManager.disposeSettingsBanner();
+    if (mounted) setState(() => _allowPop = true);
+    await WidgetsBinding.instance.endOfFrame;
+    if (mounted) Navigator.of(context).pop();
+  }
 
   Future<void> _connectGuestWithGoogle() async {
     if (_isGuestConnectLoading) return;
@@ -51,114 +126,100 @@ class _SettingsScreenState extends State<SettingsScreen>
       context: context,
       barrierColor: Colors.black.withValues(alpha: 0.72),
       builder: (dialogContext) {
-        final theme = dialogContext.read<ThemeProvider>();
-        final textColor = theme.settingsTextColor;
-        final surfaceColor =
-            theme.currentTheme.settingsCardColor ?? const Color(0xFF121A2A);
+        final themeProvider = dialogContext.read<ThemeProvider>();
+        final theme = themeProvider.currentTheme;
+        final textColor = themeProvider.settingsTextColor;
+        final surfaceColor = theme.settingsCardColor ?? const Color(0xFF172033);
+        final borderColor = theme.settingsBorderColor ??
+            const Color(0xFF38BDF8).withValues(alpha: 0.34);
 
         return Dialog(
           elevation: 0,
           backgroundColor: Colors.transparent,
-          insetPadding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Container(
-            constraints: const BoxConstraints(maxWidth: 420),
-            padding: const EdgeInsets.fromLTRB(22, 24, 22, 20),
-            decoration: BoxDecoration(
+          insetPadding: const EdgeInsets.symmetric(horizontal: 22),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 400),
+            child: SettingsSurface(
               color: surfaceColor,
-              borderRadius: BorderRadius.circular(28),
-              border: Border.all(
-                color: const Color(0xFF38BDF8).withValues(alpha: 0.38),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF2563EB).withValues(alpha: 0.24),
-                  blurRadius: 36,
-                  spreadRadius: 2,
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 76,
-                  height: 76,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [Color(0xFF67E8F9), Color(0xFF2563EB)],
+              borderColor: borderColor,
+              radius: 24,
+              padding: const EdgeInsets.fromLTRB(20, 22, 20, 16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 62,
+                    height: 62,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [Color(0xFF67E8F9), Color(0xFF2563EB)],
+                      ),
+                      borderRadius: BorderRadius.circular(19),
                     ),
-                    borderRadius: BorderRadius.circular(24),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF38BDF8).withValues(alpha: 0.34),
-                        blurRadius: 24,
-                      ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.cloud_upload_rounded,
-                    color: Colors.white,
-                    size: 38,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  'login_required'.tr(),
-                  textAlign: TextAlign.center,
-                  style: AppFonts.poppins(
-                    context: dialogContext,
-                    color: textColor,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: 9),
-                Text(
-                  'premium_login_required_desc'.tr(),
-                  textAlign: TextAlign.center,
-                  style: AppFonts.poppins(
-                    context: dialogContext,
-                    color: textColor.withValues(alpha: 0.68),
-                    fontSize: 14,
-                    height: 1.5,
-                  ),
-                ),
-                const SizedBox(height: 22),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.icon(
-                    onPressed: () => Navigator.pop(dialogContext, true),
-                    icon: const Icon(Icons.link_rounded),
-                    label: Text('guest_connect_google_title'.tr()),
-                    style: FilledButton.styleFrom(
-                      backgroundColor: const Color(0xFF2563EB),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 15),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      textStyle: AppFonts.poppins(
-                        context: dialogContext,
-                        fontWeight: FontWeight.w700,
-                      ),
+                    child: const Icon(
+                      Icons.cloud_upload_rounded,
+                      color: Colors.white,
+                      size: 31,
                     ),
                   ),
-                ),
-                const SizedBox(height: 7),
-                TextButton(
-                  onPressed: () => Navigator.pop(dialogContext, false),
-                  child: Text(
-                    'cancel'.tr(),
+                  const SizedBox(height: 16),
+                  Text(
+                    'login_required'.tr(),
+                    textAlign: TextAlign.center,
                     style: AppFonts.poppins(
                       context: dialogContext,
-                      color: textColor.withValues(alpha: 0.62),
-                      fontWeight: FontWeight.w600,
+                      color: textColor,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 7),
+                  Text(
+                    'premium_login_required_desc'.tr(),
+                    textAlign: TextAlign.center,
+                    style: AppFonts.poppins(
+                      context: dialogContext,
+                      color: textColor.withValues(alpha: 0.68),
+                      fontSize: 13,
+                      height: 1.45,
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.icon(
+                      onPressed: () => Navigator.pop(dialogContext, true),
+                      icon: const Icon(Icons.link_rounded, size: 19),
+                      label: Text('guest_connect_google_title'.tr()),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: const Color(0xFF2563EB),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 13),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        textStyle: AppFonts.poppins(
+                          context: dialogContext,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(dialogContext, false),
+                    child: Text(
+                      'cancel'.tr(),
+                      style: AppFonts.poppins(
+                        context: dialogContext,
+                        color: textColor.withValues(alpha: 0.62),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         );
@@ -170,859 +231,603 @@ class _SettingsScreenState extends State<SettingsScreen>
     }
   }
 
-  String _getLanguageName(String code) {
-    switch (code) {
-      case 'tr':
-        return 'Türkçe';
-      case 'en':
-        return 'English';
-      case 'es':
-        return 'Español';
-      case 'pt':
-        return 'Português';
-      case 'de':
-        return 'Deutsch';
-      case 'fr':
-        return 'Français';
-      case 'it':
-        return 'Italiano';
-      case 'ru':
-        return 'Русский';
-      case 'ja':
-        return '日本語';
-      case 'ko':
-        return '한국어';
-      case 'zh':
-        return '中文';
-      case 'hi':
-        return 'हिन्दी';
-      case 'ar':
-        return 'العربية';
-      case 'id':
-        return 'Bahasa Indonesia';
-      case 'vi':
-        return 'Tiếng Việt';
-      case 'bn':
-        return 'বাংলা';
-      case 'ur':
-        return 'اردو';
-      case 'pl':
-        return 'Polski';
-      case 'th':
-        return 'ไทย';
-      case 'nl':
-        return 'Nederlands';
-      case 'uk':
-        return 'Укра\u0457нська';
-      case 'el':
-        return 'Ελληνικά';
-      case 'sv':
-        return 'Svenska';
-      default:
-        return 'English';
+  Future<void> _openPremium() async {
+    if (context.read<AuthProvider>().isGuest) {
+      await _showPremiumLoginRequired();
+      return;
     }
+    await _openSettingsPage(const PremiumScreen());
   }
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-
-    // 🔥 Adaptive banner reklamı yükle (ekran genişliği ile)
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final width = MediaQuery.of(context).size.width;
-      context.read<AdManager>().loadSettingsBanner(width);
-    });
-  }
-
-  late AdManager _adManager;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _adManager = context.read<AdManager>();
-  }
-
-  @override
-  void dispose() {
+  Future<void> _showPrivacyOptions() async {
+    final consent = context.read<AdConsentService>();
+    _adManager.disposeSettingsBanner();
     try {
-      _adManager.disposeSettingsBanner();
-    } catch (e) {
-      debugPrint("SettingsScreen Dispose Hatası: $e");
-    }
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  void deactivate() {
-    context.read<SettingsProvider>().stopPreview();
-    super.deactivate();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused) {
-      context.read<SettingsProvider>().stopPreview();
+      await WidgetsBinding.instance.endOfFrame;
+      if (!mounted) return;
+      await consent.showPrivacyOptionsForm();
+    } catch (error) {
+      debugPrint('Privacy options form failed: $error');
+    } finally {
+      if (mounted) {
+        WidgetsBinding.instance.addPostFrameCallback((_) => _loadBanner());
+      }
     }
   }
+
+  Future<void> _rateApp() async {
+    final inAppReview = InAppReview.instance;
+    if (await inAppReview.isAvailable()) {
+      await inAppReview.openStoreListing();
+    }
+  }
+
+  Future<void> _showLogoutDialog({
+    required AuthProvider auth,
+    required Color surfaceColor,
+    required Color itemColor,
+    required Color borderColor,
+  }) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: surfaceColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(color: borderColor),
+        ),
+        title: Text(
+          auth.isGuest ? 'exit_guest_mode_title'.tr() : 'log_out_title'.tr(),
+          style: AppFonts.poppins(
+            context: dialogContext,
+            color: itemColor,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        content: Text(
+          'log_out_confirm'.tr(),
+          style: AppFonts.poppins(
+            context: dialogContext,
+            color: itemColor.withValues(alpha: 0.72),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(
+              'cancel'.tr(),
+              style: AppFonts.poppins(
+                context: dialogContext,
+                color: itemColor.withValues(alpha: 0.65),
+              ),
+            ),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: const Color(0xFFEF4444),
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text('log_out'.tr()),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      try {
+        await auth.signOut();
+        if (mounted) {
+          _adManager.disposeSettingsBanner();
+          setState(() => _allowPop = true);
+          await WidgetsBinding.instance.endOfFrame;
+        }
+        if (mounted) Navigator.of(context).popUntil((route) => route.isFirst);
+      } catch (error, stackTrace) {
+        debugPrint('Sign out failed: $error\n$stackTrace');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: const Color(0xFFB91C1C),
+              content: Row(
+                children: [
+                  const Icon(Icons.error_outline_rounded, color: Colors.white),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'transaction_failed'.tr(),
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  String _getLanguageName(String code) => switch (code) {
+        'tr' => 'Türkçe',
+        'en' => 'English',
+        'es' => 'Español',
+        'pt' => 'Português',
+        'de' => 'Deutsch',
+        'fr' => 'Français',
+        'it' => 'Italiano',
+        'ru' => 'Русский',
+        'ja' => '日本語',
+        'ko' => '한국어',
+        'zh' => '中文',
+        'hi' => 'हिन्दी',
+        'ar' => 'العربية',
+        'id' => 'Bahasa Indonesia',
+        'vi' => 'Tiếng Việt',
+        'bn' => 'বাংলা',
+        'ur' => 'اردو',
+        'pl' => 'Polski',
+        'th' => 'ไทย',
+        'nl' => 'Nederlands',
+        'uk' => 'Українська',
+        'el' => 'Ελληνικά',
+        'sv' => 'Svenska',
+        _ => 'English',
+      };
 
   @override
   Widget build(BuildContext context) {
     final settings = context.watch<SettingsProvider>();
     final themeProvider = context.watch<ThemeProvider>();
+    final auth = context.watch<AuthProvider>();
+    final purchase = context.watch<PurchaseProvider>();
+    final privacyRequired =
+        context.watch<AdConsentService>().isPrivacyOptionsRequired;
+    final theme = themeProvider.currentTheme;
+    final backgroundColor = themeProvider.settingsBgColor;
+    final itemColor = themeProvider.settingsTextColor;
+    final cardColor = theme.settingsCardColor ?? const Color(0xFF202020);
+    final borderColor =
+        theme.settingsBorderColor ?? itemColor.withValues(alpha: 0.11);
+    final accentColor = themeProvider.settingsAccentColor;
 
-    return Scaffold(
-      backgroundColor: themeProvider.settingsBgColor,
-      appBar: AppBar(
-        title: Text(
-          'settings_title'.tr(),
-          style: AppFonts.poppins(
+    return PopScope(
+      canPop: _allowPop,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _closeSettings();
+      },
+      child: Scaffold(
+        backgroundColor: backgroundColor,
+        appBar: AppBar(
+          centerTitle: true,
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          backgroundColor: backgroundColor,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+            color: itemColor,
+            onPressed: _closeSettings,
+          ),
+          title: Text(
+            'settings_title'.tr(),
+            style: AppFonts.poppins(
               context: context,
-              fontWeight: FontWeight.w600,
-              color: themeProvider.settingsTextColor),
+              color: itemColor,
+              fontSize: 21,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
         ),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded),
-          color: themeProvider.settingsTextColor,
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      // 🔥 Body: Column ile wrap edildi - Liste + Banner
-      body: LayoutBuilder(builder: (context, constraints) {
-        final isTablet = constraints.maxWidth >= 600;
-        final double hPadding = isTablet ? 40 : 20;
-        final double vPadding = isTablet ? 30 : 20;
-        final double titleSize = isTablet ? 20 : 16; // 16 -> 20
-        final double subtitleSize = isTablet ? 14 : 12; // 12 -> 14
-        final double iconSize = isTablet ? 28 : 24; // Default -> 28
-        final double trailingIconSize = isTablet ? 20 : 18; // 18 -> 20
-
-        return Column(
-          children: [
-            // Ayarlar Listesi (Scrollable)
-            Expanded(
-              child: ListView(
-                padding: EdgeInsets.symmetric(
-                    horizontal: hPadding, vertical: vPadding),
-                children: [
-                  // 🔥 Dinamik Kart Rengi Hesaplama
-                  // Her tema artık kendi settingsCardColor ve settingsBorderColor değerlerini taşıyor.
-                  Builder(
-                    builder: (context) {
-                      final theme = themeProvider.currentTheme;
-                      final cardColor =
-                          theme.settingsCardColor ?? const Color(0xFF202020);
-                      final borderColor = theme.settingsBorderColor ??
-                          Colors.white.withOpacity(0.06);
-                      // 🔥 İçerik Rengi: Eğer tema özel renk belirttiyse onu kullan, yoksa genel textColor
-                      final itemColor = theme.settingsItemColor ??
-                          themeProvider.idleTextColor;
-
-                      return Column(
-                        children: [
-                          // 🔥 KULLANICI PROFİLİ
-                          if (!context.watch<AuthProvider>().isGuest)
-                            Padding(
-                              padding:
-                                  const EdgeInsets.only(bottom: 24.0, top: 8.0),
-                              child: Row(
-                                children: [
-                                  CircleAvatar(
-                                    radius: 30,
-                                    backgroundColor: itemColor.withOpacity(0.1),
-                                    backgroundImage: context
-                                                .watch<AuthProvider>()
-                                                .avatarUrl !=
-                                            null
-                                        ? NetworkImage(context
-                                            .watch<AuthProvider>()
-                                            .avatarUrl!)
-                                        : null,
-                                    child: context
-                                                .watch<AuthProvider>()
-                                                .avatarUrl ==
-                                            null
-                                        ? Icon(Icons.person,
-                                            size: 30, color: itemColor)
-                                        : null,
-                                  ),
-                                  const SizedBox(width: 16),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          context
-                                              .watch<AuthProvider>()
-                                              .displayName,
-                                          style: AppFonts.poppins(
-                                            context: context,
-                                            color: itemColor,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 18,
-                                          ),
-                                        ),
-                                        Text(
-                                          context
-                                                  .watch<AuthProvider>()
-                                                  .user
-                                                  ?.email ??
-                                              '',
-                                          style: AppFonts.poppins(
-                                            context: context,
-                                            color: itemColor.withOpacity(0.5),
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            final horizontal = constraints.maxWidth >= 600 ? 24.0 : 16.0;
+            return SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: EdgeInsets.fromLTRB(horizontal, 8, horizontal, 18),
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 700),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (!auth.isGuest) ...[
+                        _ProfileHeader(
+                          displayName: auth.displayName,
+                          email: auth.user?.email ?? '',
+                          avatarUrl: auth.avatarUrl,
+                          textColor: itemColor,
+                          accentColor: accentColor,
+                        ),
+                        const SizedBox(height: 12),
+                      ] else ...[
+                        _GuestConnectCard(
+                          isLoading: _isGuestConnectLoading,
+                          onTap: _connectGuestWithGoogle,
+                        ),
+                        const SizedBox(height: 12),
+                      ],
+                      _PremiumBanner(
+                        isPremium: purchase.isPremium,
+                        onTap: _openPremium,
+                      ),
+                      const SizedBox(height: 12),
+                      SettingsSurface(
+                        color: cardColor,
+                        borderColor: borderColor,
+                        child: Column(
+                          children: [
+                            SettingsNavigationTile(
+                              icon: Icons.timer_outlined,
+                              title: 'duration_settings'.tr(),
+                              textColor: itemColor,
+                              accentColor: accentColor,
+                              onTap: () => _openSettingsPage(
+                                const DurationSettingsScreen(),
                               ),
                             ),
-
-                          if (context.watch<AuthProvider>().isGuest)
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                bottom: 18,
-                                top: 4,
-                              ),
-                              child: DecoratedBox(
-                                decoration: BoxDecoration(
-                                  gradient: const LinearGradient(
-                                    colors: [
-                                      Color(0xFF38BDF8),
-                                      Color(0xFF2563EB),
-                                    ],
-                                  ),
-                                  borderRadius: BorderRadius.circular(16),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: const Color(0xFF38BDF8)
-                                          .withValues(alpha: 0.22),
-                                      blurRadius: 18,
-                                      offset: const Offset(0, 8),
-                                    ),
-                                  ],
-                                ),
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    onTap: _isGuestConnectLoading
-                                        ? null
-                                        : _connectGuestWithGoogle,
-                                    borderRadius: BorderRadius.circular(16),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                        vertical: 15,
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          Container(
-                                            width: 42,
-                                            height: 42,
-                                            decoration: BoxDecoration(
-                                              color: Colors.white
-                                                  .withValues(alpha: 0.16),
-                                              borderRadius:
-                                                  BorderRadius.circular(13),
-                                            ),
-                                            child: _isGuestConnectLoading
-                                                ? const Padding(
-                                                    padding: EdgeInsets.all(11),
-                                                    child:
-                                                        CircularProgressIndicator(
-                                                      strokeWidth: 2.4,
-                                                      color: Colors.white,
-                                                    ),
-                                                  )
-                                                : Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(9),
-                                                    child: Image.asset(
-                                                      'assets/icons/google.png',
-                                                      fit: BoxFit.contain,
-                                                    ),
-                                                  ),
-                                          ),
-                                          const SizedBox(width: 14),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  'guest_connect_google_title'
-                                                      .tr(),
-                                                  maxLines: 1,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  style: AppFonts.poppins(
-                                                    context: context,
-                                                    color: Colors.white,
-                                                    fontSize: titleSize,
-                                                    fontWeight: FontWeight.w700,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 2),
-                                                Text(
-                                                  'guest_connect_google_desc'
-                                                      .tr(),
-                                                  maxLines: 2,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  style: AppFonts.poppins(
-                                                    context: context,
-                                                    color: Colors.white
-                                                        .withValues(
-                                                            alpha: 0.78),
-                                                    fontSize: subtitleSize,
-                                                    height: 1.25,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          const Icon(
-                                            Icons.arrow_forward_rounded,
-                                            color: Colors.white,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                            SettingsDivider(color: borderColor),
+                            SettingsNavigationTile(
+                              icon: Icons.music_note_rounded,
+                              title: 'sound_settings'.tr(),
+                              subtitle: settings.isBackgroundMusicEnabled
+                                  ? 'on'.tr()
+                                  : 'off'.tr(),
+                              textColor: itemColor,
+                              accentColor: accentColor,
+                              onTap: () => _openSettingsPage(
+                                const SoundSettingsScreen(),
                               ),
                             ),
-
-                          // PREMIUM BUTONU
-                          Container(
-                            decoration: BoxDecoration(
-                              gradient:
-                                  context.watch<PurchaseProvider>().isPremium
-                                      ? const LinearGradient(
-                                          colors: [
-                                            Color(0xFF64748B),
-                                            Color(0xFF2563EB),
-                                            Color(0xFF0891B2),
-                                          ],
-                                          stops: [0.0, 0.52, 1.0],
-                                          begin: Alignment.topLeft,
-                                          end: Alignment.bottomRight,
-                                        )
-                                      : const LinearGradient(
-                                          colors: [
-                                            Color(0xFF38BDF8),
-                                            Color(0xFF3B82F6)
-                                          ], // Diamond Cyan/Blue
-                                          begin: Alignment.topLeft,
-                                          end: Alignment.bottomRight,
-                                        ),
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(
-                                color: context
-                                        .watch<PurchaseProvider>()
-                                        .isPremium
-                                    ? const Color(0xFF38BDF8).withOpacity(0.5)
-                                    : Colors.transparent,
-                                width: 1,
-                              ),
-                              boxShadow:
-                                  context.watch<PurchaseProvider>().isPremium
-                                      ? [
-                                          BoxShadow(
-                                            color: const Color(0xFF38BDF8)
-                                                .withValues(alpha: 0.34),
-                                            blurRadius: 20,
-                                            offset: const Offset(0, 8),
-                                          ),
-                                          BoxShadow(
-                                            color: const Color(0xFFE2E8F0)
-                                                .withValues(alpha: 0.12),
-                                            blurRadius: 8,
-                                            offset: const Offset(-3, -2),
-                                          ),
-                                        ]
-                                      : [
-                                          BoxShadow(
-                                            color: const Color(0xFF38BDF8)
-                                                .withOpacity(0.4),
-                                            blurRadius: 12,
-                                            offset: const Offset(0, 4),
-                                          ),
-                                        ],
-                            ),
-                            child: Material(
-                              color: Colors.transparent,
-                              child: InkWell(
-                                borderRadius: BorderRadius.circular(16),
-                                onTap: () {
-                                  final isGuest =
-                                      context.read<AuthProvider>().isGuest;
-                                  if (isGuest) {
-                                    _showPremiumLoginRequired();
-                                  } else {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const PremiumScreen()),
-                                    );
-                                  }
-                                },
-                                child: ListTile(
-                                  contentPadding: EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: isTablet ? 8 : 0),
-                                  leading: Icon(
-                                    Icons.diamond_rounded,
-                                    color: Colors.white,
-                                    size: iconSize,
-                                  ),
-                                  title: Text(
-                                    context.watch<PurchaseProvider>().isPremium
-                                        ? 'premium_active'
-                                            .tr()
-                                            .replaceAll(RegExp(r'👑\s*'), '')
-                                        : 'get_premium'
-                                            .tr()
-                                            .replaceAll(RegExp(r'👑\s*'), ''),
-                                    style: AppFonts.poppins(
-                                      context: context,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: titleSize,
-                                    ),
-                                  ),
-                                  subtitle: context
-                                          .watch<PurchaseProvider>()
-                                          .isPremium
-                                      ? null
-                                      : Text(
-                                          'premium_subtitle'.tr(),
-                                          style: AppFonts.poppins(
-                                            context: context,
-                                            fontSize: subtitleSize,
-                                            color:
-                                                Colors.white.withOpacity(0.9),
-                                          ),
-                                        ),
-                                  trailing: Icon(
-                                      Icons.arrow_forward_ios_rounded,
-                                      size: trailingIconSize,
-                                      color: Colors.white),
-                                ),
+                            SettingsDivider(color: borderColor),
+                            SettingsNavigationTile(
+                              icon: Icons.palette_outlined,
+                              title: 'theme_settings'.tr(),
+                              subtitle: 'theme_name_${theme.id}'.tr(),
+                              textColor: itemColor,
+                              accentColor: accentColor,
+                              onTap: () => _openSettingsPage(
+                                const ThemeSelectionScreen(),
                               ),
                             ),
-                          ),
-                          const SizedBox(height: 20),
-
-                          // SÜRE AYARLARI
-                          Card(
-                            color: cardColor,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                              side: BorderSide(color: borderColor, width: 1),
+                            SettingsDivider(color: borderColor),
+                            SettingsNavigationTile(
+                              icon: Icons.language_rounded,
+                              title: 'language_label'.tr(),
+                              subtitle: _getLanguageName(
+                                context.locale.languageCode,
+                              ),
+                              textColor: itemColor,
+                              accentColor: accentColor,
+                              onTap: () => _openSettingsPage(
+                                const LanguageSelectionScreen(),
+                              ),
                             ),
-                            child: ListTile(
-                              contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: isTablet ? 8 : 0),
-                              leading: Icon(Icons.timer_outlined,
-                                  color: itemColor, size: iconSize),
-                              title: Text(
-                                "duration_settings".tr(),
-                                style: AppFonts.poppins(
-                                  context: context,
-                                  color: itemColor,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: titleSize,
-                                ),
+                            if (privacyRequired) ...[
+                              SettingsDivider(color: borderColor),
+                              SettingsNavigationTile(
+                                icon: Icons.privacy_tip_outlined,
+                                title: 'privacy_options'.tr(),
+                                textColor: itemColor,
+                                accentColor: accentColor,
+                                onTap: _showPrivacyOptions,
                               ),
-                              trailing: Icon(Icons.arrow_forward_ios_rounded,
-                                  size: trailingIconSize, color: itemColor),
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const DurationSettingsScreen()),
-                                );
-                              },
-                            ),
-                          ),
-
-                          const SizedBox(height: 20),
-
-                          // SES AYARLARI
-                          Card(
-                            color: cardColor,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                              side: BorderSide(color: borderColor, width: 1),
-                            ),
-                            child: ListTile(
-                              contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: isTablet ? 8 : 0),
-                              leading: Icon(Icons.music_note_rounded,
-                                  color: itemColor, size: iconSize),
-                              title: Text(
-                                "sound_settings".tr(),
-                                style: AppFonts.poppins(
-                                  context: context,
-                                  color: itemColor,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: titleSize,
-                                ),
-                              ),
-                              subtitle: Text(
-                                settings.isBackgroundMusicEnabled
-                                    ? "on".tr()
-                                    : "off".tr(),
-                                style: AppFonts.poppins(
-                                  context: context,
-                                  fontSize: subtitleSize,
-                                  color: itemColor.withAlpha(179),
-                                ),
-                              ),
-                              trailing: Icon(Icons.arrow_forward_ios_rounded,
-                                  size: trailingIconSize, color: itemColor),
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const SoundSettingsScreen()),
-                                );
-                              },
-                            ),
-                          ),
-
-                          const SizedBox(height: 20),
-
-                          // 🎨 TEMA AYARI
-                          Card(
-                            color: cardColor,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                              side: BorderSide(color: borderColor, width: 1),
-                            ),
-                            child: ListTile(
-                              contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: isTablet ? 8 : 0),
-                              leading: Icon(Icons.palette_outlined,
-                                  color: itemColor, size: iconSize),
-                              title: Text(
-                                'theme_settings'.tr(),
-                                style: AppFonts.poppins(
-                                  context: context,
-                                  color: itemColor,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: titleSize,
-                                ),
-                              ),
-                              subtitle: Text(
-                                'theme_name_${themeProvider.currentTheme.id}'
-                                    .tr(),
-                                style: AppFonts.poppins(
-                                  context: context,
-                                  fontSize: subtitleSize,
-                                  color: itemColor.withAlpha(179),
-                                ),
-                              ),
-                              trailing: Icon(Icons.arrow_forward_ios,
-                                  size: trailingIconSize, color: itemColor),
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const ThemeSelectionScreen(),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-
-                          const SizedBox(height: 20),
-
-                          // DİL AYARI
-                          Card(
-                            color: cardColor,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                              side: BorderSide(color: borderColor, width: 1),
-                            ),
-                            child: ListTile(
-                              contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: isTablet ? 8 : 0),
-                              leading: Icon(Icons.language,
-                                  color: itemColor, size: iconSize),
-                              title: Text(
-                                'language_label'.tr(),
-                                style: AppFonts.poppins(
-                                  context: context,
-                                  color: itemColor,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: titleSize,
-                                ),
-                              ),
-                              subtitle: Text(
-                                _getLanguageName(context.locale.languageCode),
-                                style: AppFonts.poppins(
-                                  context: context,
-                                  fontSize: subtitleSize,
-                                  color: itemColor.withAlpha(179),
-                                ),
-                              ),
-                              trailing: Icon(Icons.arrow_forward_ios,
-                                  size: trailingIconSize, color: itemColor),
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const LanguageSelectionScreen(),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                          if (context
-                              .watch<AdConsentService>()
-                              .isPrivacyOptionsRequired) ...[
-                            const SizedBox(height: 12),
-                            Card(
-                              color: cardColor,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                side: BorderSide(color: borderColor, width: 1),
-                              ),
-                              child: ListTile(
-                                contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: isTablet ? 8 : 0,
-                                ),
-                                leading: Icon(
-                                  Icons.privacy_tip_outlined,
-                                  color: itemColor,
-                                  size: iconSize,
-                                ),
-                                title: Text(
-                                  'privacy_options'.tr(),
-                                  style: AppFonts.poppins(
-                                    context: context,
-                                    color: itemColor,
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: titleSize,
-                                  ),
-                                ),
-                                trailing: Icon(
-                                  Icons.arrow_forward_ios,
-                                  size: trailingIconSize,
-                                  color: itemColor,
-                                ),
-                                onTap: () async {
-                                  final consent =
-                                      context.read<AdConsentService>();
-                                  final adManager = context.read<AdManager>();
-                                  final width =
-                                      MediaQuery.sizeOf(context).width;
-                                  try {
-                                    await consent.showPrivacyOptionsForm();
-                                    if (mounted && consent.adsReady) {
-                                      await adManager.loadSettingsBanner(width);
-                                    }
-                                  } catch (error) {
-                                    debugPrint(
-                                      'Privacy options form failed: $error',
-                                    );
-                                  }
-                                },
-                              ),
+                            ],
+                            SettingsDivider(color: borderColor),
+                            SettingsNavigationTile(
+                              icon: Icons.star_rounded,
+                              title: 'rate_us'.tr(),
+                              textColor: itemColor,
+                              accentColor: accentColor,
+                              iconColor: const Color(0xFFF59E0B),
+                              onTap: _rateApp,
                             ),
                           ],
-                          // BİZİ DEĞERLENDİRİN BUTONU
-                          Card(
-                            color: cardColor,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                              side: BorderSide(color: borderColor, width: 1),
-                            ),
-                            child: ListTile(
-                              contentPadding:
-                                  EdgeInsets.symmetric(horizontal: 16),
-                              leading: Icon(Icons.star_rate_rounded,
-                                  color: Colors.amber, size: iconSize),
-                              title: Text(
-                                'rate_us'.tr(),
-                                style: AppFonts.poppins(
-                                  context: context,
-                                  color: itemColor,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: titleSize,
-                                ),
-                              ),
-                              trailing: Icon(Icons.arrow_forward_ios,
-                                  size: trailingIconSize, color: itemColor),
-                              onTap: () async {
-                                final InAppReview inAppReview =
-                                    InAppReview.instance;
-                                if (await inAppReview.isAvailable()) {
-                                  // requestReview kotaya takılıp sessizce başarısız olabileceği için
-                                  // ayarlardan tıklandığında her zaman doğrudan mağaza sayfasını açıyoruz.
-                                  inAppReview.openStoreListing();
-                                }
-                              },
-                            ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      SettingsSurface(
+                        color: const Color(0xFFEF4444).withValues(alpha: 0.08),
+                        borderColor:
+                            const Color(0xFFEF4444).withValues(alpha: 0.55),
+                        child: SettingsNavigationTile(
+                          icon: Icons.logout_rounded,
+                          title: auth.isGuest
+                              ? 'exit_guest_mode'.tr()
+                              : 'log_out'.tr(),
+                          textColor: const Color(0xFFEF4444),
+                          accentColor: const Color(0xFFEF4444),
+                          trailing: const SizedBox.shrink(),
+                          onTap: () => _showLogoutDialog(
+                            auth: auth,
+                            surfaceColor: cardColor,
+                            itemColor: itemColor,
+                            borderColor: borderColor,
                           ),
-
-                          const SizedBox(height: 20),
-
-                          // LOGOUT BUTONU
-                          Card(
-                            color: Colors.redAccent.withOpacity(0.1),
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                              side: const BorderSide(
-                                  color: Colors.redAccent, width: 1),
-                            ),
-                            child: ListTile(
-                              contentPadding:
-                                  EdgeInsets.symmetric(horizontal: 16),
-                              leading: const Icon(Icons.logout,
-                                  color: Colors.redAccent),
-                              title: Text(
-                                context.watch<AuthProvider>().isGuest
-                                    ? 'exit_guest_mode'.tr()
-                                    : 'log_out'.tr(),
-                                style: AppFonts.poppins(
-                                  context: context,
-                                  color: Colors.redAccent,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              onTap: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) => AlertDialog(
-                                    backgroundColor:
-                                        themeProvider.settingsBgColor,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(16)),
-                                    title: Text(
-                                      context.read<AuthProvider>().isGuest
-                                          ? 'exit_guest_mode_title'.tr()
-                                          : 'log_out_title'.tr(),
-                                      style: AppFonts.poppins(
-                                          context: context,
-                                          color: itemColor,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    content: Text(
-                                      'log_out_confirm'.tr(),
-                                      style: AppFonts.poppins(
-                                          context: context,
-                                          color: itemColor.withOpacity(0.8)),
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () => Navigator.pop(context),
-                                        child: Text('cancel'.tr(),
-                                            style: AppFonts.poppins(
-                                                context: context,
-                                                color: itemColor
-                                                    .withOpacity(0.6))),
-                                      ),
-                                      ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.redAccent),
-                                        onPressed: () {
-                                          context
-                                              .read<AuthProvider>()
-                                              .signOut();
-                                          Navigator.of(context).popUntil(
-                                              (route) => route.isFirst);
-                                        },
-                                        child: Text('log_out'.tr(),
-                                            style: AppFonts.poppins(
-                                                context: context,
-                                                color: Colors.white)),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // App Version Display
-                  FutureBuilder<PackageInfo>(
-                    future: PackageInfo.fromPlatform(),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        final version = snapshot.data!.version;
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 20.0),
-                          child: Center(
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      FutureBuilder<PackageInfo>(
+                        future: PackageInfo.fromPlatform(),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) return const SizedBox.shrink();
+                          return Center(
                             child: Text(
-                              'v$version',
+                              'v${snapshot.data!.version}',
                               style: AppFonts.poppins(
                                 context: context,
-                                color: themeProvider.settingsTextColor
-                                    .withValues(alpha: 0.5),
-                                fontSize: 12,
+                                color: itemColor.withValues(alpha: 0.46),
+                                fontSize: 11,
                               ),
                             ),
-                          ),
-                        );
-                      }
-                      return const SizedBox.shrink();
-                    },
+                          );
+                        },
+                      ),
+                      Consumer<AdManager>(
+                        builder: (context, adManager, _) => SettingsAdBanner(
+                          enabled: adManager.canServeAds,
+                          ad: adManager.settingsBannerAd,
+                          isLoaded: adManager.isSettingsBannerLoaded,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 10),
-                ],
+                ),
               ),
-            ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
 
-            // 🔥 BANNER REKLAM ALANI
-            Consumer<AdManager>(
-              builder: (context, adManager, child) {
-                if (adManager.isSettingsBannerLoaded &&
-                    adManager.settingsBannerAd != null) {
-                  return Container(
-                    width: adManager.settingsBannerAd!.size.width.toDouble(),
-                    height: adManager.settingsBannerAd!.size.height.toDouble(),
-                    margin: const EdgeInsets.only(bottom: 10),
-                    child: AdWidget(ad: adManager.settingsBannerAd!),
-                  );
-                }
-                // Reklam yüklenmediyse boş alan
-                return const SizedBox(height: 50);
-              },
+class _ProfileHeader extends StatelessWidget {
+  const _ProfileHeader({
+    required this.displayName,
+    required this.email,
+    required this.avatarUrl,
+    required this.textColor,
+    required this.accentColor,
+  });
+
+  final String displayName;
+  final String email;
+  final String? avatarUrl;
+  final Color textColor;
+  final Color accentColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 25,
+            backgroundColor: accentColor.withValues(alpha: 0.14),
+            backgroundImage:
+                avatarUrl == null ? null : NetworkImage(avatarUrl!),
+            child: avatarUrl == null
+                ? Icon(Icons.person_rounded, size: 25, color: accentColor)
+                : null,
+          ),
+          const SizedBox(width: 13),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  displayName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppFonts.poppins(
+                    context: context,
+                    color: textColor,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                if (email.isNotEmpty)
+                  Text(
+                    email,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppFonts.poppins(
+                      context: context,
+                      color: textColor.withValues(alpha: 0.55),
+                      fontSize: 12.5,
+                    ),
+                  ),
+              ],
             ),
-          ],
-        );
-      }),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _GuestConnectCard extends StatelessWidget {
+  const _GuestConnectCard({
+    required this.isLoading,
+    required this.onTap,
+  });
+
+  final bool isLoading;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF38BDF8), Color(0xFF2563EB)],
+        ),
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF38BDF8).withValues(alpha: 0.20),
+            blurRadius: 18,
+            offset: const Offset(0, 7),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: isLoading ? null : onTap,
+          borderRadius: BorderRadius.circular(18),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            child: Row(
+              children: [
+                Container(
+                  width: 42,
+                  height: 42,
+                  padding: const EdgeInsets.all(9),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.16),
+                    borderRadius: BorderRadius.circular(13),
+                  ),
+                  child: isLoading
+                      ? const CircularProgressIndicator(
+                          strokeWidth: 2.3,
+                          color: Colors.white,
+                        )
+                      : Image.asset('assets/icons/google.png'),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'guest_connect_google_title'.tr(),
+                        style: AppFonts.poppins(
+                          context: context,
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'guest_connect_google_desc'.tr(),
+                        style: AppFonts.poppins(
+                          context: context,
+                          color: Colors.white.withValues(alpha: 0.8),
+                          fontSize: 11.5,
+                          height: 1.3,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                const Icon(Icons.arrow_forward_rounded, color: Colors.white),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PremiumBanner extends StatelessWidget {
+  const _PremiumBanner({required this.isPremium, required this.onTap});
+
+  final bool isPremium;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isPremium
+              ? const [Color(0xFF64748B), Color(0xFF2563EB), Color(0xFF0891B2)]
+              : const [Color(0xFF38BDF8), Color(0xFF2563EB)],
+        ),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF38BDF8).withValues(alpha: 0.24),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(18),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            child: Row(
+              children: [
+                Container(
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.16),
+                    borderRadius: BorderRadius.circular(13),
+                  ),
+                  child: const Icon(
+                    Icons.diamond_rounded,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        (isPremium ? 'premium_active' : 'get_premium')
+                            .tr()
+                            .replaceFirst(RegExp(r'^[💎👑]\s*'), ''),
+                        style: AppFonts.poppins(
+                          context: context,
+                          color: Colors.white,
+                          fontSize: 15.5,
+                          height: 1.2,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      if (!isPremium) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          'premium_subtitle'.tr(),
+                          style: AppFonts.poppins(
+                            context: context,
+                            color: Colors.white.withValues(alpha: 0.82),
+                            fontSize: 11.5,
+                            height: 1.3,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                const Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  color: Colors.white,
+                  size: 17,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

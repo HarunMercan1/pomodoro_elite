@@ -1,14 +1,13 @@
-//duration_settings_screen
-
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
-import '../providers/settings_provider.dart';
-import '../providers/timer_provider.dart';
-import '../providers/theme_provider.dart';
+
 import '../providers/ad_manager.dart';
+import '../providers/settings_provider.dart';
+import '../providers/theme_provider.dart';
+import '../providers/timer_provider.dart';
 import '../utils/app_fonts.dart';
+import '../widgets/settings_components.dart';
 
 class DurationSettingsScreen extends StatefulWidget {
   const DurationSettingsScreen({super.key});
@@ -18,12 +17,23 @@ class DurationSettingsScreen extends StatefulWidget {
 }
 
 class _DurationSettingsScreenState extends State<DurationSettingsScreen> {
-  // Slider değerlerini anlık olarak tutacak yerel değişkenler
   double? _tempWorkTime;
   double? _tempShortBreak;
   double? _tempLongBreak;
-
+  bool _allowPop = false;
+  bool _isClosing = false;
   late AdManager _adManager;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context
+          .read<AdManager>()
+          .loadDurationBanner(MediaQuery.sizeOf(context).width);
+    });
+  }
 
   @override
   void didChangeDependencies() {
@@ -35,388 +45,402 @@ class _DurationSettingsScreenState extends State<DurationSettingsScreen> {
   void dispose() {
     try {
       _adManager.disposeDurationBanner();
-    } catch (e) {
-      debugPrint("DurationSettingsScreen Dispose Hatası: $e");
+    } catch (error) {
+      debugPrint('Duration banner dispose failed: $error');
     }
     super.dispose();
   }
 
-  @override
-  void initState() {
-    super.initState();
-    // 🔥 Duration ekranı için adaptive banner reklamı yükle
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final width = MediaQuery.of(context).size.width;
-      context.read<AdManager>().loadDurationBanner(width);
-    });
+  Future<void> _closeScreen() async {
+    if (_isClosing) return;
+    _isClosing = true;
+    _adManager.disposeDurationBanner();
+    if (mounted) setState(() => _allowPop = true);
+    await WidgetsBinding.instance.endOfFrame;
+    if (mounted) Navigator.of(context).pop();
   }
 
   @override
   Widget build(BuildContext context) {
     final settings = context.watch<SettingsProvider>();
-    // TimerProvider'ı izliyoruz (watch) ki sayaç durumu değişince ekran güncellensin
     final timerProvider = context.watch<TimerProvider>();
-
-    // --- KİLİT KONTROLÜ ---
-    final bool isLocked = timerProvider.isRunning;
-
-    // Eğer yerel değişkenler null ise (ilk açılış), provider'dan al
-    double currentWork = _tempWorkTime ?? settings.workTime.toDouble();
-    double currentShort = _tempShortBreak ?? settings.shortBreakTime.toDouble();
-    double currentLong = _tempLongBreak ?? settings.longBreakTime.toDouble();
-
     final themeProvider = context.watch<ThemeProvider>();
+    final theme = themeProvider.currentTheme;
+    final backgroundColor = themeProvider.settingsBgColor;
+    final itemColor = themeProvider.settingsTextColor;
+    final cardColor = theme.settingsCardColor ?? const Color(0xFF202020);
+    final borderColor =
+        theme.settingsBorderColor ?? itemColor.withValues(alpha: 0.11);
+    final accentColor = themeProvider.settingsAccentColor;
+    final isLocked = timerProvider.isRunning;
+    final currentWork = _tempWorkTime ?? settings.workTime.toDouble();
+    final currentShort = _tempShortBreak ?? settings.shortBreakTime.toDouble();
+    final currentLong = _tempLongBreak ?? settings.longBreakTime.toDouble();
 
-    return Scaffold(
-      backgroundColor: themeProvider.settingsBgColor,
-      appBar: AppBar(
-        title: Text(
-          "duration_settings".tr(),
-          style: AppFonts.poppins(
+    return PopScope(
+      canPop: _allowPop,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _closeScreen();
+      },
+      child: Scaffold(
+        backgroundColor: backgroundColor,
+        appBar: AppBar(
+          centerTitle: true,
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          backgroundColor: backgroundColor,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+            color: itemColor,
+            onPressed: _closeScreen,
+          ),
+          title: Text(
+            'duration_settings'.tr(),
+            style: AppFonts.poppins(
               context: context,
-              fontWeight: FontWeight.w600,
-              color: themeProvider.settingsTextColor),
+              color: itemColor,
+              fontSize: 21,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
         ),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded),
-          color: themeProvider.settingsTextColor,
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: LayoutBuilder(builder: (context, constraints) {
-        final isTablet = constraints.maxWidth >= 600;
-        final double hPadding = isTablet ? 32 : 20;
-        final double contentPaddingV = isTablet ? 20 : 15;
-        final double titleSize = isTablet ? 20 : 16;
-        final double timeTextSize = isTablet ? 20 : 16;
-        final double sliderHeight = isTablet ? 12.0 : 6.0;
-
-        return Column(
-          children: [
-            // --- UYARI MESAJI (Sadece kilitliyse görünür) ---
-            if (isLocked)
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(10),
-                margin: EdgeInsets.fromLTRB(hPadding, 0, hPadding, 10),
-                decoration: BoxDecoration(
-                  color: Colors.orangeAccent.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.orangeAccent),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.lock_outline, color: Colors.orange),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        "change_lock_msg".tr(),
-                        style: AppFonts.poppins(
-                          context: context,
-                          fontSize: 12, // Uyarı mesajı sabit kalabilir
-                          color: Theme.of(context).colorScheme.onSurface,
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            final horizontal = constraints.maxWidth >= 600 ? 24.0 : 16.0;
+            return SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: EdgeInsets.fromLTRB(horizontal, 8, horizontal, 18),
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 700),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (isLocked) ...[
+                        SettingsLockNotice(
+                          message: 'change_lock_msg'.tr(),
+                          textColor: itemColor,
+                        ),
+                        const SizedBox(height: 12),
+                      ],
+                      IgnorePointer(
+                        ignoring: isLocked,
+                        child: AnimatedOpacity(
+                          opacity: isLocked ? 0.48 : 1,
+                          duration: const Duration(milliseconds: 180),
+                          child: SettingsSurface(
+                            color: cardColor,
+                            borderColor: borderColor,
+                            padding: const EdgeInsets.symmetric(vertical: 3),
+                            child: Column(
+                              children: [
+                                _buildDurationSlider(
+                                  context,
+                                  label: 'focus'.tr(),
+                                  icon: Icons.center_focus_strong_rounded,
+                                  value: currentWork,
+                                  min: 10,
+                                  max: 180,
+                                  itemColor: itemColor,
+                                  accentColor: accentColor,
+                                  onChanged: (value) =>
+                                      setState(() => _tempWorkTime = value),
+                                  onChangeEnd: (value) {
+                                    final minutes = value.toInt();
+                                    settings.setWorkTime(minutes);
+                                    timerProvider.updateDurationFromSettings(
+                                      minutes,
+                                      TimerMode.work,
+                                    );
+                                    if (mounted) {
+                                      setState(() => _tempWorkTime = null);
+                                    }
+                                  },
+                                ),
+                                SettingsDivider(color: borderColor, indent: 16),
+                                _buildDurationSlider(
+                                  context,
+                                  label: 'short_break'.tr(),
+                                  icon: Icons.coffee_rounded,
+                                  value: currentShort,
+                                  min: 1,
+                                  max: 60,
+                                  itemColor: itemColor,
+                                  accentColor: accentColor,
+                                  onChanged: (value) =>
+                                      setState(() => _tempShortBreak = value),
+                                  onChangeEnd: (value) {
+                                    final minutes = value.toInt();
+                                    settings.setShortBreakTime(minutes);
+                                    timerProvider.updateDurationFromSettings(
+                                      minutes,
+                                      TimerMode.shortBreak,
+                                    );
+                                    if (mounted) {
+                                      setState(() => _tempShortBreak = null);
+                                    }
+                                  },
+                                ),
+                                SettingsDivider(color: borderColor, indent: 16),
+                                _buildDurationSlider(
+                                  context,
+                                  label: 'long_break'.tr(),
+                                  icon: Icons.self_improvement_rounded,
+                                  value: currentLong,
+                                  min: 5,
+                                  max: 120,
+                                  itemColor: itemColor,
+                                  accentColor: accentColor,
+                                  onChanged: (value) =>
+                                      setState(() => _tempLongBreak = value),
+                                  onChangeEnd: (value) {
+                                    final minutes = value.toInt();
+                                    settings.setLongBreakTime(minutes);
+                                    timerProvider.updateDurationFromSettings(
+                                      minutes,
+                                      TimerMode.longBreak,
+                                    );
+                                    if (mounted) {
+                                      setState(() => _tempLongBreak = null);
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-
-            // --- AYARLAR LİSTESİ (KİLİTLENEBİLİR ALAN) ---
-            Expanded(
-              child: IgnorePointer(
-                ignoring: isLocked, // Kilitliyse dokunmayı engelle
-                child: Opacity(
-                  opacity: isLocked ? 0.5 : 1.0, // Kilitliyse soluklaştır
-                  child: ListView(
-                    padding: EdgeInsets.all(hPadding),
-                    children: [
-                      // 1. Odaklanma Süresi
-                      _buildDurationSlider(
-                        context,
-                        label: "focus".tr(),
-                        value: currentWork,
-                        min: 10,
-                        max: 180,
-                        onChanged: (val) {
-                          setState(() => _tempWorkTime = val);
-                        },
-                        onChangeEnd: (val) {
-                          int newValue = val.toInt();
-                          settings.setWorkTime(newValue);
-                          timerProvider.updateDurationFromSettings(
-                              newValue, TimerMode.work);
-                          _tempWorkTime = null;
-                        },
-                        titleSize: titleSize,
-                        timeTextSize: timeTextSize,
-                        sliderHeight: sliderHeight,
-                        contentPaddingV: contentPaddingV,
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      // 2. Kısa Mola
-                      _buildDurationSlider(
-                        context,
-                        label: "short_break".tr(),
-                        value: currentShort,
-                        min: 1,
-                        max: 60,
-                        onChanged: (val) {
-                          setState(() => _tempShortBreak = val);
-                        },
-                        onChangeEnd: (val) {
-                          int newValue = val.toInt();
-                          settings.setShortBreakTime(newValue);
-                          timerProvider.updateDurationFromSettings(
-                              newValue, TimerMode.shortBreak);
-                          _tempShortBreak = null;
-                        },
-                        titleSize: titleSize,
-                        timeTextSize: timeTextSize,
-                        sliderHeight: sliderHeight,
-                        contentPaddingV: contentPaddingV,
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      // 3. Uzun Mola
-                      _buildDurationSlider(
-                        context,
-                        label: "long_break".tr(),
-                        value: currentLong,
-                        min: 5,
-                        max:
-                            120, // 📢 DÜZELTME: Maksimum 120 dk (Uzun mola da esnek olsun)
-                        onChanged: (val) {
-                          setState(() => _tempLongBreak = val);
-                        },
-                        onChangeEnd: (val) {
-                          int newValue = val.toInt();
-                          settings.setLongBreakTime(newValue);
-                          timerProvider.updateDurationFromSettings(
-                              newValue, TimerMode.longBreak);
-                          _tempLongBreak = null;
-                        },
-                        titleSize: titleSize,
-                        timeTextSize: timeTextSize,
-                        sliderHeight: sliderHeight,
-                        contentPaddingV: contentPaddingV,
+                      Consumer<AdManager>(
+                        builder: (context, adManager, _) => SettingsAdBanner(
+                          enabled: adManager.canServeAds,
+                          ad: adManager.durationBannerAd,
+                          isLoaded: adManager.isDurationBannerLoaded,
+                        ),
                       ),
                     ],
                   ),
                 ),
               ),
-            ),
-
-            // 🔥 BANNER REKLAM ALANI
-            Consumer<AdManager>(
-              builder: (context, adManager, child) {
-                if (adManager.isDurationBannerLoaded &&
-                    adManager.durationBannerAd != null) {
-                  return Container(
-                    width: adManager.durationBannerAd!.size.width.toDouble(),
-                    height: adManager.durationBannerAd!.size.height.toDouble(),
-                    margin: const EdgeInsets.only(bottom: 10),
-                    child: AdWidget(ad: adManager.durationBannerAd!),
-                  );
-                }
-                // Reklam yüklenmediyse boş alan
-                return const SizedBox(height: 50);
-              },
-            ),
-          ],
-        );
-      }),
+            );
+          },
+        ),
+      ),
     );
   }
 
   Widget _buildDurationSlider(
     BuildContext context, {
     required String label,
+    required IconData icon,
     required double value,
     required double min,
     required double max,
-    required Function(double) onChanged,
-    required Function(double) onChangeEnd,
-    double titleSize = 16,
-    double timeTextSize = 16,
-    double sliderHeight = 6.0,
-    double contentPaddingV = 15.0,
+    required Color itemColor,
+    required Color accentColor,
+    required ValueChanged<double> onChanged,
+    required ValueChanged<double> onChangeEnd,
   }) {
-    final themeProvider = context.watch<ThemeProvider>();
-    final theme = themeProvider.currentTheme;
-    final cardColor = theme.settingsCardColor ?? const Color(0xFF202020);
-    final borderColor =
-        theme.settingsBorderColor ?? Colors.white.withOpacity(0.06);
-    final itemColor = theme.settingsItemColor ?? themeProvider.idleTextColor;
-    final sliderColor =
-        themeProvider.idleAccentColor; // Tema bazlı slider rengi
-
-    return Card(
-      elevation: 0,
-      color: cardColor,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-        side: BorderSide(color: borderColor, width: 1),
-      ),
-      child: Padding(
-        padding:
-            EdgeInsets.symmetric(vertical: contentPaddingV, horizontal: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(15, 13, 12, 9),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: accentColor.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, size: 19, color: accentColor),
+              ),
+              const SizedBox(width: 11),
+              Expanded(
+                child: Text(
                   label,
                   style: AppFonts.poppins(
                     context: context,
-                    fontWeight: FontWeight.w500,
-                    fontSize: titleSize,
                     color: itemColor,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-                // 🔥 TIKLANABİLİR SÜRE METNİ (Manuel Giriş)
-                GestureDetector(
+              ),
+              const SizedBox(width: 8),
+              Material(
+                color: accentColor.withValues(alpha: 0.11),
+                borderRadius: BorderRadius.circular(11),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(11),
                   onTap: () => _showDurationDialog(
-                      context, label, value, min, max, onChangeEnd),
+                    context,
+                    title: label,
+                    currentValue: value,
+                    min: min,
+                    max: max,
+                    onConfirm: onChangeEnd,
+                  ),
                   child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    constraints: const BoxConstraints(minHeight: 36),
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: sliderColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: sliderColor.withOpacity(0.3)),
+                      border: Border.all(
+                        color: accentColor.withValues(alpha: 0.30),
+                      ),
+                      borderRadius: BorderRadius.circular(11),
                     ),
                     child: Text(
-                      "${value.toInt()} ${'minutes_label'.tr().toLowerCase()}",
+                      '${value.toInt()} ${'minutes_label'.tr().toLowerCase()}',
+                      textAlign: TextAlign.center,
                       style: AppFonts.poppins(
                         context: context,
-                        fontWeight: FontWeight.bold,
-                        color: sliderColor,
-                        fontSize: timeTextSize,
+                        color: accentColor,
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            SliderTheme(
-              data: SliderTheme.of(context).copyWith(
-                trackHeight: sliderHeight,
-                thumbShape:
-                    const RoundSliderThumbShape(enabledThumbRadius: 12.0),
-                overlayShape:
-                    const RoundSliderOverlayShape(overlayRadius: 24.0),
               ),
-              child: Slider(
-                value: value,
-                min: min,
-                max: max,
-                activeColor: sliderColor,
-                inactiveColor: sliderColor.withOpacity(0.2),
-                onChanged: onChanged,
-                onChangeEnd: onChangeEnd,
-              ),
+            ],
+          ),
+          const SizedBox(height: 5),
+          SliderTheme(
+            data: SliderTheme.of(context).copyWith(
+              trackHeight: 4,
+              activeTrackColor: accentColor,
+              inactiveTrackColor: accentColor.withValues(alpha: 0.16),
+              thumbColor: accentColor,
+              overlayColor: accentColor.withValues(alpha: 0.12),
+              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 9),
+              overlayShape: const RoundSliderOverlayShape(overlayRadius: 19),
             ),
-          ],
-        ),
+            child: Slider(
+              value: value.clamp(min, max),
+              min: min,
+              max: max,
+              onChanged: onChanged,
+              onChangeEnd: onChangeEnd,
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  // 🔥 Manuel Süre Giriş Dialogu
-  void _showDurationDialog(BuildContext context, String title,
-      double currentVal, double min, double max, Function(double) onConfirm) {
-    final TextEditingController controller =
-        TextEditingController(text: currentVal.toInt().toString());
-    String? errorText; // Hata mesajı için değişken
+  Future<void> _showDurationDialog(
+    BuildContext context, {
+    required String title,
+    required double currentValue,
+    required double min,
+    required double max,
+    required ValueChanged<double> onConfirm,
+  }) async {
+    final controller =
+        TextEditingController(text: currentValue.toInt().toString());
+    final themeProvider = context.read<ThemeProvider>();
+    final theme = themeProvider.currentTheme;
+    final itemColor = themeProvider.settingsTextColor;
+    final accentColor = themeProvider.settingsAccentColor;
+    final cardColor = theme.settingsCardColor ?? const Color(0xFF202020);
+    final borderColor =
+        theme.settingsBorderColor ?? itemColor.withValues(alpha: 0.12);
+    String? errorText;
 
-    showDialog(
+    await showDialog<void>(
       context: context,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              backgroundColor: const Color(0xFF202020),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                  side: BorderSide(
-                      color: Colors.white.withOpacity(0.06), width: 1)),
-              title: Text("$title - ${'minutes_label'.tr()}",
-                  style:
-                      AppFonts.poppins(context: context, color: Colors.white)),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: controller,
-                    keyboardType: TextInputType.number,
-                    style:
-                        AppFonts.poppins(context: context, color: Colors.white),
-                    decoration: InputDecoration(
-                      hintText: "min_max_warning".tr(args: [
-                        min.toInt().toString(),
-                        max.toInt().toString()
-                      ]), // örn: "10 - 180 arası"
-                      hintStyle:
-                          TextStyle(color: Colors.white.withOpacity(0.5)),
-                      errorText: errorText, // 🔥 Hata mesajını göster
-                      errorStyle: const TextStyle(color: Colors.redAccent),
-                      enabledBorder: OutlineInputBorder(
-                          borderSide:
-                              BorderSide(color: Colors.white.withOpacity(0.3))),
-                      focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                              color: Theme.of(context).primaryColor)),
-                      errorBorder: const OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.redAccent)),
-                      focusedErrorBorder: const OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.redAccent)),
-                    ),
-                  ),
-                ],
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          void submit() {
+            final value = int.tryParse(controller.text.trim());
+            if (value == null || value < min || value > max) {
+              setDialogState(
+                () => errorText = 'min_max_warning'.tr(args: [
+                  min.toInt().toString(),
+                  max.toInt().toString(),
+                ]),
+              );
+              return;
+            }
+            onConfirm(value.toDouble());
+            Navigator.pop(dialogContext);
+          }
+
+          return AlertDialog(
+            backgroundColor: cardColor,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+              side: BorderSide(color: borderColor),
+            ),
+            title: Text(
+              '$title · ${'minutes_label'.tr()}',
+              style: AppFonts.poppins(
+                context: context,
+                color: itemColor,
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
               ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text("cancel".tr(),
-                      style: TextStyle(color: Colors.white.withOpacity(0.7))),
+            ),
+            content: TextField(
+              controller: controller,
+              autofocus: true,
+              keyboardType: TextInputType.number,
+              textInputAction: TextInputAction.done,
+              onSubmitted: (_) => submit(),
+              style: AppFonts.poppins(context: context, color: itemColor),
+              decoration: InputDecoration(
+                errorText: errorText,
+                hintText: 'min_max_warning'.tr(args: [
+                  min.toInt().toString(),
+                  max.toInt().toString(),
+                ]),
+                hintStyle: TextStyle(
+                  color: itemColor.withValues(alpha: 0.48),
                 ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).primaryColor),
-                  onPressed: () {
-                    final int? val = int.tryParse(controller.text);
-                    if (val != null && val >= min && val <= max) {
-                      onConfirm(val.toDouble());
-                      Navigator.pop(context);
-                    } else {
-                      // Hata varsa UI'ı güncelle
-                      setState(() {
-                        errorText = "min_max_warning".tr(args: [
-                          min.toInt().toString(),
-                          max.toInt().toString()
-                        ]);
-                      });
-                    }
-                  },
-                  child: Text("save".tr(),
-                      style: const TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold)),
+                filled: true,
+                fillColor: itemColor.withValues(alpha: 0.05),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(13),
                 ),
-              ],
-            );
-          },
-        );
-      },
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(13),
+                  borderSide: BorderSide(color: borderColor),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(13),
+                  borderSide: BorderSide(color: accentColor, width: 1.5),
+                ),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: Text(
+                  'cancel'.tr(),
+                  style: TextStyle(color: itemColor.withValues(alpha: 0.65)),
+                ),
+              ),
+              FilledButton(
+                onPressed: submit,
+                style: FilledButton.styleFrom(
+                  backgroundColor: accentColor,
+                  foregroundColor: ThemeData.estimateBrightnessForColor(
+                            accentColor,
+                          ) ==
+                          Brightness.dark
+                      ? Colors.white
+                      : Colors.black,
+                ),
+                child: Text('save'.tr()),
+              ),
+            ],
+          );
+        },
+      ),
     );
+    controller.dispose();
   }
 }

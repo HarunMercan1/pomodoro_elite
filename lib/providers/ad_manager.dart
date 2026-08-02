@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
@@ -5,10 +7,19 @@ import '../utils/ad_helper.dart';
 
 class AdManager extends ChangeNotifier {
   bool _isPremium = false;
+  bool _isPremiumStatusLoading = true;
   bool _adServingAllowed = false;
   bool _disposed = false;
 
-  bool get _canLoadAds => !_isPremium && _adServingAllowed && !_disposed;
+  bool get _canLoadAds =>
+      !_isPremiumStatusLoading &&
+      !_isPremium &&
+      _adServingAllowed &&
+      !_disposed;
+
+  /// Reklamların entitlement sonucu kesinleşip izin verildiğinde görünmesini
+  /// sağlar. Premium durumu yüklenirken native reklam yüzeyi oluşturulmaz.
+  bool get canServeAds => _canLoadAds;
 
   BannerAd? _settingsBannerAd;
   BannerAd? _durationBannerAd;
@@ -16,15 +27,20 @@ class AdManager extends ChangeNotifier {
   bool _isSettingsBannerLoaded = false;
   bool _isDurationBannerLoaded = false;
   bool _isSoundBannerLoaded = false;
+  double? _settingsBannerRequestedWidth;
+  double? _durationBannerRequestedWidth;
+  double? _soundBannerRequestedWidth;
   AdSize? _adSize;
 
   RewardedAd? _rewardedAd;
   bool _isRewardedAdReady = false;
   bool _isRewardedAdLoading = false;
+  bool _rewardedAdRequested = false;
 
   InterstitialAd? _interstitialAd;
   bool _isInterstitialAdReady = false;
   bool _isInterstitialAdLoading = false;
+  bool _interstitialAdRequested = false;
   int _pomodorosSinceLastAd = 0;
 
   BannerAd? get settingsBannerAd => _settingsBannerAd;
@@ -37,19 +53,37 @@ class AdManager extends ChangeNotifier {
   bool get isRewardedAdReady => _isRewardedAdReady;
   bool get isInterstitialAdReady => _isInterstitialAdReady;
 
-  void updatePremiumStatus(bool isPremium) {
-    if (_isPremium == isPremium) return;
+  void updatePremiumStatus({
+    required bool isPremium,
+    required bool isLoading,
+  }) {
+    if (_isPremium == isPremium && _isPremiumStatusLoading == isLoading) {
+      return;
+    }
     _isPremium = isPremium;
-    if (isPremium) _disposeAllAds();
+    _isPremiumStatusLoading = isLoading;
+
+    if (!_canLoadAds) {
+      _disposeAllAds();
+    } else {
+      _safeNotify();
+      _resumeRequestedAds();
+    }
   }
 
   void updateAdServingAllowed(bool allowed) {
     if (_adServingAllowed == allowed) return;
     _adServingAllowed = allowed;
-    if (!allowed) _disposeAllAds();
+    if (!allowed) {
+      _disposeAllAds();
+    } else if (_canLoadAds) {
+      _safeNotify();
+      _resumeRequestedAds();
+    }
   }
 
   Future<void> loadSettingsBanner(double width) async {
+    _settingsBannerRequestedWidth = width;
     if (!_canLoadAds || _settingsBannerAd != null) return;
 
     final adaptiveSize = await AdSize.getAnchoredAdaptiveBannerAdSize(
@@ -88,6 +122,7 @@ class AdManager extends ChangeNotifier {
   }
 
   Future<void> loadDurationBanner(double width) async {
+    _durationBannerRequestedWidth = width;
     if (!_canLoadAds || _durationBannerAd != null) return;
     late final BannerAd banner;
     banner = BannerAd(
@@ -118,6 +153,7 @@ class AdManager extends ChangeNotifier {
   }
 
   Future<void> loadSoundBanner(double width) async {
+    _soundBannerRequestedWidth = width;
     if (!_canLoadAds || _soundBannerAd != null) return;
     late final BannerAd banner;
     banner = BannerAd(
@@ -148,6 +184,7 @@ class AdManager extends ChangeNotifier {
   }
 
   void loadRewardedAd() {
+    _rewardedAdRequested = true;
     if (!_canLoadAds || _rewardedAd != null || _isRewardedAdLoading) return;
     _isRewardedAdLoading = true;
     RewardedAd.load(
@@ -206,6 +243,7 @@ class AdManager extends ChangeNotifier {
   }
 
   void loadInterstitialAd() {
+    _interstitialAdRequested = true;
     if (!_canLoadAds || _interstitialAd != null || _isInterstitialAdLoading) {
       return;
     }
@@ -271,6 +309,7 @@ class AdManager extends ChangeNotifier {
   }
 
   void disposeSettingsBanner() {
+    _settingsBannerRequestedWidth = null;
     _settingsBannerAd?.dispose();
     _settingsBannerAd = null;
     _isSettingsBannerLoaded = false;
@@ -278,6 +317,7 @@ class AdManager extends ChangeNotifier {
   }
 
   void disposeDurationBanner() {
+    _durationBannerRequestedWidth = null;
     _durationBannerAd?.dispose();
     _durationBannerAd = null;
     _isDurationBannerLoaded = false;
@@ -285,6 +325,7 @@ class AdManager extends ChangeNotifier {
   }
 
   void disposeSoundBanner() {
+    _soundBannerRequestedWidth = null;
     _soundBannerAd?.dispose();
     _soundBannerAd = null;
     _isSoundBannerLoaded = false;
@@ -312,6 +353,28 @@ class AdManager extends ChangeNotifier {
     _safeNotify();
   }
 
+  void _resumeRequestedAds() {
+    if (!_canLoadAds) return;
+
+    final settingsWidth = _settingsBannerRequestedWidth;
+    if (settingsWidth != null) {
+      unawaited(loadSettingsBanner(settingsWidth));
+    }
+
+    final durationWidth = _durationBannerRequestedWidth;
+    if (durationWidth != null) {
+      unawaited(loadDurationBanner(durationWidth));
+    }
+
+    final soundWidth = _soundBannerRequestedWidth;
+    if (soundWidth != null) {
+      unawaited(loadSoundBanner(soundWidth));
+    }
+
+    if (_rewardedAdRequested) loadRewardedAd();
+    if (_interstitialAdRequested) loadInterstitialAd();
+  }
+
   void _safeNotify() {
     if (!_disposed) notifyListeners();
   }
@@ -319,6 +382,11 @@ class AdManager extends ChangeNotifier {
   @override
   void dispose() {
     _disposed = true;
+    _settingsBannerRequestedWidth = null;
+    _durationBannerRequestedWidth = null;
+    _soundBannerRequestedWidth = null;
+    _rewardedAdRequested = false;
+    _interstitialAdRequested = false;
     _disposeAllAds();
     super.dispose();
   }
