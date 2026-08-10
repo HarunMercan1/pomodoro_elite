@@ -100,9 +100,37 @@ void main() {
       throwsA(isA<StateError>()),
     );
 
-    await expectLater(
-      service.migratePending('user-2'),
-      throwsA(isA<StateError>()),
+    await service.migratePending('user-2');
+
+    expect(gateway.attempts, hasLength(1));
+    expect(await service.hasPendingBatches(userId: 'user-1'), isTrue);
+    expect(await service.hasPendingBatches(userId: 'user-2'), isFalse);
+  });
+
+  test('the same completed session id is queued only once', () async {
+    final service = GuestStatsMigrationService(
+      gateway: _FakeMigrationGateway(),
+    );
+
+    expect(
+      await service.enqueueSessionDelta(
+        minutes: 25,
+        dateKey: '2026-08-04',
+        currentStreak: 1,
+        batchId: 'session-fixed-id',
+        targetUserId: 'user-1',
+      ),
+      isTrue,
+    );
+    expect(
+      await service.enqueueSessionDelta(
+        minutes: 25,
+        dateKey: '2026-08-04',
+        currentStreak: 1,
+        batchId: 'session-fixed-id',
+        targetUserId: 'user-1',
+      ),
+      isFalse,
     );
   });
 

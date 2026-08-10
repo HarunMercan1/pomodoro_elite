@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'package:confetti/confetti.dart';
+import 'dart:async';
 import 'dart:math';
 import '../providers/timer_provider.dart';
 import '../providers/settings_provider.dart';
@@ -30,7 +31,6 @@ class _HomeScreenState extends State<HomeScreen> {
   TimerProvider? _listenedTimerProvider;
   AdManager? _adManager;
   VoidCallback? _timerListener;
-  int _surfaceGeneration = 0;
 
   @override
   void initState() {
@@ -38,7 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _confettiController =
         ConfettiController(duration: const Duration(seconds: 2));
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
 
       final timerProvider = context.read<TimerProvider>();
@@ -47,11 +47,21 @@ class _HomeScreenState extends State<HomeScreen> {
 
       adManager.loadInterstitialAd();
 
-      if (!timerProvider.isRunning &&
+      final restored = await timerProvider.restoreSession(
+        settingsProvider,
+        context.read<StatsProvider>(),
+      );
+      if (!mounted) return;
+
+      if (!restored &&
+          !timerProvider.isRunning &&
           !timerProvider.isAlarmPlaying &&
           timerProvider.currentMode == TimerMode.work) {
         if (timerProvider.currentDuration != settingsProvider.workTime) {
-          timerProvider.setTime(settingsProvider.workTime, TimerMode.work);
+          await timerProvider.setTime(
+            settingsProvider.workTime,
+            TimerMode.work,
+          );
         }
       }
 
@@ -96,7 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
   /// Drops stale compositor layers without touching the provider-owned timer.
   void _refreshHomeSurface() {
     if (!mounted) return;
-    setState(() => _surfaceGeneration++);
+    setState(() {});
     SchedulerBinding.instance.scheduleForcedFrame();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -105,9 +115,69 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void _runTimerInteraction(VoidCallback action) {
-    action();
+  Future<void> _runTimerInteraction(
+    FutureOr<void> Function() action,
+  ) async {
+    await action();
     _refreshHomeSurface();
+  }
+
+  Future<void> _requestModeChange(
+    int minutes,
+    TimerMode mode,
+    String modeLabel,
+  ) async {
+    final provider = context.read<TimerProvider>();
+    if (provider.currentMode == mode) return;
+
+    var confirmed = true;
+    if (provider.hasActiveProgress) {
+      final themeProvider = context.read<ThemeProvider>();
+      final itemColor = themeProvider.settingsTextColor;
+      final surfaceColor = themeProvider.currentTheme.settingsCardColor ??
+          const Color(0xFF202020);
+      final borderColor = themeProvider.currentTheme.settingsBorderColor ??
+          itemColor.withValues(alpha: 0.12);
+      confirmed = await showDialog<bool>(
+            context: context,
+            builder: (dialogContext) => AlertDialog(
+              backgroundColor: surfaceColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(color: borderColor),
+              ),
+              title: Text(
+                'switch_timer_mode_title'.tr(),
+                style: AppFonts.poppins(
+                  context: dialogContext,
+                  color: itemColor,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              content: Text(
+                'switch_timer_mode_message'.tr(args: [modeLabel]),
+                style: AppFonts.poppins(
+                  context: dialogContext,
+                  color: itemColor.withValues(alpha: 0.72),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext, false),
+                  child: Text('cancel'.tr()),
+                ),
+                FilledButton(
+                  onPressed: () => Navigator.pop(dialogContext, true),
+                  child: Text('switch_timer_mode_confirm'.tr()),
+                ),
+              ],
+            ),
+          ) ??
+          false;
+    }
+
+    if (!confirmed || !mounted) return;
+    await _runTimerInteraction(() => provider.setTime(minutes, mode));
   }
 
   @override
@@ -241,11 +311,11 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      // Tema değiştirildikten sonra yeni yüzey doğrudan canlı frame'i çizer.
-      body: Container(
-        key: ValueKey<String>(
-          'home-${themeProvider.currentThemeId}-$_surfaceGeneration',
-        ),
+      // Rota geri dönüşlerinde canlı frame korunurken durum renkleri yumuşakça
+      // birbirine akar.
+      body: AnimatedContainer(
+        duration: const Duration(milliseconds: 800),
+        curve: Curves.easeInOut,
         decoration: BoxDecoration(
           color: bgGradient == null ? bgColor : null,
           gradient: bgGradient,
@@ -444,22 +514,25 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       children: [
                         GestureDetector(
-                          onTap: () {
+                          onTap: () async {
                             final provider = context.read<TimerProvider>();
                             final stats = context.read<StatsProvider>();
 
-                            _runTimerInteraction(() {
+                            await _runTimerInteraction(() async {
                               if (provider.isAlarmPlaying) {
-                                provider.stopAlarm(
+                                await provider.stopAlarm(
                                   workTime: settingsProvider.workTime,
                                   shortBreakTime:
                                       settingsProvider.shortBreakTime,
                                   longBreakTime: settingsProvider.longBreakTime,
                                 );
                               } else if (provider.isRunning) {
-                                provider.stopTimer(reset: false);
+                                await provider.stopTimer(reset: false);
                               } else {
-                                provider.startTimer(settingsProvider, stats);
+                                await provider.startTimer(
+                                  settingsProvider,
+                                  stats,
+                                );
                               }
                             });
                           },
@@ -601,9 +674,7 @@ class _HomeScreenState extends State<HomeScreen> {
       titleFontSize: titleSize,
       subTitleFontSize: subTitleSize,
       padding: padding,
-      onTap: () => _runTimerInteraction(
-        () => context.read<TimerProvider>().setTime(time, mode),
-      ),
+      onTap: () => _requestModeChange(time, mode, title),
     );
   }
 }

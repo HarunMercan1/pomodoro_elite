@@ -9,14 +9,17 @@ class AuthProvider extends ChangeNotifier {
   AuthProvider({
     GuestStatsMigrationService? guestStatsMigrationService,
     SupabaseClient? supabaseClient,
+    Future<void> Function()? onBeforeIdentityChange,
   })  : _supabase = supabaseClient ?? Supabase.instance.client,
         _guestStatsMigrationService =
-            guestStatsMigrationService ?? GuestStatsMigrationService() {
+            guestStatsMigrationService ?? GuestStatsMigrationService(),
+        _onBeforeIdentityChange = onBeforeIdentityChange {
     _initializeAuth();
   }
 
   final SupabaseClient _supabase;
   final GuestStatsMigrationService _guestStatsMigrationService;
+  final Future<void> Function()? _onBeforeIdentityChange;
   User? _user;
   bool _isGuest = false;
   bool _isLoading = true;
@@ -64,6 +67,7 @@ class AuthProvider extends ChangeNotifier {
   Future<void> signIn(String email, String password) async {
     try {
       await _supabase.auth.signInWithPassword(email: email, password: password);
+      await _onBeforeIdentityChange?.call();
     } catch (e) {
       rethrow;
     }
@@ -72,7 +76,11 @@ class AuthProvider extends ChangeNotifier {
   // 🔥 EMAIL/PASSWORD SIGN UP
   Future<void> signUp(String email, String password) async {
     try {
-      await _supabase.auth.signUp(email: email, password: password);
+      final response =
+          await _supabase.auth.signUp(email: email, password: password);
+      if (response.session != null) {
+        await _onBeforeIdentityChange?.call();
+      }
     } catch (e) {
       rethrow;
     }
@@ -123,10 +131,13 @@ class AuthProvider extends ChangeNotifier {
       provider: OAuthProvider.google,
       idToken: idToken,
     );
+    await _onBeforeIdentityChange?.call();
   }
 
   // 🔥 SIGN OUT
   Future<void> signOut() async {
+    await _onBeforeIdentityChange?.call();
+
     // Google Sign-In oturumunu da kapat
     try {
       await _ensureGoogleInitialized();
@@ -143,6 +154,7 @@ class AuthProvider extends ChangeNotifier {
 
   // 🔥 GUEST MODE
   Future<void> continueAsGuest() async {
+    await _onBeforeIdentityChange?.call();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isGuest', true);
     _isGuest = true;

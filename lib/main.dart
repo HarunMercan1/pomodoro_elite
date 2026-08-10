@@ -88,6 +88,10 @@ void main() async {
             create: (context) => AuthProvider(
               guestStatsMigrationService:
                   context.read<GuestStatsMigrationService>(),
+              onBeforeIdentityChange: () =>
+                  context.read<TimerProvider>().clearForIdentityChange(
+                        workTime: context.read<SettingsProvider>().workTime,
+                      ),
             ),
           ),
           ChangeNotifierProvider(create: (_) => PurchaseProvider()),
@@ -133,7 +137,7 @@ class MyApp extends StatelessWidget {
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
       locale: context.locale,
-      title: 'Pomodoro Elite',
+      onGenerateTitle: (_) => '${'app_name'.tr()} ${'app_subtitle'.tr()}',
       themeMode: settings.isDarkMode ? ThemeMode.dark : ThemeMode.light,
       theme: ThemeData(
         brightness: Brightness.light,

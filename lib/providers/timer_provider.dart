@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import '../services/countdown_engine.dart';
 import '../services/timer_audio_gateway.dart';
+import '../services/timer_session_store.dart';
 import '../utils/notification_service.dart';
 import 'settings_provider.dart';
 import 'stats_provider.dart';
@@ -17,13 +18,17 @@ typedef PeriodicTimerFactory = Timer Function(
   void Function(Timer timer) callback,
 );
 typedef TimerTextResolver = String Function(String key);
+typedef SessionRecorder = Future<void> Function(
+  String sessionId,
+  int minutes,
+);
 
 class TimerRunConfiguration {
   final String notificationSound;
   final bool isBackgroundMusicEnabled;
   final double backgroundVolume;
   final Future<String?> Function()? resolveMusicFilePath;
-  final Future<void> Function(int minutes) recordSession;
+  final SessionRecorder recordSession;
 
   const TimerRunConfiguration({
     required this.notificationSound,
@@ -40,6 +45,7 @@ class TimerProvider with ChangeNotifier, WidgetsBindingObserver {
   final CountdownEngine _countdown;
   final TimerNotificationGateway _notifications;
   final TimerAudioGateway _audio;
+  final TimerSessionStore _sessionStore;
   final PeriodicTimerFactory _periodicTimerFactory;
   final TimerTextResolver _resolveText;
   final bool _observeLifecycle;
@@ -56,11 +62,15 @@ class TimerProvider with ChangeNotifier, WidgetsBindingObserver {
   bool _isDisposed = false;
   int _notificationGeneration = 0;
   int _completedRounds = 0;
+  String? _activeSessionId;
+  Future<bool>? _restoreFuture;
+  Future<void>? _recordingCompletion;
 
   TimerProvider({
     CountdownEngine? countdown,
     TimerNotificationGateway? notifications,
     TimerAudioGateway? audio,
+    TimerSessionStore? sessionStore,
     PeriodicTimerFactory? periodicTimerFactory,
     TimerTextResolver? textResolver,
     bool observeLifecycle = true,
@@ -68,6 +78,7 @@ class TimerProvider with ChangeNotifier, WidgetsBindingObserver {
             countdown ?? CountdownEngine(initialSeconds: defaultWorkTime * 60),
         _notifications = notifications ?? NotificationService(),
         _audio = audio ?? AudioPlayersTimerAudioGateway(),
+        _sessionStore = sessionStore ?? SharedPreferencesTimerSessionStore(),
         _periodicTimerFactory = periodicTimerFactory ?? Timer.periodic,
         _resolveText = textResolver ?? ((key) => key.tr()),
         _observeLifecycle = observeLifecycle {
@@ -132,6 +143,11 @@ class TimerProvider with ChangeNotifier, WidgetsBindingObserver {
   TimerMode get currentMode => _currentMode;
   bool get isAlarmPlaying => _isAlarmPlaying;
   int get completedRounds => _completedRounds;
+  bool get hasActiveProgress =>
+      _countdown.isRunning ||
+      (!_isAlarmPlaying &&
+          _countdown.remainingSeconds > 0 &&
+          _countdown.remainingSeconds < _selectedTimeInMinutes * 60);
 
   double get progress {
     if (_selectedTimeInMinutes == 0) return 0;
@@ -154,27 +170,97 @@ class TimerProvider with ChangeNotifier, WidgetsBindingObserver {
     _currentMotivation = _quotes[Random().nextInt(_quotes.length)];
   }
 
-  void startTimer(SettingsProvider settings, StatsProvider stats) {
-    startCountdown(
-      TimerRunConfiguration(
-        notificationSound: settings.notificationSound,
-        isBackgroundMusicEnabled: settings.isBackgroundMusicEnabled,
-        backgroundVolume: settings.backgroundVolume,
-        resolveMusicFilePath: () {
-          return settings.getMusicFilePath(settings.backgroundMusic);
-        },
-        recordSession: stats.addSession,
+  Future<void> startTimer(SettingsProvider settings, StatsProvider stats) {
+    return startCountdown(_configurationFor(settings, stats));
+  }
+
+  TimerRunConfiguration _configurationFor(
+    SettingsProvider settings,
+    StatsProvider stats,
+  ) {
+    return TimerRunConfiguration(
+      notificationSound: settings.notificationSound,
+      isBackgroundMusicEnabled: settings.isBackgroundMusicEnabled,
+      backgroundVolume: settings.backgroundVolume,
+      resolveMusicFilePath: () {
+        return settings.getMusicFilePath(settings.backgroundMusic);
+      },
+      recordSession: (sessionId, minutes) => stats.addSession(
+        minutes,
+        sessionId: sessionId,
       ),
     );
   }
 
-  void startCountdown(TimerRunConfiguration configuration) {
+  Future<bool> restoreSession(
+    SettingsProvider settings,
+    StatsProvider stats,
+  ) {
+    return restoreCountdown(_configurationFor(settings, stats));
+  }
+
+  Future<bool> restoreCountdown(TimerRunConfiguration configuration) {
+    return _restoreFuture ??= _restoreCountdown(configuration);
+  }
+
+  Future<bool> _restoreCountdown(TimerRunConfiguration configuration) async {
+    final persisted = await _sessionStore.load();
+    if (persisted == null) return false;
+
+    TimerMode? mode;
+    for (final candidate in TimerMode.values) {
+      if (candidate.name == persisted.mode) {
+        mode = candidate;
+        break;
+      }
+    }
+    final isValid = mode != null &&
+        persisted.durationMinutes > 0 &&
+        persisted.remainingSeconds >= 0 &&
+        (!persisted.isRunning || persisted.deadlineUtc != null);
+    if (!isValid) {
+      await _sessionStore.clear(expectedSessionId: persisted.id);
+      return false;
+    }
+
+    _activeRunConfiguration = configuration;
+    _activeSessionId = persisted.id;
+    _selectedTimeInMinutes = persisted.durationMinutes;
+    _currentMode = mode;
+    _completionHandled = false;
+    _isAlarmPlaying = false;
+    _currentMotivation = 'start_message';
+
+    if (persisted.isRunning) {
+      _countdown.restore(
+        remainingSeconds: max(1, persisted.remainingSeconds),
+        deadline: persisted.deadlineUtc!.toLocal(),
+      );
+      _cancelScheduledNotification();
+      final update = _countdown.update();
+      if (update == CountdownUpdate.completed) {
+        _completeTimer(completedInBackground: true);
+        await _recordingCompletion;
+      } else {
+        _startPeriodicTimer();
+        _startBackgroundMusic(configuration);
+        _notifyListeners();
+      }
+    } else {
+      _countdown.restore(remainingSeconds: persisted.remainingSeconds);
+      _notifyListeners();
+    }
+
+    return true;
+  }
+
+  Future<void> startCountdown(TimerRunConfiguration configuration) async {
     if (_countdown.isRunning) return;
 
     if (_isAlarmPlaying) {
       _runSafely(_audio.stopAlarm(), 'Alarm stop');
       _isAlarmPlaying = false;
-      resetTimer();
+      await resetTimer();
       return;
     }
 
@@ -182,6 +268,8 @@ class TimerProvider with ChangeNotifier, WidgetsBindingObserver {
     _completionHandled = false;
     if (!_countdown.start()) return;
 
+    _activeSessionId ??= _newSessionId();
+    await _persistActiveSession();
     _changeQuote();
     _startPeriodicTimer();
     _startBackgroundMusic(configuration);
@@ -223,11 +311,21 @@ class TimerProvider with ChangeNotifier, WidgetsBindingObserver {
     if (_currentMode == TimerMode.work) {
       _completedRounds++;
       final configuration = _activeRunConfiguration;
-      if (_selectedTimeInMinutes > 0 && configuration != null) {
-        _runSafely(
-          configuration.recordSession(_selectedTimeInMinutes),
-          'Session record',
+      final sessionId = _activeSessionId;
+      if (_selectedTimeInMinutes > 0 &&
+          configuration != null &&
+          sessionId != null) {
+        _recordingCompletion = _recordCompletedWork(
+          configuration,
+          sessionId,
         );
+      }
+    } else {
+      final sessionId = _activeSessionId;
+      _activeSessionId = null;
+      if (sessionId != null) {
+        _recordingCompletion =
+            _sessionStore.clear(expectedSessionId: sessionId);
       }
     }
 
@@ -240,6 +338,39 @@ class TimerProvider with ChangeNotifier, WidgetsBindingObserver {
     }
 
     _notifyListeners();
+  }
+
+  Future<void> _recordCompletedWork(
+    TimerRunConfiguration configuration,
+    String sessionId,
+  ) async {
+    try {
+      await configuration.recordSession(sessionId, _selectedTimeInMinutes);
+      await _sessionStore.clear(expectedSessionId: sessionId);
+      if (_activeSessionId == sessionId) _activeSessionId = null;
+    } catch (error, stackTrace) {
+      debugPrint('Session record error: $error\n$stackTrace');
+    }
+  }
+
+  Future<void> _persistActiveSession() async {
+    final sessionId = _activeSessionId;
+    if (sessionId == null) return;
+    await _sessionStore.save(
+      PersistedTimerSession(
+        id: sessionId,
+        mode: _currentMode.name,
+        durationMinutes: _selectedTimeInMinutes,
+        remainingSeconds: _countdown.remainingSeconds,
+        isRunning: _countdown.isRunning,
+        deadlineUtc: _countdown.deadline?.toUtc(),
+      ),
+    );
+  }
+
+  String _newSessionId() {
+    return '${DateTime.now().microsecondsSinceEpoch}-'
+        '${Random.secure().nextInt(1 << 32).toRadixString(16)}';
   }
 
   Future<void> _playAlarm(String soundFile) async {
@@ -302,28 +433,30 @@ class TimerProvider with ChangeNotifier, WidgetsBindingObserver {
     unawaited(_notifications.cancelScheduledNotification());
   }
 
-  void stopAlarm({
+  Future<void> stopAlarm({
     required int workTime,
     required int shortBreakTime,
     required int longBreakTime,
-  }) {
+  }) async {
+    await _recordingCompletion;
     _runSafely(_audio.stopAlarm(), 'Alarm stop');
     _runSafely(_audio.stopMusic(), 'Music stop');
     _isAlarmPlaying = false;
 
     if (_currentMode == TimerMode.work) {
       if (_completedRounds % 4 == 0 && _completedRounds != 0) {
-        setTime(longBreakTime, TimerMode.longBreak);
+        await setTime(longBreakTime, TimerMode.longBreak);
       } else {
-        setTime(shortBreakTime, TimerMode.shortBreak);
+        await setTime(shortBreakTime, TimerMode.shortBreak);
       }
     } else {
-      setTime(workTime, TimerMode.work);
+      await setTime(workTime, TimerMode.work);
     }
   }
 
-  void stopTimer({bool reset = true}) {
+  Future<void> stopTimer({bool reset = true}) async {
     _stopActivePlayback();
+    await _persistActiveSession();
     _notifyListeners();
   }
 
@@ -337,16 +470,44 @@ class TimerProvider with ChangeNotifier, WidgetsBindingObserver {
     _isAlarmPlaying = false;
   }
 
-  void resetTimer() {
+  Future<void> resetTimer() async {
+    await _recordingCompletion;
     _stopActivePlayback();
     _countdown.reset(_selectedTimeInMinutes * 60);
     _currentMotivation = 'ready';
     _isAlarmPlaying = false;
     _completionHandled = false;
+    final sessionId = _activeSessionId;
+    _activeSessionId = null;
+    if (sessionId != null) {
+      await _sessionStore.clear(expectedSessionId: sessionId);
+    }
     _notifyListeners();
   }
 
-  void setTime(int minutes, TimerMode mode) {
+  /// Discards the current timer when the effective app identity changes.
+  /// A timer must never continue from a signed-in account into guest mode or
+  /// another account, and an old persisted session must not be restored later.
+  Future<void> clearForIdentityChange({required int workTime}) async {
+    await _restoreFuture;
+    await _recordingCompletion;
+    _stopActivePlayback();
+    _selectedTimeInMinutes = workTime;
+    _countdown.reset(workTime * 60);
+    _currentMode = TimerMode.work;
+    _currentMotivation = 'ready';
+    _isAlarmPlaying = false;
+    _completionHandled = false;
+    _completedRounds = 0;
+    _activeRunConfiguration = null;
+    final sessionId = _activeSessionId;
+    _activeSessionId = null;
+    await _sessionStore.clear(expectedSessionId: sessionId);
+    _notifyListeners();
+  }
+
+  Future<void> setTime(int minutes, TimerMode mode) async {
+    await _recordingCompletion;
     _stopActivePlayback();
     _selectedTimeInMinutes = minutes;
     _countdown.reset(minutes * 60);
@@ -354,6 +515,11 @@ class TimerProvider with ChangeNotifier, WidgetsBindingObserver {
     _changeQuote();
     _isAlarmPlaying = false;
     _completionHandled = false;
+    final sessionId = _activeSessionId;
+    _activeSessionId = null;
+    if (sessionId != null) {
+      await _sessionStore.clear(expectedSessionId: sessionId);
+    }
     _notifyListeners();
   }
 
@@ -363,6 +529,11 @@ class TimerProvider with ChangeNotifier, WidgetsBindingObserver {
       _selectedTimeInMinutes = newMinutes;
       _countdown.reset(newMinutes * 60);
       _completionHandled = false;
+      final sessionId = _activeSessionId;
+      _activeSessionId = null;
+      if (sessionId != null) {
+        unawaited(_sessionStore.clear(expectedSessionId: sessionId));
+      }
       _notifyListeners();
     }
   }

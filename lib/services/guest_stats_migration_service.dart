@@ -52,9 +52,13 @@ class GuestStatsMigrationService {
   final Future<SharedPreferences> Function() _preferencesFactory;
   Future<void> _operationTail = Future<void>.value();
 
-  Future<bool> hasPendingBatches() => _locked(() async {
+  Future<bool> hasPendingBatches({String? userId}) => _locked(() async {
         final prefs = await _preferencesFactory();
-        return _readQueue(prefs).isNotEmpty;
+        final queue = _readQueue(prefs);
+        if (userId == null) return queue.isNotEmpty;
+        return queue.any(
+          (batch) => batch.targetUserId == null || batch.targetUserId == userId,
+        );
       });
 
   Future<void> clearPendingBatches() => _locked(() async {
@@ -65,7 +69,7 @@ class GuestStatsMigrationService {
   Future<void> prepareGuestSnapshot() => _locked(() async {
         final prefs = await _preferencesFactory();
         final queue = _readQueue(prefs);
-        if (queue.isNotEmpty) return;
+        if (queue.any((batch) => batch.targetUserId == null)) return;
 
         final minutesByDate = _readIntMap(prefs.getString('daily_stats'));
         final sessionsByDate =
@@ -92,28 +96,33 @@ class GuestStatsMigrationService {
         await _writeQueue(prefs, queue);
       });
 
-  Future<void> enqueueSessionDelta({
+  Future<bool> enqueueSessionDelta({
     required int minutes,
     required String dateKey,
     required int currentStreak,
+    String? batchId,
+    String? targetUserId,
   }) =>
       _locked(() async {
         final prefs = await _preferencesFactory();
         final queue = _readQueue(prefs);
-        if (queue.isEmpty) return;
+        final id = batchId ?? _newBatchId();
+        if (queue.any((batch) => batch.id == id)) return false;
 
         queue.add(
           GuestStatsMigrationBatch(
-            id: _newBatchId(),
+            id: id,
             totalSessions: 1,
             totalMinutes: minutes,
             currentStreak: currentStreak,
             dailyStats: [
               {'date_key': dateKey, 'minutes': minutes, 'sessions': 1},
             ],
+            targetUserId: targetUserId,
           ),
         );
         await _writeQueue(prefs, queue);
+        return true;
       });
 
   /// Tüm batch'leri sırayla uygular. Her başarılı batch anında kuyruktan
@@ -122,17 +131,18 @@ class GuestStatsMigrationService {
         final prefs = await _preferencesFactory();
         var queue = _readQueue(prefs);
 
-        while (queue.isNotEmpty) {
-          var batch = queue.first;
-          if (batch.targetUserId != null && batch.targetUserId != userId) {
-            throw StateError(
-              'Pending guest data belongs to a different account.',
-            );
-          }
+        while (true) {
+          final batchIndex = queue.indexWhere(
+            (candidate) =>
+                candidate.targetUserId == null ||
+                candidate.targetUserId == userId,
+          );
+          if (batchIndex == -1) return;
+          var batch = queue[batchIndex];
 
           if (batch.targetUserId == null) {
             batch = batch.copyWith(targetUserId: userId);
-            queue[0] = batch;
+            queue[batchIndex] = batch;
             await _writeQueue(prefs, queue);
           }
 

@@ -286,7 +286,9 @@ class _SettingsScreenState extends State<SettingsScreen>
           ),
         ),
         content: Text(
-          'log_out_confirm'.tr(),
+          auth.isGuest
+              ? 'exit_guest_mode_confirm'.tr()
+              : 'log_out_confirm'.tr(),
           style: AppFonts.poppins(
             context: dialogContext,
             color: itemColor.withValues(alpha: 0.72),
@@ -309,7 +311,9 @@ class _SettingsScreenState extends State<SettingsScreen>
               foregroundColor: Colors.white,
             ),
             onPressed: () => Navigator.pop(dialogContext, true),
-            child: Text('log_out'.tr()),
+            child: Text(
+              auth.isGuest ? 'exit_guest_mode'.tr() : 'log_out'.tr(),
+            ),
           ),
         ],
       ),

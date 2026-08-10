@@ -38,6 +38,17 @@ class CountdownEngine {
     return true;
   }
 
+  void restore({
+    required int remainingSeconds,
+    DateTime? deadline,
+  }) {
+    assert(remainingSeconds >= 0);
+    _remainingSeconds = remainingSeconds;
+    _deadline = deadline;
+    _isRunning = deadline != null && remainingSeconds > 0;
+    _completionReported = false;
+  }
+
   CountdownUpdate update() {
     if (!_isRunning || _deadline == null) {
       return CountdownUpdate.unchanged;

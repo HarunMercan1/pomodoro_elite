@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../services/play_store_ownership_gateway.dart';
 import '../services/revenuecat_gateway.dart';
 
 enum PurchaseOutcome {
@@ -13,15 +12,16 @@ enum PurchaseOutcome {
   restored,
   cancelled,
   pending,
+  notFound,
   alreadyOwnedButInactive,
   ownedByAnotherAppAccount,
+  authenticationRequired,
   storeUnavailable,
   failed,
 }
 
 class PurchaseProvider extends ChangeNotifier {
   final RevenueCatGateway _revenueCat;
-  final PlayStoreOwnershipGateway _playStoreOwnership;
 
   late final Future<void> _initialization;
   late final StreamSubscription<String?> _authSubscription;
@@ -35,7 +35,6 @@ class PurchaseProvider extends ChangeNotifier {
   int _pendingIdentitySyncCount = 0;
   bool _isPurchaseInProgress = false;
   bool _hasRevenueCatPremium = false;
-  bool _hasPlayStorePremium = false;
   bool _isPremium = false;
   bool _isDisposed = false;
   String? _lastError;
@@ -54,13 +53,10 @@ class PurchaseProvider extends ChangeNotifier {
 
   PurchaseProvider({
     RevenueCatGateway? revenueCat,
-    PlayStoreOwnershipGateway? playStoreOwnership,
     SupabaseClient? supabaseClient,
     Stream<String?>? userIdChanges,
     String? Function()? currentUserId,
-  })  : _revenueCat = revenueCat ?? PurchasesRevenueCatGateway(),
-        _playStoreOwnership =
-            playStoreOwnership ?? MethodChannelPlayStoreOwnershipGateway() {
+  }) : _revenueCat = revenueCat ?? PurchasesRevenueCatGateway() {
     final needsSupabase = userIdChanges == null || currentUserId == null;
     final auth = needsSupabase
         ? (supabaseClient ?? Supabase.instance.client).auth
@@ -93,7 +89,6 @@ class PurchaseProvider extends ChangeNotifier {
 
       await _synchronizeLatestIdentity();
       await _refreshCustomerState();
-      await _refreshPlayStoreOwnership();
       await _fetchOfferingsInternal();
     } catch (error, stackTrace) {
       _lastError = 'RevenueCat initialization error: $error';
@@ -171,26 +166,20 @@ class PurchaseProvider extends ChangeNotifier {
   }
 
   void _applyCustomerState(RevenueCatCustomerState customerState) {
-    _hasRevenueCatPremium = customerState.isPremium;
+    // Store ownership belongs to the signed-in Pomodoro Elite account, not to
+    // every profile that happens to use the same phone or Play Store account.
+    // Anonymous RevenueCat customers must therefore never unlock Premium.
+    final hasStableAuthenticatedIdentity =
+        _desiredUserId != null && _desiredUserId == _syncedUserId;
+    _hasRevenueCatPremium =
+        hasStableAuthenticatedIdentity && customerState.isPremium;
     _recomputePremiumStatus();
   }
 
-  Future<bool> _refreshPlayStoreOwnership() async {
-    try {
-      _hasPlayStorePremium =
-          await _playStoreOwnership.hasActivePremiumPurchase();
-      _recomputePremiumStatus();
-      return _hasPlayStorePremium;
-    } catch (error, stackTrace) {
-      // RevenueCat remains the primary source of truth. A temporary Play
-      // connection failure must not revoke access that was already resolved.
-      debugPrint('Google Play ownership query error: $error\n$stackTrace');
-      return _hasPlayStorePremium;
-    }
-  }
-
   void _recomputePremiumStatus() {
-    final nextValue = _hasRevenueCatPremium || _hasPlayStorePremium;
+    final nextValue = _desiredUserId != null &&
+        _desiredUserId == _syncedUserId &&
+        _hasRevenueCatPremium;
     if (_isPremium == nextValue) return;
     _isPremium = nextValue;
     _notifyListeners();
@@ -214,6 +203,9 @@ class PurchaseProvider extends ChangeNotifier {
 
   Future<PurchaseOutcome> purchasePackage(Package package) async {
     await _initialization;
+    if (_desiredUserId == null || _desiredUserId != _syncedUserId) {
+      return PurchaseOutcome.authenticationRequired;
+    }
     if (!_isConfigured || _isDisposed || _isPurchaseInProgress) {
       return PurchaseOutcome.failed;
     }
@@ -281,9 +273,6 @@ class PurchaseProvider extends ChangeNotifier {
       }
 
       _applyCustomerState(customerState);
-      if (!customerState.isPremium) {
-        await _refreshPlayStoreOwnership();
-      }
       _lastError = null;
       return _isPremium
           ? PurchaseOutcome.restored
@@ -302,13 +291,18 @@ class PurchaseProvider extends ChangeNotifier {
 
       _lastError = 'RevenueCat already-owned recovery error: $error';
       debugPrint('$_lastError\n$stackTrace');
-      return PurchaseOutcome.alreadyOwnedButInactive;
+      return PurchaseOutcome.failed;
     }
   }
 
-  Future<bool> restorePurchases() async {
+  Future<PurchaseOutcome> restorePurchases() async {
     await _initialization;
-    if (!_isConfigured || _isDisposed || _isPurchaseInProgress) return false;
+    if (_desiredUserId == null || _desiredUserId != _syncedUserId) {
+      return PurchaseOutcome.authenticationRequired;
+    }
+    if (!_isConfigured || _isDisposed || _isPurchaseInProgress) {
+      return PurchaseOutcome.failed;
+    }
 
     _isPurchaseInProgress = true;
     _notifyListeners();
@@ -321,22 +315,37 @@ class PurchaseProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> _restorePurchasesInternal() async {
+  Future<PurchaseOutcome> _restorePurchasesInternal() async {
     try {
       var customerState = await _revenueCat.restorePurchases();
       if (!customerState.isPremium) {
         customerState = await _revenueCat.resyncPurchases();
       }
       _applyCustomerState(customerState);
-      if (!customerState.isPremium) {
-        await _refreshPlayStoreOwnership();
-      }
       _lastError = null;
-      return _isPremium;
+      return _isPremium ? PurchaseOutcome.restored : PurchaseOutcome.notFound;
     } catch (error, stackTrace) {
+      if (error is PlatformException) {
+        final errorCode = PurchasesErrorHelper.getErrorCode(error);
+        if (errorCode == PurchasesErrorCode.receiptAlreadyInUseError ||
+            errorCode ==
+                PurchasesErrorCode.receiptInUseByOtherSubscriberError) {
+          _lastError = 'RevenueCat receipt belongs to another app account.';
+          debugPrint('$_lastError\n$stackTrace');
+          return PurchaseOutcome.ownedByAnotherAppAccount;
+        }
+        if (errorCode == PurchasesErrorCode.networkError ||
+            errorCode == PurchasesErrorCode.offlineConnectionError ||
+            errorCode == PurchasesErrorCode.storeProblemError) {
+          _lastError = 'RevenueCat store connection error: $error';
+          debugPrint('$_lastError\n$stackTrace');
+          return PurchaseOutcome.storeUnavailable;
+        }
+      }
+
       _lastError = 'RevenueCat restore error: $error';
       debugPrint('$_lastError\n$stackTrace');
-      return false;
+      return PurchaseOutcome.failed;
     }
   }
 

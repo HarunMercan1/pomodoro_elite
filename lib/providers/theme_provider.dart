@@ -1078,20 +1078,6 @@ class ThemeProvider with ChangeNotifier {
     return remaining.isNegative ? Duration.zero : remaining;
   }
 
-  /// 🔥 Kalan süreyi okunabilir formatta döndür
-  String getRemainingTimeFormattedForTheme(String themeId) {
-    final remaining = getRemainingTimeForTheme(themeId);
-    if (remaining == Duration.zero) return '';
-
-    final hours = remaining.inHours;
-    final minutes = remaining.inMinutes % 60;
-
-    if (hours > 0) {
-      return '${hours}s ${minutes}dk';
-    }
-    return '${minutes}dk';
-  }
-
   Future<void> _loadThemeData() async {
     _prefs = await SharedPreferences.getInstance();
 

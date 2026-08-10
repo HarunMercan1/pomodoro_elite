@@ -4,14 +4,12 @@ import 'package:flutter/material.dart';
 ///
 /// Settings pages can contain native ad views. On a few Android renderers a
 /// cached route snapshot can remain visible after the route has been popped,
-/// even though the home screen underneath is already receiving taps. A jump
-/// cut keeps navigation deterministic and guarantees that the visible frame is
-/// produced by the active route.
+/// even though the home screen underneath is already receiving taps. Disabling
+/// snapshotting keeps the surface live while MaterialPageRoute preserves the
+/// platform's natural enter and exit animations.
 Route<T> livePageRoute<T>({required WidgetBuilder builder}) {
-  return PageRouteBuilder<T>(
+  return MaterialPageRoute<T>(
     allowSnapshotting: false,
-    transitionDuration: Duration.zero,
-    reverseTransitionDuration: Duration.zero,
-    pageBuilder: (context, _, __) => builder(context),
+    builder: builder,
   );
 }

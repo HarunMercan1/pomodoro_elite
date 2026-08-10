@@ -43,25 +43,26 @@ class TimeOptionButton extends StatelessWidget {
     if (isLightMode) {
       // --- AYDINLIK MOD (Boşta) ---
       backgroundColor = isSelected ? darkNavy : Colors.transparent;
-      textColor = isSelected ? Colors.white : darkNavy.withOpacity(0.8);
-      borderColor = isSelected ? Colors.transparent : darkNavy.withOpacity(0.2);
+      textColor = isSelected ? Colors.white : darkNavy.withValues(alpha: 0.8);
+      borderColor =
+          isSelected ? Colors.transparent : darkNavy.withValues(alpha: 0.2);
     } else {
       // --- GRADYANLI MODLAR (Çalışıyor/Durdu/Bitti) ---
       // Seçiliyse dışarıdan gelen rengi kullan (Yoksa beyaz yap)
       backgroundColor = isSelected
           ? (activeBackgroundColor ?? Colors.white)
-          : (inactiveTextColor?.withOpacity(0.1) ??
-              Colors.white.withOpacity(0.15));
+          : (inactiveTextColor?.withValues(alpha: 0.1) ??
+              Colors.white.withValues(alpha: 0.15));
 
       // Yazı rengi de dışarıdan geliyor
       textColor = isSelected
           ? (activeTextColor ?? darkNavy)
-          : (inactiveTextColor ?? Colors.white.withOpacity(0.9));
+          : (inactiveTextColor ?? Colors.white.withValues(alpha: 0.9));
 
       borderColor = isSelected
           ? Colors.transparent
-          : (inactiveTextColor?.withOpacity(0.3) ??
-              Colors.white.withOpacity(0.2));
+          : (inactiveTextColor?.withValues(alpha: 0.3) ??
+              Colors.white.withValues(alpha: 0.2));
     }
 
     return GestureDetector(
@@ -80,7 +81,7 @@ class TimeOptionButton extends StatelessWidget {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   )
@@ -107,7 +108,7 @@ class TimeOptionButton extends StatelessWidget {
                 style: AppFonts.poppins(
                   context: context,
                   fontSize: subTitleFontSize ?? 10,
-                  color: textColor.withOpacity(0.8), // Opacity artırıldı
+                  color: textColor.withValues(alpha: 0.8),
                 ),
               ),
             ],

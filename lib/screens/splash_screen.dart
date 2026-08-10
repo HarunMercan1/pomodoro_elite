@@ -120,7 +120,7 @@ class _SplashScreenState extends State<SplashScreen>
     final bgColor = isDark ? const Color(0xFF121212) : const Color(0xFFF5F5F7);
     final primaryColor = Theme.of(context).primaryColor;
     final textColor =
-        isDark ? Colors.white.withOpacity(0.9) : const Color(0xFF2D3142);
+        isDark ? Colors.white.withValues(alpha: 0.9) : const Color(0xFF2D3142);
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -178,7 +178,7 @@ class _SplashScreenState extends State<SplashScreen>
                     context: context,
                     fontSize: 12,
                     fontWeight: FontWeight.w400,
-                    color: textColor.withOpacity(0.5),
+                    color: textColor.withValues(alpha: 0.5),
                     letterSpacing: 1.5,
                   ),
                 ),
@@ -191,7 +191,7 @@ class _SplashScreenState extends State<SplashScreen>
                   height: 30,
                   child: CircularProgressIndicator(
                     strokeWidth: 2.5,
-                    color: primaryColor.withOpacity(0.6),
+                    color: primaryColor.withValues(alpha: 0.6),
                   ),
                 ),
               ],

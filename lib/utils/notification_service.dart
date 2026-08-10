@@ -53,7 +53,7 @@ class NotificationService implements TimerNotificationGateway {
 
     final androidDetails = AndroidNotificationDetails(
       'pomodoro_elite_timer_channel',
-      'Pomodoro Elite',
+      '${'app_name'.tr()} ${'app_subtitle'.tr()}',
       channelDescription: 'notification_channel_description'.tr(),
       importance: Importance.max,
       priority: Priority.high,

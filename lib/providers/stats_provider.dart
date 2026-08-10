@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -6,6 +7,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../services/guest_stats_migration_service.dart';
 
 class StatsProvider with ChangeNotifier {
+  static const _localStateKey = 'stats_state_v2';
+
   StatsProvider({
     SupabaseClient? supabaseClient,
     GuestStatsMigrationService? guestStatsMigrationService,
@@ -28,9 +31,11 @@ class StatsProvider with ChangeNotifier {
   final SupabaseClient _supabase;
   final GuestStatsMigrationService _guestStatsMigrationService;
   Future<void> _loadTail = Future<void>.value();
+  Future<void> _mutationTail = Future<void>.value();
 
   Map<String, int> _dailyStats = {};
   Map<String, int> _dailySessionCounts = {};
+  Set<String> _recordedSessionIds = {};
 
   int _totalSessions = 0;
   int _totalMinutes = 0;
@@ -88,7 +93,9 @@ class StatsProvider with ChangeNotifier {
 
     if (user != null) {
       try {
-        if (await _guestStatsMigrationService.hasPendingBatches()) {
+        if (await _guestStatsMigrationService.hasPendingBatches(
+          userId: user.id,
+        )) {
           await _guestStatsMigrationService.migratePending(user.id);
         }
         await _fetchFromSupabase(user.id);
@@ -110,6 +117,24 @@ class StatsProvider with ChangeNotifier {
   }
 
   void _loadFromLocal() {
+    final stateString = _prefs.getString(_localStateKey);
+    if (stateString != null) {
+      try {
+        final state = Map<String, dynamic>.from(jsonDecode(stateString) as Map);
+        _dailyStats = _decodeIntMap(state['daily_stats']);
+        _dailySessionCounts = _decodeIntMap(state['daily_session_counts']);
+        _totalSessions = (state['total_sessions'] as num?)?.toInt() ?? 0;
+        _totalMinutes = (state['total_minutes'] as num?)?.toInt() ?? 0;
+        _recordedSessionIds = (state['recorded_session_ids'] as List<dynamic>?)
+                ?.whereType<String>()
+                .toSet() ??
+            {};
+        return;
+      } catch (_) {
+        // Fall back to the legacy preference keys.
+      }
+    }
+
     String? statsString = _prefs.getString('daily_stats');
     if (statsString != null) {
       Map<String, dynamic> decoded = jsonDecode(statsString);
@@ -129,6 +154,38 @@ class StatsProvider with ChangeNotifier {
 
     _totalSessions = _prefs.getInt('total_sessions') ?? 0;
     _totalMinutes = _prefs.getInt('total_minutes') ?? 0;
+    _recordedSessionIds = {};
+  }
+
+  Map<String, int> _decodeIntMap(dynamic value) {
+    if (value is! Map) return {};
+    return Map<String, dynamic>.from(value).map(
+      (key, item) => MapEntry(key, (item as num).toInt()),
+    );
+  }
+
+  Future<void> _persistLocalState() async {
+    await _prefs.setString(
+      _localStateKey,
+      jsonEncode({
+        'daily_stats': _dailyStats,
+        'daily_session_counts': _dailySessionCounts,
+        'total_minutes': _totalMinutes,
+        'total_sessions': _totalSessions,
+        'recorded_session_ids': _recordedSessionIds.toList()..sort(),
+      }),
+    );
+
+    // Keep the legacy keys current for one release to preserve rollback safety.
+    await Future.wait([
+      _prefs.setString('daily_stats', jsonEncode(_dailyStats)),
+      _prefs.setString(
+        'daily_session_counts',
+        jsonEncode(_dailySessionCounts),
+      ),
+      _prefs.setInt('total_minutes', _totalMinutes),
+      _prefs.setInt('total_sessions', _totalSessions),
+    ]);
   }
 
   Future<void> _clearLocalStatsCache() async {
@@ -137,6 +194,7 @@ class StatsProvider with ChangeNotifier {
       _prefs.remove('daily_session_counts'),
       _prefs.remove('total_minutes'),
       _prefs.remove('total_sessions'),
+      _prefs.remove(_localStateKey),
     ]);
   }
 
@@ -154,8 +212,6 @@ class StatsProvider with ChangeNotifier {
       _currentStreak = userStatsResponse['current_streak'] ?? 0;
 
       // Lokali güncelle
-      await _prefs.setInt('total_sessions', _totalSessions);
-      await _prefs.setInt('total_minutes', _totalMinutes);
     } else {
       // Supabase'de veri yoksa lokaldekini buluta gönder (İlk Senkronizasyon)
       _loadFromLocal();
@@ -179,9 +235,7 @@ class StatsProvider with ChangeNotifier {
     }
 
     // Lokali güncelle
-    await _prefs.setString('daily_stats', jsonEncode(_dailyStats));
-    await _prefs.setString(
-        'daily_session_counts', jsonEncode(_dailySessionCounts));
+    await _persistLocalState();
   }
 
   Future<void> _syncToSupabase(String userId) async {
@@ -231,10 +285,26 @@ class StatsProvider with ChangeNotifier {
     return a.year == b.year && a.month == b.month && a.day == b.day;
   }
 
-  Future<void> addSession(int minutes) async {
+  Future<void> addSession(int minutes, {String? sessionId}) {
+    final operation = _mutationTail
+        .catchError((_) {})
+        .then((_) => _addSession(minutes, sessionId: sessionId));
+    _mutationTail = operation;
+    return operation;
+  }
+
+  Future<void> _addSession(int minutes, {String? sessionId}) async {
     // Auth değişimi sırasında çalışan migration/fetch tamamlanmadan toplamları
     // değiştirme; aksi halde eski lokal snapshot bulut toplamını ezebilir.
     await _loadTail;
+    final effectiveSessionId =
+        sessionId ?? 'legacy-${DateTime.now().microsecondsSinceEpoch}';
+    if (_recordedSessionIds.contains(effectiveSessionId)) return;
+
+    final user = _supabase.auth.currentUser;
+    if (user == null) {
+      await _guestStatsMigrationService.prepareGuestSnapshot();
+    }
     final todayKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
     int currentTodayMinutes = _dailyStats[todayKey] ?? 0;
@@ -247,43 +317,30 @@ class StatsProvider with ChangeNotifier {
     _totalSessions += 1;
 
     // 1. LOKALDE KAYDET
-    await _prefs.setString('daily_stats', jsonEncode(_dailyStats));
-    await _prefs.setString(
-        'daily_session_counts', jsonEncode(_dailySessionCounts));
-    await _prefs.setInt('total_minutes', _totalMinutes);
-    await _prefs.setInt('total_sessions', _totalSessions);
-
     _calculateStreak();
 
-    final user = _supabase.auth.currentUser;
-    final hasPendingMigration =
-        await _guestStatsMigrationService.hasPendingBatches();
-
-    if (hasPendingMigration) {
-      await _guestStatsMigrationService.enqueueSessionDelta(
-        minutes: minutes,
-        dateKey: todayKey,
-        currentStreak: _currentStreak,
-      );
-
-      if (user != null) {
-        try {
-          await _guestStatsMigrationService.migratePending(user.id);
-          await _fetchFromSupabase(user.id);
-        } catch (e) {
-          debugPrint('Pending guest stats sync error: $e');
-        }
-      }
-    } else if (user != null) {
-      try {
-        await _syncToSupabase(user.id);
-      } catch (e) {
-        debugPrint("Supabase'e veri kaydetme hatası: $e");
-        // Hata olsa bile lokalde kayıtlı kalır, bir dahaki açılışta veriler kaybolmaz
-      }
-    }
-
+    await _guestStatsMigrationService.enqueueSessionDelta(
+      minutes: minutes,
+      dateKey: todayKey,
+      currentStreak: _currentStreak,
+      batchId: effectiveSessionId,
+      targetUserId: user?.id,
+    );
+    _recordedSessionIds.add(effectiveSessionId);
+    await _persistLocalState();
     notifyListeners();
+
+    if (user != null) unawaited(_syncPendingStats(user.id));
+  }
+
+  Future<void> _syncPendingStats(String userId) async {
+    try {
+      await _guestStatsMigrationService.migratePending(userId);
+      await _fetchFromSupabase(userId);
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Pending stats sync error: $e');
+    }
   }
 
   int get dailyAverageMinutes {
@@ -302,6 +359,7 @@ class StatsProvider with ChangeNotifier {
   Future<void> clearAllStats() async {
     _dailyStats.clear();
     _dailySessionCounts.clear();
+    _recordedSessionIds.clear();
     _totalMinutes = 0;
     _totalSessions = 0;
     _currentStreak = 0;

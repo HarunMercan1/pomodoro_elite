@@ -4,6 +4,24 @@ import 'package:pomodoro_elite/core/constants/revenuecat_constants.dart';
 
 void main() {
   group('RevenueCat product classification', () {
+    test('recognizes the account-scoped Premium product', () {
+      final isPremium = RevenueCatConstants.isPremiumPackage(
+        packageIdentifier: r'$rc_lifetime',
+        productIdentifier: 'premium_account_lifetime_v2',
+      );
+
+      expect(isPremium, isTrue);
+    });
+
+    test('keeps recognizing the legacy Premium product', () {
+      final isPremium = RevenueCatConstants.isPremiumPackage(
+        packageIdentifier: 'legacy_lifetime',
+        productIdentifier: 'premium_lifetime',
+      );
+
+      expect(isPremium, isTrue);
+    });
+
     test('recognizes the currently configured mega product as support', () {
       final isSupport = RevenueCatConstants.isSupportPackage(
         packageIdentifier: 'mega_star',

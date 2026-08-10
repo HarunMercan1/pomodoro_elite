@@ -5,7 +5,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 import 'package:pomodoro_elite/providers/purchase_provider.dart';
-import 'package:pomodoro_elite/services/play_store_ownership_gateway.dart';
 import 'package:pomodoro_elite/services/revenuecat_gateway.dart';
 
 void main() {
@@ -37,6 +36,21 @@ void main() {
       expect(gateway.loginCalls, isEmpty);
       expect(provider.isPremium, isTrue);
       expect(provider.isReady, isTrue);
+    });
+
+    test('never grants an anonymous RevenueCat entitlement to a guest',
+        () async {
+      final gateway = _FakeRevenueCatGateway(anonymousPremium: true);
+      final provider = PurchaseProvider(
+        revenueCat: gateway,
+        currentUserId: () => null,
+        userIdChanges: authChanges.stream,
+      );
+      addTearDown(provider.dispose);
+
+      await provider.initialized;
+
+      expect(provider.isPremium, isFalse);
     });
 
     test('waits for configure before processing an auth event', () async {
@@ -118,6 +132,36 @@ void main() {
       expect(provider.isPremium, isFalse);
     });
 
+    test('does not leak Premium from one account to guest or another account',
+        () async {
+      final gateway = _FakeRevenueCatGateway(
+        anonymousPremium: true,
+        premiumByUser: {'user-a': true, 'user-b': false},
+      );
+      final provider = PurchaseProvider(
+        revenueCat: gateway,
+        currentUserId: () => 'user-a',
+        userIdChanges: authChanges.stream,
+      );
+      addTearDown(provider.dispose);
+
+      await provider.initialized;
+      expect(provider.isPremium, isTrue);
+
+      authChanges.add(null);
+      await Future<void>.delayed(Duration.zero);
+      expect(provider.isPremium, isFalse);
+      await provider.pendingIdentitySync;
+      expect(provider.isPremium, isFalse);
+
+      authChanges.add('user-b');
+      await Future<void>.delayed(Duration.zero);
+      expect(provider.isPremium, isFalse);
+      await provider.pendingIdentitySync;
+      expect(provider.isPremium, isFalse);
+      expect(gateway.loginCalls, ['user-b']);
+    });
+
     test('leaves loading state when identity synchronization fails', () async {
       final gateway = _FakeRevenueCatGateway(
         loginErrors: {'user-a': StateError('login failed')},
@@ -165,8 +209,7 @@ void main() {
       expect(gateway.resyncCalls, 1);
     });
 
-    test('reports the stale Play ownership state without granting Premium',
-        () async {
+    test('reports store ownership without an active entitlement', () async {
       final gateway = _FakeRevenueCatGateway(
         purchaseError: PlatformException(
           code:
@@ -191,21 +234,12 @@ void main() {
       expect(gateway.resyncCalls, 1);
     });
 
-    test('grants Premium when Play verifies an active lifetime purchase',
+    test('guest cannot purchase even if the store has an owned product',
         () async {
-      final gateway = _FakeRevenueCatGateway(
-        purchaseError: PlatformException(
-          code:
-              PurchasesErrorCode.productAlreadyPurchasedError.index.toString(),
-        ),
-        restoreState: const RevenueCatCustomerState(isPremium: false),
-        resyncState: const RevenueCatCustomerState(isPremium: false),
-      );
-      final ownership = _FakePlayStoreOwnershipGateway(isPremiumOwned: true);
+      final gateway = _FakeRevenueCatGateway(anonymousPremium: true);
       final provider = PurchaseProvider(
         revenueCat: gateway,
-        playStoreOwnership: ownership,
-        currentUserId: () => 'user-a',
+        currentUserId: () => null,
         userIdChanges: authChanges.stream,
       );
       addTearDown(provider.dispose);
@@ -213,21 +247,19 @@ void main() {
       await provider.initialized;
       final outcome = await provider.purchasePackage(_TestPackage());
 
-      expect(outcome, PurchaseOutcome.restored);
-      expect(provider.isPremium, isTrue);
-      expect(ownership.queryCalls, greaterThanOrEqualTo(1));
+      expect(outcome, PurchaseOutcome.authenticationRequired);
+      expect(provider.isPremium, isFalse);
+      expect(gateway.purchaseCalls, 0);
     });
 
-    test('restore re-syncs RevenueCat then checks active Play ownership',
+    test('restore trusts only the signed-in RevenueCat account entitlement',
         () async {
       final gateway = _FakeRevenueCatGateway(
         restoreState: const RevenueCatCustomerState(isPremium: false),
         resyncState: const RevenueCatCustomerState(isPremium: false),
       );
-      final ownership = _FakePlayStoreOwnershipGateway(isPremiumOwned: true);
       final provider = PurchaseProvider(
         revenueCat: gateway,
-        playStoreOwnership: ownership,
         currentUserId: () => 'user-a',
         userIdChanges: authChanges.stream,
       );
@@ -236,10 +268,27 @@ void main() {
       await provider.initialized;
       final restored = await provider.restorePurchases();
 
-      expect(restored, isTrue);
-      expect(provider.isPremium, isTrue);
+      expect(restored, PurchaseOutcome.notFound);
+      expect(provider.isPremium, isFalse);
       expect(gateway.restoreCalls, 1);
       expect(gateway.resyncCalls, 1);
+    });
+
+    test('guest cannot restore purchases into an anonymous profile', () async {
+      final gateway = _FakeRevenueCatGateway(anonymousPremium: true);
+      final provider = PurchaseProvider(
+        revenueCat: gateway,
+        currentUserId: () => null,
+        userIdChanges: authChanges.stream,
+      );
+      addTearDown(provider.dispose);
+
+      await provider.initialized;
+      final restored = await provider.restorePurchases();
+
+      expect(restored, PurchaseOutcome.authenticationRequired);
+      expect(provider.isPremium, isFalse);
+      expect(gateway.restoreCalls, 0);
     });
 
     test('distinguishes user cancellation from a purchase failure', () async {
@@ -266,12 +315,12 @@ void main() {
 
 class _FakeRevenueCatGateway implements RevenueCatGateway {
   final Completer<void>? configureCompleter;
+  final bool anonymousPremium;
   final Map<String, bool> premiumByUser;
   final Map<String, Future<RevenueCatCustomerState>> loginResults;
   final Map<String, Completer<void>> loginStarted;
   final Map<String, Object> loginErrors;
   final Object? purchaseError;
-  final RevenueCatCustomerState? purchaseState;
   final RevenueCatCustomerState? restoreState;
   final RevenueCatCustomerState? resyncState;
 
@@ -280,25 +329,27 @@ class _FakeRevenueCatGateway implements RevenueCatGateway {
   int logoutCalls = 0;
   int restoreCalls = 0;
   int resyncCalls = 0;
+  int purchaseCalls = 0;
 
   String? _currentUserId;
   RevenueCatCustomerStateListener? _listener;
 
   _FakeRevenueCatGateway({
     this.configureCompleter,
+    this.anonymousPremium = false,
     this.premiumByUser = const {},
     this.loginResults = const {},
     this.loginStarted = const {},
     this.loginErrors = const {},
     this.purchaseError,
-    this.purchaseState,
     this.restoreState,
     this.resyncState,
   });
 
   RevenueCatCustomerState get _currentState => RevenueCatCustomerState(
-        isPremium:
-            _currentUserId != null && (premiumByUser[_currentUserId] ?? false),
+        isPremium: _currentUserId == null
+            ? anonymousPremium
+            : (premiumByUser[_currentUserId] ?? false),
       );
 
   @override
@@ -331,7 +382,7 @@ class _FakeRevenueCatGateway implements RevenueCatGateway {
   Future<RevenueCatCustomerState> logOut() async {
     logoutCalls++;
     _currentUserId = null;
-    return const RevenueCatCustomerState(isPremium: false);
+    return _currentState;
   }
 
   @override
@@ -339,9 +390,10 @@ class _FakeRevenueCatGateway implements RevenueCatGateway {
 
   @override
   Future<RevenueCatCustomerState> purchasePackage(Package package) {
+    purchaseCalls++;
     final error = purchaseError;
     if (error != null) throw error;
-    return Future.value(purchaseState ?? _currentState);
+    return Future.value(_currentState);
   }
 
   @override
@@ -370,17 +422,4 @@ class _FakeRevenueCatGateway implements RevenueCatGateway {
 class _TestPackage implements Package {
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
-}
-
-class _FakePlayStoreOwnershipGateway implements PlayStoreOwnershipGateway {
-  final bool isPremiumOwned;
-  int queryCalls = 0;
-
-  _FakePlayStoreOwnershipGateway({this.isPremiumOwned = false});
-
-  @override
-  Future<bool> hasActivePremiumPurchase() async {
-    queryCalls++;
-    return isPremiumOwned;
-  }
 }

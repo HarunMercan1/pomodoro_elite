@@ -91,8 +91,8 @@ class AppColors {
   // 7. Sıfırla Yazısı
   static Color getResetTextColor(
       bool isActive, bool isPaused, Color defaultColor) {
-    if (isPaused) return themeBronze.withOpacity(0.8);
-    if (isActive) return white.withOpacity(0.9);
+    if (isPaused) return themeBronze.withValues(alpha: 0.8);
+    if (isActive) return white.withValues(alpha: 0.9);
     return defaultColor;
   }
 }

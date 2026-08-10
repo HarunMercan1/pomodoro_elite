@@ -236,6 +236,13 @@ class _PremiumScreenState extends State<PremiumScreen> {
         await context.read<PurchaseProvider>().purchasePackage(package);
     if (!context.mounted) return;
 
+    _showPurchaseOutcome(context, outcome);
+  }
+
+  void _showPurchaseOutcome(
+    BuildContext context,
+    PurchaseOutcome outcome,
+  ) {
     final presentation = switch (outcome) {
       PurchaseOutcome.purchased => (
           'thanks_title',
@@ -261,6 +268,12 @@ class _PremiumScreenState extends State<PremiumScreen> {
           Icons.hourglass_top_rounded,
           const Color(0xFFF59E0B),
         ),
+      PurchaseOutcome.notFound => (
+          'not_found_title',
+          'restore_not_found',
+          Icons.search_off_rounded,
+          const Color(0xFFF59E0B),
+        ),
       PurchaseOutcome.alreadyOwnedButInactive => (
           'play_account_sync_title',
           'play_account_sync_desc',
@@ -271,6 +284,12 @@ class _PremiumScreenState extends State<PremiumScreen> {
           'purchase_account_conflict_title',
           'purchase_account_conflict_desc',
           Icons.manage_accounts_rounded,
+          const Color(0xFFF59E0B),
+        ),
+      PurchaseOutcome.authenticationRequired => (
+          'login_required',
+          'premium_login_required_desc',
+          Icons.login_rounded,
           const Color(0xFFF59E0B),
         ),
       PurchaseOutcome.storeUnavailable => (
@@ -297,16 +316,10 @@ class _PremiumScreenState extends State<PremiumScreen> {
   }
 
   Future<void> _restore(BuildContext context) async {
-    final success = await context.read<PurchaseProvider>().restorePurchases();
+    final outcome = await context.read<PurchaseProvider>().restorePurchases();
     if (!context.mounted) return;
 
-    _showResultDialog(
-      context,
-      title: success ? 'success_title'.tr() : 'not_found_title'.tr(),
-      message: success ? 'restore_success'.tr() : 'restore_not_found'.tr(),
-      icon: success ? Icons.restore_rounded : Icons.search_off_rounded,
-      color: success ? const Color(0xFF22C55E) : const Color(0xFFF59E0B),
-    );
+    _showPurchaseOutcome(context, outcome);
   }
 
   void _showResultDialog(
@@ -415,7 +428,6 @@ class _PremiumHero extends StatelessWidget {
     final features = <(IconData, String)>[
       (Icons.block_rounded, 'premium_feature_ads'.tr()),
       (Icons.palette_rounded, 'premium_feature_themes'.tr()),
-      (Icons.bolt_rounded, 'premium_feature_updates'.tr()),
       (Icons.favorite_rounded, 'premium_feature_support'.tr()),
     ];
 
@@ -509,30 +521,16 @@ class _PremiumHero extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 20),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              // Natural-height pills let long translations wrap instead of
-              // truncating. Two columns stay compact on phones; only extremely
-              // narrow accessibility layouts fall back to a single column.
-              final columns = constraints.maxWidth >= 240 ? 2 : 1;
-              const spacing = 9.0;
-              final itemWidth =
-                  (constraints.maxWidth - spacing * (columns - 1)) / columns;
-              return Wrap(
-                spacing: spacing,
-                runSpacing: spacing,
-                children: [
-                  for (final feature in features)
-                    SizedBox(
-                      width: itemWidth,
-                      child: _FeaturePill(
-                        icon: feature.$1,
-                        label: feature.$2,
-                      ),
-                    ),
-                ],
-              );
-            },
+          Column(
+            children: [
+              for (var index = 0; index < features.length; index++) ...[
+                _FeaturePill(
+                  icon: features[index].$1,
+                  label: features[index].$2,
+                ),
+                if (index != features.length - 1) const SizedBox(height: 9),
+              ],
+            ],
           ),
         ],
       ),
@@ -549,36 +547,42 @@ class _FeaturePill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: const BoxConstraints(minHeight: 48),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      constraints: const BoxConstraints(minHeight: 54),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.11),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        color: Colors.white.withValues(alpha: 0.095),
+        borderRadius: BorderRadius.circular(17),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
       ),
       child: Row(
         children: [
           Container(
-            width: 30,
-            height: 30,
+            width: 34,
+            height: 34,
             decoration: BoxDecoration(
-              color: const Color(0xFF38BDF8).withValues(alpha: 0.13),
-              borderRadius: BorderRadius.circular(10),
+              color: const Color(0xFF38BDF8).withValues(alpha: 0.16),
+              borderRadius: BorderRadius.circular(11),
             ),
-            child: Icon(icon, color: const Color(0xFF7DD3FC), size: 17),
+            child: Icon(icon, color: const Color(0xFF7DD3FC), size: 18),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 11),
           Expanded(
             child: Text(
               label,
               style: AppFonts.poppins(
                 context: context,
                 color: const Color(0xFFE2E8F0),
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                height: 1.25,
+                fontSize: 12.5,
+                fontWeight: FontWeight.w700,
+                height: 1.3,
               ),
             ),
+          ),
+          const SizedBox(width: 8),
+          Icon(
+            Icons.check_circle_rounded,
+            color: const Color(0xFF7DD3FC).withValues(alpha: 0.88),
+            size: 20,
           ),
         ],
       ),
@@ -632,80 +636,120 @@ class _PremiumPurchaseCard extends StatelessWidget {
       );
     }
 
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [_PremiumScreenState._diamond, _PremiumScreenState._sapphire],
-        ),
-        borderRadius: BorderRadius.circular(22),
-        boxShadow: [
-          BoxShadow(
-            color: _PremiumScreenState._diamond.withValues(alpha: 0.28),
-            blurRadius: 22,
-            offset: const Offset(0, 10),
+    return Semantics(
+      button: true,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF0EA5E9),
+              _PremiumScreenState._sapphire,
+            ],
           ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: isBusy ? null : onPurchase,
-          borderRadius: BorderRadius.circular(22),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 17),
-            child: Row(
-              children: [
-                Container(
-                  width: 46,
-                  height: 46,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.16),
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: isBusy
-                      ? const Padding(
-                          padding: EdgeInsets.all(13),
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2.5,
+          borderRadius: BorderRadius.circular(21),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.20)),
+          boxShadow: [
+            BoxShadow(
+              color: _PremiumScreenState._diamond.withValues(alpha: 0.28),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: isBusy ? null : onPurchase,
+            borderRadius: BorderRadius.circular(21),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(14, 13, 13, 13),
+              child: Row(
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.14),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.14),
+                      ),
+                    ),
+                    child: isBusy
+                        ? const Padding(
+                            padding: EdgeInsets.all(13),
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Icon(
+                            Icons.diamond_outlined,
                             color: Colors.white,
+                            size: 26,
                           ),
-                        )
-                      : const Icon(Icons.diamond_rounded,
-                          color: Colors.white, size: 27),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'get_unlimited_premium'.tr(),
-                        style: AppFonts.poppins(
-                          context: context,
-                          color: Colors.white,
-                          fontSize: 15.5,
-                          height: 1.25,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      const SizedBox(height: 3),
-                      Text(
-                        package!.storeProduct.priceString,
-                        style: AppFonts.poppins(
-                          context: context,
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                    ],
                   ),
-                ),
-                const SizedBox(width: 8),
-                const Icon(Icons.arrow_forward_rounded,
-                    color: Colors.white, size: 20),
-              ],
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'get_unlimited_premium'.tr(),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppFonts.poppins(
+                        context: context,
+                        color: Colors.white,
+                        fontSize: 15,
+                        height: 1.22,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Container(
+                    constraints: const BoxConstraints(minWidth: 88),
+                    padding: const EdgeInsets.fromLTRB(12, 10, 9, 10),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.96),
+                      borderRadius: BorderRadius.circular(15),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.10),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              package!.storeProduct.priceString,
+                              maxLines: 1,
+                              style: AppFonts.poppins(
+                                context: context,
+                                color: const Color(0xFF0F3D91),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 5),
+                        const Icon(
+                          Icons.arrow_forward_rounded,
+                          color: Color(0xFF0F3D91),
+                          size: 18,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

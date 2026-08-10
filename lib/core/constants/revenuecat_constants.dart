@@ -7,8 +7,17 @@ class RevenueCatConstants {
   // RevenueCat Entitlement ID for Premium
   static const String premiumEntitlementId = 'premium_lifetime';
 
-  // Google Play one-time product IDs.
-  static const String premiumProductId = 'premium_lifetime';
+  // New Premium purchases are consumable at the Play Store level so each
+  // signed-in app account can buy its own lifetime entitlement. The legacy
+  // non-consumable ID remains recognized for existing customers/restores.
+  static const String premiumProductId = 'premium_account_lifetime_v2';
+  static const String legacyPremiumProductId = 'premium_lifetime';
+  static const Set<String> premiumProductIds = {
+    premiumProductId,
+    legacyPremiumProductId,
+  };
+
+  // Google Play one-time support product IDs.
   static const String starSupportProductId = 'tip_star';
   static const String superStarSupportProductId = 'tip_super_star';
 
@@ -31,7 +40,7 @@ class RevenueCatConstants {
 
     return packageId == r'$rc_lifetime' ||
         packageId.contains('premium') ||
-        productId == premiumProductId ||
+        premiumProductIds.contains(productId) ||
         productId.contains('premium');
   }
 

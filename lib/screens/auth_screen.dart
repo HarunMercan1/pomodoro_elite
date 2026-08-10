@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/auth_provider.dart';
@@ -15,6 +16,7 @@ class AuthScreen extends StatefulWidget {
 class _AuthScreenState extends State<AuthScreen> {
   bool _isLoading = false;
   bool _isGuestLoading = false;
+  late final Future<PackageInfo> _packageInfo = PackageInfo.fromPlatform();
 
   bool get _isBusy => _isLoading || _isGuestLoading;
 
@@ -104,12 +106,12 @@ class _AuthScreenState extends State<AuthScreen> {
                               TextSpan(
                                 children: [
                                   TextSpan(
-                                    text: 'Pomodoro ',
+                                    text: '${'title'.tr()} ',
                                     style: TextStyle(color: primaryText),
                                   ),
-                                  const TextSpan(
-                                    text: 'Elite',
-                                    style: TextStyle(color: cyan),
+                                  TextSpan(
+                                    text: 'app_subtitle'.tr(),
+                                    style: const TextStyle(color: cyan),
                                   ),
                                 ],
                               ),
@@ -288,28 +290,37 @@ class _AuthScreenState extends State<AuthScreen> {
                               ),
                             ),
                             const SizedBox(height: 22),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 13,
-                                vertical: 7,
-                              ),
-                              decoration: BoxDecoration(
-                                color: cyan.withValues(alpha: 0.08),
-                                borderRadius: BorderRadius.circular(999),
-                                border: Border.all(
-                                  color: cyan.withValues(alpha: 0.18),
-                                ),
-                              ),
-                              child: Text(
-                                'v3.3.1',
-                                style: AppFonts.poppins(
-                                  context: context,
-                                  color: secondaryText,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600,
-                                  letterSpacing: 0.8,
-                                ),
-                              ),
+                            FutureBuilder<PackageInfo>(
+                              future: _packageInfo,
+                              builder: (context, snapshot) {
+                                final version = snapshot.data?.version;
+                                if (version == null) {
+                                  return const SizedBox(height: 28);
+                                }
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 13,
+                                    vertical: 7,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: cyan.withValues(alpha: 0.08),
+                                    borderRadius: BorderRadius.circular(999),
+                                    border: Border.all(
+                                      color: cyan.withValues(alpha: 0.18),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    version,
+                                    style: AppFonts.poppins(
+                                      context: context,
+                                      color: secondaryText,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                      letterSpacing: 0.8,
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
                           ],
                         ),

@@ -455,7 +455,8 @@ class _WeeklyCard extends StatelessWidget {
                               if (index < 0 || index >= weekStats.length) {
                                 return const SizedBox.shrink();
                               }
-                              final weekday = weekStats[index]['weekday'] as int;
+                              final weekday =
+                                  weekStats[index]['weekday'] as int;
                               final isToday = weekday == DateTime.now().weekday;
                               return Padding(
                                 padding: const EdgeInsets.only(top: 9),
@@ -502,8 +503,8 @@ class _WeeklyCard extends StatelessWidget {
                       ),
                       barGroups: List.generate(weekStats.length, (index) {
                         final minutes = weekStats[index]['minutes'] as int;
-                        final isToday =
-                            weekStats[index]['weekday'] == DateTime.now().weekday;
+                        final isToday = weekStats[index]['weekday'] ==
+                            DateTime.now().weekday;
                         return BarChartGroupData(
                           x: index,
                           barRods: [
@@ -659,7 +660,10 @@ class _AllTimeCard extends StatelessWidget {
                 palette: palette,
               );
 
-              if (constraints.maxWidth < 300) {
+              // Phone widths do not leave enough room for localized labels and
+              // dates in two columns. Keep the compact side-by-side layout for
+              // tablets, and use readable full-width rows on phones.
+              if (constraints.maxWidth < 420) {
                 return Column(
                   children: [
                     average,
@@ -930,38 +934,38 @@ class _DetailPill extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
                   style: AppFonts.poppins(
                     context: context,
                     color: palette.mutedText,
-                    fontSize: 9,
+                    fontSize: 10.5,
                     fontWeight: FontWeight.w500,
+                    height: 1.25,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   value,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
                   style: AppFonts.poppins(
                     context: context,
                     color: palette.text,
-                    fontSize: 13,
+                    fontSize: 14,
                     fontWeight: FontWeight.w700,
+                    height: 1.25,
                   ),
                 ),
                 if (subtitle != null) ...[
                   const SizedBox(height: 2),
                   Text(
                     subtitle!,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
                     style: AppFonts.poppins(
                       context: context,
                       color: color,
-                      fontSize: 9,
+                      fontSize: 10.5,
                       fontWeight: FontWeight.w600,
+                      height: 1.25,
                     ),
                   ),
                 ],

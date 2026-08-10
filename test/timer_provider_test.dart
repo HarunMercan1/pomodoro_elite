@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_elite/providers/timer_provider.dart';
 import 'package:pomodoro_elite/services/countdown_engine.dart';
 import 'package:pomodoro_elite/services/timer_audio_gateway.dart';
+import 'package:pomodoro_elite/services/timer_session_store.dart';
 import 'package:pomodoro_elite/utils/notification_service.dart';
 
 void main() {
@@ -81,13 +82,14 @@ void main() {
         countdown: CountdownEngine(initialSeconds: 2, now: () => now),
         notifications: notifications,
         audio: audio,
+        sessionStore: _MemoryTimerSessionStore(),
         periodicTimerFactory: timers.create,
         textResolver: (key) => key,
         observeLifecycle: false,
       );
       addTearDown(provider.dispose);
 
-      provider.startCountdown(
+      await provider.startCountdown(
         _configuration(recordedMinutes),
       );
 
@@ -123,13 +125,14 @@ void main() {
         countdown: CountdownEngine(initialSeconds: 5, now: () => now),
         notifications: notifications,
         audio: audio,
+        sessionStore: _MemoryTimerSessionStore(),
         periodicTimerFactory: timers.create,
         textResolver: (key) => key,
         observeLifecycle: false,
       );
       addTearDown(provider.dispose);
 
-      provider.startCountdown(_configuration(recordedMinutes));
+      await provider.startCountdown(_configuration(recordedMinutes));
       provider.didChangeAppLifecycleState(AppLifecycleState.paused);
       await Future<void>.delayed(Duration.zero);
 
@@ -156,13 +159,14 @@ void main() {
         countdown: CountdownEngine(initialSeconds: 5, now: () => now),
         notifications: notifications,
         audio: audio,
+        sessionStore: _MemoryTimerSessionStore(),
         periodicTimerFactory: timers.create,
         textResolver: (key) => key,
         observeLifecycle: false,
       );
       addTearDown(provider.dispose);
 
-      provider.startCountdown(_configuration(<int>[]));
+      await provider.startCountdown(_configuration(<int>[]));
       provider.didChangeAppLifecycleState(AppLifecycleState.paused);
       await Future<void>.delayed(Duration.zero);
 
@@ -183,11 +187,143 @@ void main() {
     });
   });
 
+  group('TimerProvider process death recovery', () {
+    test('restores a running countdown from its absolute deadline', () async {
+      var now = DateTime(2026, 8, 4, 12);
+      final store = _MemoryTimerSessionStore();
+      final firstProvider = TimerProvider(
+        countdown: CountdownEngine(initialSeconds: 5, now: () => now),
+        notifications: _FakeTimerNotifications(),
+        audio: _FakeTimerAudio(),
+        sessionStore: store,
+        periodicTimerFactory: _ManualTimerFactory().create,
+        textResolver: (key) => key,
+        observeLifecycle: false,
+      );
+
+      await firstProvider.startCountdown(_configuration(<int>[]));
+      firstProvider.dispose();
+      now = now.add(const Duration(seconds: 2));
+
+      final restoredTimers = _ManualTimerFactory();
+      final restoredProvider = TimerProvider(
+        countdown: CountdownEngine(initialSeconds: 1, now: () => now),
+        notifications: _FakeTimerNotifications(),
+        audio: _FakeTimerAudio(),
+        sessionStore: store,
+        periodicTimerFactory: restoredTimers.create,
+        textResolver: (key) => key,
+        observeLifecycle: false,
+      );
+      addTearDown(restoredProvider.dispose);
+
+      expect(
+        await restoredProvider.restoreCountdown(_configuration(<int>[])),
+        isTrue,
+      );
+      expect(restoredProvider.isRunning, isTrue);
+      expect(restoredProvider.remainingSeconds, 3);
+      expect(restoredProvider.currentMode, TimerMode.work);
+      expect(restoredTimers.created, hasLength(1));
+    });
+
+    test('records an elapsed restored session exactly once', () async {
+      var now = DateTime(2026, 8, 4, 12);
+      final store = _MemoryTimerSessionStore();
+      final firstProvider = TimerProvider(
+        countdown: CountdownEngine(initialSeconds: 5, now: () => now),
+        notifications: _FakeTimerNotifications(),
+        audio: _FakeTimerAudio(),
+        sessionStore: store,
+        periodicTimerFactory: _ManualTimerFactory().create,
+        textResolver: (key) => key,
+        observeLifecycle: false,
+      );
+      await firstProvider.startCountdown(_configuration(<int>[]));
+      firstProvider.dispose();
+      now = now.add(const Duration(seconds: 8));
+
+      final recordedMinutes = <int>[];
+      final restoredProvider = TimerProvider(
+        countdown: CountdownEngine(initialSeconds: 1, now: () => now),
+        notifications: _FakeTimerNotifications(),
+        audio: _FakeTimerAudio(),
+        sessionStore: store,
+        periodicTimerFactory: _ManualTimerFactory().create,
+        textResolver: (key) => key,
+        observeLifecycle: false,
+      );
+      addTearDown(restoredProvider.dispose);
+
+      expect(
+        await restoredProvider.restoreCountdown(
+          _configuration(recordedMinutes),
+        ),
+        isTrue,
+      );
+      expect(recordedMinutes, [TimerProvider.defaultWorkTime]);
+      expect(await store.load(), isNull);
+
+      final secondRestore = TimerProvider(
+        countdown: CountdownEngine(initialSeconds: 1, now: () => now),
+        notifications: _FakeTimerNotifications(),
+        audio: _FakeTimerAudio(),
+        sessionStore: store,
+        observeLifecycle: false,
+      );
+      addTearDown(secondRestore.dispose);
+      expect(
+        await secondRestore.restoreCountdown(_configuration(recordedMinutes)),
+        isFalse,
+      );
+      expect(recordedMinutes, [TimerProvider.defaultWorkTime]);
+    });
+
+    test('restores a paused countdown without consuming wall-clock time',
+        () async {
+      var now = DateTime(2026, 8, 4, 12);
+      final store = _MemoryTimerSessionStore();
+      final firstProvider = TimerProvider(
+        countdown: CountdownEngine(initialSeconds: 5, now: () => now),
+        notifications: _FakeTimerNotifications(),
+        audio: _FakeTimerAudio(),
+        sessionStore: store,
+        periodicTimerFactory: _ManualTimerFactory().create,
+        textResolver: (key) => key,
+        observeLifecycle: false,
+      );
+      await firstProvider.startCountdown(_configuration(<int>[]));
+      now = now.add(const Duration(seconds: 2));
+      await firstProvider.stopTimer(reset: false);
+      firstProvider.dispose();
+      now = now.add(const Duration(hours: 1));
+
+      final restoredProvider = TimerProvider(
+        countdown: CountdownEngine(initialSeconds: 1, now: () => now),
+        notifications: _FakeTimerNotifications(),
+        audio: _FakeTimerAudio(),
+        sessionStore: store,
+        observeLifecycle: false,
+      );
+      addTearDown(restoredProvider.dispose);
+
+      expect(
+        await restoredProvider.restoreCountdown(_configuration(<int>[])),
+        isTrue,
+      );
+      expect(restoredProvider.isRunning, isFalse);
+      expect(restoredProvider.remainingSeconds, 3);
+      expect(restoredProvider.hasActiveProgress, isTrue);
+    });
+  });
+
   group('TimerProvider atomic UI notifications', () {
-    test('mode selection publishes only the completed state transition', () {
+    test('mode selection publishes only the completed state transition',
+        () async {
       final provider = TimerProvider(
         notifications: _FakeTimerNotifications(),
         audio: _FakeTimerAudio(),
+        sessionStore: _MemoryTimerSessionStore(),
         observeLifecycle: false,
       );
       addTearDown(provider.dispose);
@@ -202,33 +338,58 @@ void main() {
         ));
       });
 
-      provider.setTime(5, TimerMode.shortBreak);
+      await provider.setTime(5, TimerMode.shortBreak);
 
       expect(snapshots, [
         (TimerMode.shortBreak, 5, 5 * 60, false),
       ]);
     });
 
-    test('reset publishes one coherent idle snapshot', () {
+    test('reset publishes one coherent idle snapshot', () async {
       final provider = TimerProvider(
         notifications: _FakeTimerNotifications(),
         audio: _FakeTimerAudio(),
+        sessionStore: _MemoryTimerSessionStore(),
         observeLifecycle: false,
       );
       addTearDown(provider.dispose);
-      provider.setTime(5, TimerMode.shortBreak);
-      provider.startCountdown(_configuration(<int>[]));
+      await provider.setTime(5, TimerMode.shortBreak);
+      await provider.startCountdown(_configuration(<int>[]));
 
       var notifications = 0;
       provider.addListener(() => notifications++);
 
-      provider.resetTimer();
+      await provider.resetTimer();
 
       expect(notifications, 1);
       expect(provider.currentMode, TimerMode.shortBreak);
       expect(provider.remainingSeconds, 5 * 60);
       expect(provider.isRunning, isFalse);
       expect(provider.currentMotivation, 'ready');
+    });
+
+    test('identity change discards the timer and its persisted session',
+        () async {
+      final store = _MemoryTimerSessionStore();
+      final provider = TimerProvider(
+        notifications: _FakeTimerNotifications(),
+        audio: _FakeTimerAudio(),
+        sessionStore: store,
+        periodicTimerFactory: _ManualTimerFactory().create,
+        observeLifecycle: false,
+      );
+      addTearDown(provider.dispose);
+      await provider.setTime(5, TimerMode.shortBreak);
+      await provider.startCountdown(_configuration(<int>[]));
+
+      await provider.clearForIdentityChange(workTime: 30);
+
+      expect(provider.currentMode, TimerMode.work);
+      expect(provider.currentDuration, 30);
+      expect(provider.remainingSeconds, 30 * 60);
+      expect(provider.isRunning, isFalse);
+      expect(provider.hasActiveProgress, isFalse);
+      expect(await store.load(), isNull);
     });
   });
 }
@@ -238,7 +399,7 @@ TimerRunConfiguration _configuration(List<int> recordedMinutes) {
     notificationSound: 'zil1.mp3',
     isBackgroundMusicEnabled: false,
     backgroundVolume: 0.5,
-    recordSession: (minutes) async {
+    recordSession: (sessionId, minutes) async {
       recordedMinutes.add(minutes);
     },
   );
@@ -253,6 +414,24 @@ class _ManualTimerFactory {
     final timer = _ManualTimer(callback);
     created.add(timer);
     return timer;
+  }
+}
+
+class _MemoryTimerSessionStore implements TimerSessionStore {
+  PersistedTimerSession? session;
+
+  @override
+  Future<PersistedTimerSession?> load() async => session;
+
+  @override
+  Future<void> save(PersistedTimerSession session) async {
+    this.session = session;
+  }
+
+  @override
+  Future<void> clear({String? expectedSessionId}) async {
+    if (expectedSessionId != null && session?.id != expectedSessionId) return;
+    session = null;
   }
 }
 

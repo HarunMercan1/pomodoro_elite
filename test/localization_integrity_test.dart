@@ -64,11 +64,44 @@ void main() {
       expect(translations.keys.toSet(), expectedKeys, reason: file.path);
 
       for (final entry in translations.entries) {
-        expect(entry.value, isA<String>(), reason: '${file.path}: ${entry.key}');
+        expect(entry.value, isA<String>(),
+            reason: '${file.path}: ${entry.key}');
         expect(
+          entry.value,
           (entry.value as String).trim(),
+          reason: '${file.path}: ${entry.key} has surrounding whitespace',
+        );
+        expect(
+          entry.value,
           isNotEmpty,
           reason: '${file.path}: ${entry.key}',
+        );
+        expect(
+          entry.value,
+          isNot(matches(RegExp(r'[\u0080-\u009F\uFFFD]'))),
+          reason: '${file.path}: ${entry.key} contains invalid text bytes',
+        );
+      }
+    }
+  });
+
+  test('translation JSON has no duplicate keys and has all 100 quotes', () {
+    final rawKey = RegExp(r'^\s*"([^"]+)"\s*:', multiLine: true);
+
+    for (final file in translationFiles) {
+      final raw = file.readAsStringSync();
+      final rawKeys = rawKey
+          .allMatches(raw)
+          .map((match) => match.group(1)!)
+          .toList(growable: false);
+      expect(rawKeys.toSet().length, rawKeys.length, reason: file.path);
+
+      final translations = readTranslations(file);
+      for (var quoteNumber = 1; quoteNumber <= 100; quoteNumber++) {
+        expect(
+          translations,
+          contains('quote_$quoteNumber'),
+          reason: '${file.path}: quote_$quoteNumber',
         );
       }
     }
@@ -170,6 +203,11 @@ void main() {
       'super_supporter',
       'mega_supporter',
       'theme_unlocked_72h',
+      'exit_guest_mode_confirm',
+      'packages_loading',
+      'switch_timer_mode_title',
+      'switch_timer_mode_message',
+      'switch_timer_mode_confirm',
     };
     final english = readTranslations(
       translationFiles.singleWhere((file) => file.path.endsWith('en.json')),
@@ -220,6 +258,9 @@ void main() {
         if (code.contains('debugPrint')) continue;
 
         for (final match in stringLiteral.allMatches(code)) {
+          final suffix = code.substring(match.end);
+          if (RegExp(r'^\s*\.tr\(').hasMatch(suffix)) continue;
+
           final literal = match.group(2)!.trim();
           final location = '${file.path}:${index + 1}';
 
@@ -237,6 +278,57 @@ void main() {
                 ? anything
                 : isNot(contains(literal.toLowerCase())),
             reason: '$location embeds a Turkish translation value: $literal',
+          );
+        }
+      }
+    }
+  });
+
+  test('UI code does not embed English user-facing copy', () {
+    final english = readTranslations(
+      translationFiles.singleWhere((file) => file.path.endsWith('en.json')),
+    );
+    final translatedValues = english.values
+        .whereType<String>()
+        .map((value) => value.trim().toLowerCase())
+        .where((value) => value.length >= 4)
+        .toSet();
+    final visibleSourceFiles = <File>[
+      ...Directory('lib/screens').listSync(recursive: true).whereType<File>(),
+      ...Directory('lib/widgets').listSync(recursive: true).whereType<File>(),
+      File('lib/utils/notification_service.dart'),
+    ].where((file) => file.path.endsWith('.dart'));
+    final stringLiteral = RegExp(r'''(['"])([^'"\r\n]*)\1''');
+    const allowedInternalOrBrandValues = {
+      'elite',
+      'pomodoro elite',
+      'minutes',
+      'sessions',
+      'date',
+      'weekday',
+    };
+
+    for (final file in visibleSourceFiles) {
+      final lines = file.readAsLinesSync();
+      for (var index = 0; index < lines.length; index++) {
+        final line = lines[index];
+        final code = line.split('//').first;
+        if (code.contains('debugPrint')) continue;
+
+        for (final match in stringLiteral.allMatches(code)) {
+          final suffix = code.substring(match.end);
+          if (RegExp(r'^\s*\.tr\(').hasMatch(suffix)) continue;
+
+          final literal = match.group(2)!.trim().toLowerCase();
+          if (literal.isEmpty ||
+              allowedInternalOrBrandValues.contains(literal)) {
+            continue;
+          }
+          expect(
+            translatedValues,
+            isNot(contains(literal)),
+            reason:
+                '${file.path}:${index + 1} embeds English UI text: $literal',
           );
         }
       }
