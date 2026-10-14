@@ -266,5 +266,14 @@
   "purchase_account_conflict_desc": "Dieser Play-Kauf ist mit einem anderen Pomodoro-Elite-Konto verknüpft. Melde dich beim ursprünglichen App-Konto an und stelle die Käufe wieder her.",
   "store_unavailable_title": "Store nicht verfügbar",
   "store_unavailable_desc": "Google Play ist nicht erreichbar. Prüfe deine Verbindung und versuche es erneut.",
-  "purchase_failed_desc": "Der Kauf konnte nicht abgeschlossen werden. Bitte versuche es später erneut."
+  "purchase_failed_desc": "Der Kauf konnte nicht abgeschlossen werden. Bitte versuche es später erneut.",
+  "delete_account": "Konto löschen",
+  "delete_account_title": "Konto löschen?",
+  "delete_account_body": "Dein Konto und alle in der Cloud gespeicherten Fokus-Statistiken (Sitzungen, Minuten, Serie und Tagesverlauf) werden dauerhaft gelöscht. Dies kann nicht rückgängig gemacht werden.",
+  "delete_account_purchase_note": "Dein Premium-Kaufnachweis bleibt bei Google Play. Das Löschen des Kontos kündigt kein aktives Abo; kündige es separat in Google Play.",
+  "delete_account_type_prompt": "Gib {} ein, um zu bestätigen",
+  "delete_account_confirm_word": "LÖSCHEN",
+  "delete_account_confirm": "Endgültig löschen",
+  "delete_account_error": "Das Konto konnte nicht gelöscht werden. Prüfe deine Internetverbindung und versuche es erneut. Falls das Problem bleibt, kannst du die Löschung auf unserer Website beantragen.",
+  "delete_account_success": "Dein Konto und deine Cloud-Daten wurden gelöscht."
 }

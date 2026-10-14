@@ -266,5 +266,14 @@
   "purchase_account_conflict_desc": "Bu Play satın alması başka bir Pomodoro Elite hesabına bağlı. Satın alırken kullandığınız uygulama hesabına girip satın almaları geri yükleyin.",
   "store_unavailable_title": "Mağazaya Ulaşılamıyor",
   "store_unavailable_desc": "Google Play'e ulaşılamadı. Bağlantınızı kontrol edip tekrar deneyin.",
-  "purchase_failed_desc": "Satın alma tamamlanamadı. Lütfen kısa süre sonra tekrar deneyin."
+  "purchase_failed_desc": "Satın alma tamamlanamadı. Lütfen kısa süre sonra tekrar deneyin.",
+  "delete_account": "Hesabı Sil",
+  "delete_account_title": "Hesabınız silinsin mi?",
+  "delete_account_body": "Hesabınız ve buluttaki tüm odak istatistikleriniz (oturumlar, dakikalar, seri ve günlük geçmiş) kalıcı olarak silinir. Bu işlem geri alınamaz.",
+  "delete_account_purchase_note": "Premium satın alma kaydınız Google Play'de kalır. Hesabı silmek aktif bir aboneliği iptal etmez; aboneliğinizi Google Play'den ayrıca iptal edin.",
+  "delete_account_type_prompt": "Onaylamak için {} yazın",
+  "delete_account_confirm_word": "SİL",
+  "delete_account_confirm": "Kalıcı Olarak Sil",
+  "delete_account_error": "Hesap silinemedi. İnternet bağlantınızı kontrol edip tekrar deneyin. Sorun sürerse web sitemizden silme talebi gönderebilirsiniz.",
+  "delete_account_success": "Hesabınız ve buluttaki verileriniz silindi."
 }

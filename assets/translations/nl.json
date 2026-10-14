@@ -266,5 +266,14 @@
   "purchase_account_conflict_desc": "Deze Play-aankoop is gekoppeld aan een ander Pomodoro Elite-account. Meld je aan bij het oorspronkelijke app-account en herstel aankopen.",
   "store_unavailable_title": "Store niet beschikbaar",
   "store_unavailable_desc": "Google Play is niet bereikbaar. Controleer je verbinding en probeer opnieuw.",
-  "purchase_failed_desc": "De aankoop kon niet worden voltooid. Probeer het zo opnieuw."
+  "purchase_failed_desc": "De aankoop kon niet worden voltooid. Probeer het zo opnieuw.",
+  "delete_account": "Account verwijderen",
+  "delete_account_title": "Je account verwijderen?",
+  "delete_account_body": "Je account en al je focusstatistieken in de cloud (sessies, minuten, reeks en dagelijkse geschiedenis) worden permanent verwijderd. Dit kan niet ongedaan worden gemaakt.",
+  "delete_account_purchase_note": "Het record van je Premium-aankoop blijft bij Google Play. Het verwijderen van je account zegt een actief abonnement niet op; zeg het apart op in Google Play.",
+  "delete_account_type_prompt": "Typ {} om te bevestigen",
+  "delete_account_confirm_word": "VERWIJDEREN",
+  "delete_account_confirm": "Definitief verwijderen",
+  "delete_account_error": "Je account kon niet worden verwijderd. Controleer je internetverbinding en probeer het opnieuw. Blijft het probleem bestaan, dan kun je verwijdering aanvragen via onze website.",
+  "delete_account_success": "Je account en clouddata zijn verwijderd."
 }

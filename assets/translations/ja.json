@@ -266,5 +266,14 @@
   "purchase_account_conflict_desc": "この購入は別の Pomodoro Elite アカウントに紐づいています。元のアプリ用アカウントでログインして購入を復元してください。",
   "store_unavailable_title": "ストアに接続できません",
   "store_unavailable_desc": "Google Play に接続できませんでした。通信状態を確認して再試行してください。",
-  "purchase_failed_desc": "購入を完了できませんでした。しばらくしてから再試行してください。"
+  "purchase_failed_desc": "購入を完了できませんでした。しばらくしてから再試行してください。",
+  "delete_account": "アカウントを削除",
+  "delete_account_title": "アカウントを削除しますか？",
+  "delete_account_body": "アカウントと、クラウドに保存されたすべての集中統計（セッション、分数、連続記録、日別履歴）が完全に削除されます。この操作は取り消せません。",
+  "delete_account_purchase_note": "Premiumの購入記録はGoogle Playに残ります。アカウントを削除しても有効なサブスクリプションは解約されません。Google Playで別途解約してください。",
+  "delete_account_type_prompt": "確認のため「{}」と入力してください",
+  "delete_account_confirm_word": "削除",
+  "delete_account_confirm": "完全に削除",
+  "delete_account_error": "アカウントを削除できませんでした。インターネット接続を確認して、もう一度お試しください。問題が続く場合は、ウェブサイトから削除をリクエストできます。",
+  "delete_account_success": "アカウントとクラウドのデータを削除しました。"
 }

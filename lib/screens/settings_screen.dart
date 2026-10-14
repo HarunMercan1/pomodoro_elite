@@ -13,6 +13,7 @@ import '../services/ad_consent_service.dart';
 import '../utils/app_fonts.dart';
 import '../utils/live_page_route.dart';
 import '../utils/text_normalization.dart';
+import '../widgets/delete_account_dialog.dart';
 import '../widgets/settings_components.dart';
 import 'duration_settings_screen.dart';
 import 'language_selection_screen.dart';
@@ -354,6 +355,38 @@ class _SettingsScreenState extends State<SettingsScreen>
     }
   }
 
+  Future<void> _showDeleteAccountDialog({
+    required AuthProvider auth,
+    required Color surfaceColor,
+    required Color itemColor,
+    required Color borderColor,
+  }) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final deleted = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => DeleteAccountDialog(
+        onDelete: auth.deleteAccount,
+        surfaceColor: surfaceColor,
+        itemColor: itemColor,
+        borderColor: borderColor,
+      ),
+    );
+
+    if (deleted != true || !mounted) return;
+
+    _adManager.disposeSettingsBanner();
+    setState(() => _allowPop = true);
+    await WidgetsBinding.instance.endOfFrame;
+    if (mounted) Navigator.of(context).popUntil((route) => route.isFirst);
+    messenger.showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        content: Text('delete_account_success'.tr()),
+      ),
+    );
+  }
+
   String _getLanguageName(String code) => switch (code) {
         'tr' => 'Türkçe',
         'en' => 'English',
@@ -536,20 +569,44 @@ class _SettingsScreenState extends State<SettingsScreen>
                         color: const Color(0xFFEF4444).withValues(alpha: 0.08),
                         borderColor:
                             const Color(0xFFEF4444).withValues(alpha: 0.55),
-                        child: SettingsNavigationTile(
-                          icon: Icons.logout_rounded,
-                          title: auth.isGuest
-                              ? 'exit_guest_mode'.tr()
-                              : 'log_out'.tr(),
-                          textColor: const Color(0xFFEF4444),
-                          accentColor: const Color(0xFFEF4444),
-                          trailing: const SizedBox.shrink(),
-                          onTap: () => _showLogoutDialog(
-                            auth: auth,
-                            surfaceColor: cardColor,
-                            itemColor: itemColor,
-                            borderColor: borderColor,
-                          ),
+                        child: Column(
+                          children: [
+                            SettingsNavigationTile(
+                              icon: Icons.logout_rounded,
+                              title: auth.isGuest
+                                  ? 'exit_guest_mode'.tr()
+                                  : 'log_out'.tr(),
+                              textColor: const Color(0xFFEF4444),
+                              accentColor: const Color(0xFFEF4444),
+                              trailing: const SizedBox.shrink(),
+                              onTap: () => _showLogoutDialog(
+                                auth: auth,
+                                surfaceColor: cardColor,
+                                itemColor: itemColor,
+                                borderColor: borderColor,
+                              ),
+                            ),
+                            if (!auth.isGuest && auth.user != null) ...[
+                              SettingsDivider(
+                                color: const Color(0xFFEF4444)
+                                    .withValues(alpha: 0.30),
+                              ),
+                              SettingsNavigationTile(
+                                key: const ValueKey('delete_account_tile'),
+                                icon: Icons.delete_forever_rounded,
+                                title: 'delete_account'.tr(),
+                                textColor: const Color(0xFFEF4444),
+                                accentColor: const Color(0xFFEF4444),
+                                trailing: const SizedBox.shrink(),
+                                onTap: () => _showDeleteAccountDialog(
+                                  auth: auth,
+                                  surfaceColor: cardColor,
+                                  itemColor: itemColor,
+                                  borderColor: borderColor,
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                       ),
                       const SizedBox(height: 14),

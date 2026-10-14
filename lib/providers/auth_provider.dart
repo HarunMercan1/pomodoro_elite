@@ -10,16 +10,19 @@ class AuthProvider extends ChangeNotifier {
     GuestStatsMigrationService? guestStatsMigrationService,
     SupabaseClient? supabaseClient,
     Future<void> Function()? onBeforeIdentityChange,
+    Future<void> Function()? deleteRemoteAccount,
   })  : _supabase = supabaseClient ?? Supabase.instance.client,
         _guestStatsMigrationService =
             guestStatsMigrationService ?? GuestStatsMigrationService(),
-        _onBeforeIdentityChange = onBeforeIdentityChange {
+        _onBeforeIdentityChange = onBeforeIdentityChange,
+        _deleteRemoteAccount = deleteRemoteAccount {
     _initializeAuth();
   }
 
   final SupabaseClient _supabase;
   final GuestStatsMigrationService _guestStatsMigrationService;
   final Future<void> Function()? _onBeforeIdentityChange;
+  final Future<void> Function()? _deleteRemoteAccount;
   User? _user;
   bool _isGuest = false;
   bool _isLoading = true;
@@ -148,6 +151,61 @@ class AuthProvider extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isGuest', false);
     _isGuest = false;
+    _user = null;
+    notifyListeners();
+  }
+
+  // 🔥 DELETE ACCOUNT
+  /// Kullanıcının Supabase hesabını ve buluttaki istatistiklerini kalıcı olarak
+  /// siler, ardından uygulamayı temiz bir misafir moduna döndürür.
+  ///
+  /// Sunucu tarafı silme başarısız olursa hiçbir yerel durum değişmez ve hata
+  /// yeniden fırlatılır. RevenueCat kimliği, auth oturumu kapandığında
+  /// PurchaseProvider tarafından otomatik olarak logOut edilir; yerel istatistik
+  /// önbelleği de StatsProvider'ın signedOut dinleyicisiyle temizlenir.
+  Future<void> deleteAccount() async {
+    // RPC, oturum açmamış çağrıları 42501 ile reddeder.
+    final deleteRemoteAccount = _deleteRemoteAccount ??
+        () => _supabase.rpc<void>('delete_my_account');
+    await deleteRemoteAccount();
+
+    // Hesap artık sunucuda yok; kalan adımlar yalnızca yerel temizliktir ve
+    // hiçbiri kullanıcıyı silinmiş hesapta oturum açık halde bırakmamalı.
+    try {
+      await _onBeforeIdentityChange?.call();
+    } catch (e) {
+      debugPrint('Identity change cleanup failed after deletion: $e');
+    }
+
+    // Google hesabının uygulamaya verdiği erişimi de geri al.
+    try {
+      await _ensureGoogleInitialized();
+      await GoogleSignIn.instance.disconnect();
+    } catch (_) {
+      try {
+        await GoogleSignIn.instance.signOut();
+      } catch (_) {}
+    }
+
+    try {
+      // Yerel oturum her durumda kaldırılır; silinmiş kullanıcı için sunucunun
+      // döndürdüğü 403/404 yanıtları gotrue tarafından zaten yok sayılır.
+      await _supabase.auth.signOut();
+    } catch (e) {
+      debugPrint('Supabase sign out after deletion failed: $e');
+    }
+
+    // Silinen hesaba ait bekleyen misafir aktarımları yeni bir hesaba
+    // taşınmasın.
+    try {
+      await _guestStatsMigrationService.clearPendingBatches();
+    } catch (e) {
+      debugPrint('Clearing guest migration queue failed: $e');
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isGuest', true);
+    _isGuest = true;
     _user = null;
     notifyListeners();
   }

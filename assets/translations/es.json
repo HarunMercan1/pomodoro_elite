@@ -266,5 +266,14 @@
   "purchase_account_conflict_desc": "Esta compra de Play está vinculada a otra cuenta de Pomodoro Elite. Inicia sesión en la cuenta original y restaura las compras.",
   "store_unavailable_title": "Tienda no disponible",
   "store_unavailable_desc": "No se pudo acceder a Google Play. Comprueba tu conexión e inténtalo de nuevo.",
-  "purchase_failed_desc": "No se pudo completar la compra. Inténtalo de nuevo en unos instantes."
+  "purchase_failed_desc": "No se pudo completar la compra. Inténtalo de nuevo en unos instantes.",
+  "delete_account": "Eliminar cuenta",
+  "delete_account_title": "¿Eliminar tu cuenta?",
+  "delete_account_body": "Tu cuenta y todas tus estadísticas de enfoque guardadas en la nube (sesiones, minutos, racha e historial diario) se eliminarán de forma permanente. Esta acción no se puede deshacer.",
+  "delete_account_purchase_note": "El registro de tu compra Premium permanece en Google Play. Eliminar la cuenta no cancela una suscripción activa; cancélala por separado en Google Play.",
+  "delete_account_type_prompt": "Escribe {} para confirmar",
+  "delete_account_confirm_word": "ELIMINAR",
+  "delete_account_confirm": "Eliminar definitivamente",
+  "delete_account_error": "No se pudo eliminar la cuenta. Revisa tu conexión a internet e inténtalo de nuevo. Si el problema continúa, puedes solicitar la eliminación en nuestro sitio web.",
+  "delete_account_success": "Tu cuenta y tus datos en la nube se han eliminado."
 }

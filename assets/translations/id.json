@@ -266,5 +266,14 @@
   "purchase_account_conflict_desc": "Pembelian Play ini terhubung ke akun Pomodoro Elite lain. Masuk ke akun aplikasi asli dan pulihkan pembelian.",
   "store_unavailable_title": "Toko tidak tersedia",
   "store_unavailable_desc": "Google Play tidak dapat dihubungi. Periksa koneksi lalu coba lagi.",
-  "purchase_failed_desc": "Pembelian tidak dapat diselesaikan. Coba lagi sebentar lagi."
+  "purchase_failed_desc": "Pembelian tidak dapat diselesaikan. Coba lagi sebentar lagi.",
+  "delete_account": "Hapus Akun",
+  "delete_account_title": "Hapus akun Anda?",
+  "delete_account_body": "Akun Anda dan semua statistik fokus yang tersimpan di cloud (sesi, menit, rentetan, dan riwayat harian) akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.",
+  "delete_account_purchase_note": "Catatan pembelian Premium Anda tetap ada di Google Play. Menghapus akun tidak membatalkan langganan aktif; batalkan secara terpisah di Google Play.",
+  "delete_account_type_prompt": "Ketik {} untuk mengonfirmasi",
+  "delete_account_confirm_word": "HAPUS",
+  "delete_account_confirm": "Hapus Permanen",
+  "delete_account_error": "Akun tidak dapat dihapus. Periksa koneksi internet Anda dan coba lagi. Jika masalah berlanjut, Anda dapat mengajukan penghapusan melalui situs web kami.",
+  "delete_account_success": "Akun dan data cloud Anda telah dihapus."
 }

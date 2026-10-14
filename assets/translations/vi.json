@@ -266,5 +266,14 @@
   "purchase_account_conflict_desc": "Giao dịch Play này liên kết với một tài khoản Pomodoro Elite khác. Hãy đăng nhập tài khoản ứng dụng ban đầu và khôi phục giao dịch.",
   "store_unavailable_title": "Cửa hàng không khả dụng",
   "store_unavailable_desc": "Không thể kết nối Google Play. Hãy kiểm tra mạng và thử lại.",
-  "purchase_failed_desc": "Không thể hoàn tất giao dịch. Vui lòng thử lại sau ít phút."
+  "purchase_failed_desc": "Không thể hoàn tất giao dịch. Vui lòng thử lại sau ít phút.",
+  "delete_account": "Xóa tài khoản",
+  "delete_account_title": "Xóa tài khoản của bạn?",
+  "delete_account_body": "Tài khoản và toàn bộ thống kê tập trung lưu trên đám mây (phiên, phút, chuỗi và lịch sử hằng ngày) sẽ bị xóa vĩnh viễn. Hành động này không thể hoàn tác.",
+  "delete_account_purchase_note": "Hồ sơ mua Premium của bạn vẫn được lưu trên Google Play. Xóa tài khoản không hủy gói đăng ký đang hoạt động; hãy hủy riêng trên Google Play.",
+  "delete_account_type_prompt": "Nhập {} để xác nhận",
+  "delete_account_confirm_word": "XÓA",
+  "delete_account_confirm": "Xóa vĩnh viễn",
+  "delete_account_error": "Không thể xóa tài khoản. Hãy kiểm tra kết nối internet và thử lại. Nếu sự cố vẫn tiếp diễn, bạn có thể yêu cầu xóa trên trang web của chúng tôi.",
+  "delete_account_success": "Tài khoản và dữ liệu đám mây của bạn đã bị xóa."
 }

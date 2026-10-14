@@ -266,5 +266,14 @@
   "purchase_account_conflict_desc": "عملية الشراء هذه مرتبطة بحساب Pomodoro Elite آخر. سجّل الدخول إلى حساب التطبيق الأصلي واستعد مشترياتك.",
   "store_unavailable_title": "المتجر غير متاح",
   "store_unavailable_desc": "تعذر الوصول إلى Google Play. تحقق من اتصالك وحاول مجدداً.",
-  "purchase_failed_desc": "تعذر إكمال عملية الشراء. حاول مرة أخرى بعد قليل."
+  "purchase_failed_desc": "تعذر إكمال عملية الشراء. حاول مرة أخرى بعد قليل.",
+  "delete_account": "حذف الحساب",
+  "delete_account_title": "هل تريد حذف حسابك؟",
+  "delete_account_body": "سيتم حذف حسابك وجميع إحصائيات التركيز المحفوظة في السحابة (الجلسات والدقائق والسلسلة والسجل اليومي) نهائيًا. لا يمكن التراجع عن هذا الإجراء.",
+  "delete_account_purchase_note": "يبقى سجل شراء Premium لدى Google Play. حذف الحساب لا يلغي أي اشتراك نشط؛ قم بإلغائه بشكل منفصل من Google Play.",
+  "delete_account_type_prompt": "اكتب {} للتأكيد",
+  "delete_account_confirm_word": "حذف",
+  "delete_account_confirm": "حذف نهائي",
+  "delete_account_error": "تعذّر حذف الحساب. تحقق من اتصالك بالإنترنت وحاول مرة أخرى. إذا استمرت المشكلة، يمكنك طلب الحذف عبر موقعنا الإلكتروني.",
+  "delete_account_success": "تم حذف حسابك وبياناتك في السحابة."
 }

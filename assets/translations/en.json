@@ -266,5 +266,14 @@
   "purchase_account_conflict_desc": "This Play purchase is linked to another Pomodoro Elite account. Sign in to the original app account and restore purchases.",
   "store_unavailable_title": "Store Unavailable",
   "store_unavailable_desc": "Google Play could not be reached. Check your connection and try again.",
-  "purchase_failed_desc": "The purchase could not be completed. Please try again shortly."
+  "purchase_failed_desc": "The purchase could not be completed. Please try again shortly.",
+  "delete_account": "Delete Account",
+  "delete_account_title": "Delete your account?",
+  "delete_account_body": "Your account and all of your focus stats stored in the cloud (sessions, minutes, streak and daily history) will be permanently deleted. This can't be undone.",
+  "delete_account_purchase_note": "Your Premium purchase record stays with Google Play. Deleting your account does not cancel an active subscription; cancel it separately in Google Play.",
+  "delete_account_type_prompt": "Type {} to confirm",
+  "delete_account_confirm_word": "DELETE",
+  "delete_account_confirm": "Delete Permanently",
+  "delete_account_error": "Couldn't delete your account. Check your internet connection and try again. If the problem continues, you can request deletion on our website.",
+  "delete_account_success": "Your account and cloud data have been deleted."
 }

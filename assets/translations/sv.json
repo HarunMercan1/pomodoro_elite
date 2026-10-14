@@ -266,5 +266,14 @@
   "purchase_account_conflict_desc": "Det här Play-köpet är länkat till ett annat Pomodoro Elite-konto. Logga in på det ursprungliga appkontot och återställ köpen.",
   "store_unavailable_title": "Butiken är inte tillgänglig",
   "store_unavailable_desc": "Google Play kunde inte nås. Kontrollera anslutningen och försök igen.",
-  "purchase_failed_desc": "Köpet kunde inte slutföras. Försök igen om en stund."
+  "purchase_failed_desc": "Köpet kunde inte slutföras. Försök igen om en stund.",
+  "delete_account": "Radera konto",
+  "delete_account_title": "Radera ditt konto?",
+  "delete_account_body": "Ditt konto och all din fokusstatistik i molnet (sessioner, minuter, svit och daglig historik) raderas permanent. Detta går inte att ångra.",
+  "delete_account_purchase_note": "Ditt Premium-köp finns kvar hos Google Play. Att radera kontot avslutar inte en aktiv prenumeration; avsluta den separat i Google Play.",
+  "delete_account_type_prompt": "Skriv {} för att bekräfta",
+  "delete_account_confirm_word": "RADERA",
+  "delete_account_confirm": "Radera permanent",
+  "delete_account_error": "Kontot kunde inte raderas. Kontrollera din internetanslutning och försök igen. Om problemet kvarstår kan du begära radering på vår webbplats.",
+  "delete_account_success": "Ditt konto och dina molndata har raderats."
 }

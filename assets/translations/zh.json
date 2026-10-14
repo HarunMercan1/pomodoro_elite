@@ -266,5 +266,14 @@
   "purchase_account_conflict_desc": "此 Play 购买已关联其他 Pomodoro Elite 账号。请登录原应用账号并恢复购买。",
   "store_unavailable_title": "商店不可用",
   "store_unavailable_desc": "无法连接 Google Play。请检查网络后重试。",
-  "purchase_failed_desc": "无法完成购买，请稍后重试。"
+  "purchase_failed_desc": "无法完成购买，请稍后重试。",
+  "delete_account": "删除账户",
+  "delete_account_title": "要删除你的账户吗？",
+  "delete_account_body": "你的账户以及保存在云端的所有专注统计（会话、分钟数、连续记录和每日历史）将被永久删除。此操作无法撤销。",
+  "delete_account_purchase_note": "你的 Premium 购买记录会保留在 Google Play 中。删除账户不会取消有效的订阅，请在 Google Play 中单独取消。",
+  "delete_account_type_prompt": "输入“{}”以确认",
+  "delete_account_confirm_word": "删除",
+  "delete_account_confirm": "永久删除",
+  "delete_account_error": "无法删除账户。请检查网络连接后重试。如果问题仍然存在，你可以在我们的网站上提交删除请求。",
+  "delete_account_success": "你的账户和云端数据已删除。"
 }

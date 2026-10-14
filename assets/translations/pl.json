@@ -266,5 +266,14 @@
   "purchase_account_conflict_desc": "Ten zakup Play jest połączony z innym kontem Pomodoro Elite. Zaloguj się na pierwotne konto aplikacji i przywróć zakupy.",
   "store_unavailable_title": "Sklep niedostępny",
   "store_unavailable_desc": "Nie można połączyć się z Google Play. Sprawdź połączenie i spróbuj ponownie.",
-  "purchase_failed_desc": "Nie udało się ukończyć zakupu. Spróbuj ponownie za chwilę."
+  "purchase_failed_desc": "Nie udało się ukończyć zakupu. Spróbuj ponownie za chwilę.",
+  "delete_account": "Usuń konto",
+  "delete_account_title": "Usunąć konto?",
+  "delete_account_body": "Twoje konto i wszystkie statystyki skupienia zapisane w chmurze (sesje, minuty, seria i historia dzienna) zostaną trwale usunięte. Tej operacji nie można cofnąć.",
+  "delete_account_purchase_note": "Zapis zakupu Premium pozostaje w Google Play. Usunięcie konta nie anuluje aktywnej subskrypcji; anuluj ją osobno w Google Play.",
+  "delete_account_type_prompt": "Wpisz {}, aby potwierdzić",
+  "delete_account_confirm_word": "USUŃ",
+  "delete_account_confirm": "Usuń trwale",
+  "delete_account_error": "Nie udało się usunąć konta. Sprawdź połączenie z internetem i spróbuj ponownie. Jeśli problem będzie się powtarzał, możesz poprosić o usunięcie na naszej stronie internetowej.",
+  "delete_account_success": "Twoje konto i dane w chmurze zostały usunięte."
 }
